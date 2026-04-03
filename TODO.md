@@ -10,4 +10,7 @@
 - [x] Corrigir TeamReport.tsx (remover estado error não usado)
 - [x] Ajustar engines Node em package.json (>=20.19.0)
 - [x] Rodar npm run build
-- [ ] Commitar e subir para GitHub
+- [x] Commitar e subir para GitHub
+- [x] Permitir host pgl-m.com no Vite (preview.allowedHosts)
+- [x] Rodar npm run build após ajuste de host
+- [ ] Commitar e subir correção de host
