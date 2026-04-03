@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
-import './Admin.css'
+import './AdminRouletteCode.css'
 
 export default function AdminRouletteCode() {
   const [code, setCode] = useState('')
@@ -18,61 +18,64 @@ export default function AdminRouletteCode() {
   }
 
   return (
-    <main className="admin-page">
+    <main className="roulette-code-page">
       <AdminSidebar />
-      <section className="admin-content admin-users-page">
-        <header className="admin-header">
+      <section className="roulette-code-content">
+        <header className="roulette-code-header">
           <div>
-            <h1>Criar Código da Roleta</h1>
-            <p className="admin-subtitle">Crie códigos promocionais para ações da roleta.</p>
+            <h1 className="roulette-code-title">Criar Código da Roleta</h1>
+            <p className="roulette-code-subtitle">Crie códigos promocionais para ações da roleta.</p>
           </div>
         </header>
 
-        <section className="admin-panel admin-panel-wide">
-          <div className="admin-panel-head">
+        <section className="roulette-code-card">
+          <div className="roulette-code-card-head">
             <h2>Novo Código</h2>
-            <span>Painel administrativo</span>
+            <p>Painel administrativo</p>
           </div>
 
-          <div className="admin-form-grid">
-            <label className="admin-form-field">
-              <span>Código</span>
+          <div className="roulette-code-grid">
+            <div className="roulette-code-field">
+              <label htmlFor="roulette-code-input">Código</label>
               <input
+                id="roulette-code-input"
                 type="text"
                 value={code}
                 onChange={(event) => setCode(event.target.value.toUpperCase())}
                 placeholder="Ex.: ROLETA10"
               />
-            </label>
+            </div>
 
-            <label className="admin-form-field">
-              <span>Recompensa (opcional)</span>
+            <div className="roulette-code-field">
+              <label htmlFor="roulette-reward-input">Recompensa (opcional)</label>
               <input
+                id="roulette-reward-input"
                 type="text"
                 value={reward}
                 onChange={(event) => setReward(event.target.value)}
                 placeholder="Ex.: Giro extra / R$ 10"
               />
-            </label>
+            </div>
 
-            <label className="admin-form-field admin-form-field-full">
-              <span>Descrição (opcional)</span>
+            <div className="roulette-code-field full">
+              <label htmlFor="roulette-description-input">Descrição (opcional)</label>
               <textarea
+                id="roulette-description-input"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={4}
                 placeholder="Detalhes sobre o código da roleta"
               />
-            </label>
+            </div>
           </div>
 
-          <div className="admin-shortcuts">
-            <button type="button" onClick={handleCreate}>Criar Código</button>
+          <div className="roulette-code-actions">
+            <button type="button" className="roulette-code-btn" onClick={handleCreate}>Criar Código</button>
           </div>
 
-          {message ? <p className="admin-log-hint">{message}</p> : null}
+          {message ? <p className="roulette-code-feedback">{message}</p> : null}
 
-          <p className="admin-log-hint">
+          <p className="roulette-code-hint">
             Integração com API de criação de código da roleta pode ser ligada na próxima etapa.
           </p>
         </section>
