@@ -30,6 +30,7 @@ import AdminRankings from './pages/AdminRankings'
 import AdminLogs from './pages/AdminLogs'
 import AdminPendingWithdrawals from './pages/AdminPendingWithdrawals'
 import AdminUserWithdrawals from './pages/AdminUserWithdrawals'
+import AdminRouletteCode from './pages/AdminRouletteCode'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -138,6 +139,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminLogs />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/roulette-code"
+          element={(
+            <RequireMaxAdmin>
+              <AdminRouletteCode />
             </RequireMaxAdmin>
           )}
         />

@@ -72,6 +72,7 @@ export default function AdminSidebar() {
 
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/dashboard'); setMenuOpen(false) }}>Ver App Usuário</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Criar Código da Roleta</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
         </nav>
 
