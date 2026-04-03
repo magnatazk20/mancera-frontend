@@ -46,6 +46,10 @@ export default function AdminLogs() {
   const [logs, setLogs] = useState<AdminLogRow[]>([])
   const [query, setQuery] = useState('')
   const [levelFilter, setLevelFilter] = useState('all')
+  const [selectedMetadata, setSelectedMetadata] = useState<{
+    id: number
+    metadata: Record<string, unknown> | null | undefined
+  } | null>(null)
 
   useEffect(() => {
     const loadLogs = async () => {
@@ -176,12 +180,13 @@ export default function AdminLogs() {
                   <th>Mensagem</th>
                   <th>Usuário</th>
                   <th>Origem</th>
+                  <th>Metadata</th>
                 </tr>
               </thead>
               <tbody>
                 {!loading && filteredLogs.length === 0 ? (
                   <tr>
-                    <td colSpan={7}>Nenhum log encontrado.</td>
+                    <td colSpan={8}>Nenhum log encontrado.</td>
                   </tr>
                 ) : (
                   filteredLogs.map((row) => (
@@ -197,6 +202,20 @@ export default function AdminLogs() {
                       <td>{row.message ?? '-'}</td>
                       <td>{row.user?.name ?? row.user?.phone ?? '-'}</td>
                       <td>{row.source ?? 'db'}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="admin-toggle-logs-btn"
+                          onClick={() =>
+                            setSelectedMetadata({
+                              id: row.id,
+                              metadata: row.metadata,
+                            })
+                          }
+                        >
+                          Ver metadata
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -204,6 +223,25 @@ export default function AdminLogs() {
             </table>
           </div>
         </section>
+        {selectedMetadata ? (
+          <section className="admin-panel admin-panel-wide" style={{ marginTop: 16 }}>
+            <div className="admin-panel-head">
+              <h2>Metadata do log #{selectedMetadata.id}</h2>
+              <button
+                type="button"
+                className="admin-toggle-logs-btn"
+                onClick={() => setSelectedMetadata(null)}
+              >
+                Fechar
+              </button>
+            </div>
+            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              {selectedMetadata.metadata
+                ? JSON.stringify(selectedMetadata.metadata, null, 2)
+                : 'Sem metadata'}
+            </pre>
+          </section>
+        ) : null}
       </section>
     </main>
   )
