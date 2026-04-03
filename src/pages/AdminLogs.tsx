@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 type AdminLogRow = {
   id: number
+  userId?: number | null
   level?: string
   source?: string
   action?: string
@@ -200,7 +201,7 @@ export default function AdminLogs() {
                       </td>
                       <td>{row.action ?? '-'}</td>
                       <td>{row.message ?? '-'}</td>
-                      <td>{row.user?.name ?? row.user?.phone ?? '-'}</td>
+                      <td>{row.userId ?? row.user?.id ?? row.user?.name ?? row.user?.phone ?? '-'}</td>
                       <td>{row.source ?? 'db'}</td>
                       <td>
                         <button
