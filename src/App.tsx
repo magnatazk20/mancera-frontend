@@ -28,6 +28,7 @@ import AdminUserHistory from './pages/AdminUserHistory'
 import AdminWithdrawConfig from './pages/AdminWithdrawConfig'
 import AdminRankings from './pages/AdminRankings'
 import AdminLogs from './pages/AdminLogs'
+import AdminPendingWithdrawals from './pages/AdminPendingWithdrawals'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -136,6 +137,22 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminLogs />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/withdrawals/users"
+          element={(
+            <RequireMaxAdmin>
+              <AdminUsers />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/withdrawals/pending"
+          element={(
+            <RequireMaxAdmin>
+              <AdminPendingWithdrawals />
             </RequireMaxAdmin>
           )}
         />

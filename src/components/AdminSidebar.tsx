@@ -66,6 +66,10 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdraw-config'); setMenuOpen(false) }}>Configuração de Saque</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Ganhos e Saques</button>
 
+          <p className="dash-nav-group-title">Saques</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/users'); setMenuOpen(false) }}>Saques Usuários</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/pending'); setMenuOpen(false) }}>Saques Pendentes</button>
+
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/dashboard'); setMenuOpen(false) }}>Ver App Usuário</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
