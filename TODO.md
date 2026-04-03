@@ -3,3 +3,11 @@
 - [x] Exibir status de depósito e total depositado por convidado
 - [x] Adicionar estado vazio quando não houver convidados por nível
 - [ ] Ajustar CSS se necessário
+
+- [x] Mapear erros de build TS6133 no deploy
+- [x] Corrigir Dashboard.tsx (uso de vipLabel)
+- [x] Corrigir Profile.tsx (remover símbolos/estados não usados)
+- [x] Corrigir TeamReport.tsx (remover estado error não usado)
+- [x] Ajustar engines Node em package.json (>=20.19.0)
+- [x] Rodar npm run build
+- [ ] Commitar e subir para GitHub

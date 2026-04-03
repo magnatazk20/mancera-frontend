@@ -52,7 +52,6 @@ export default function TeamReport() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [fetching, setFetching] = useState(false)
-  const [error, setError] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'reports' | 'team'>('reports')
   const [startDate, setStartDate] = useState('')
@@ -82,7 +81,6 @@ export default function TeamReport() {
   const loadReport = async (params?: { startDate?: string; endDate?: string }) => {
     if (!user?.id) return
     setFetching(true)
-    setError('')
     try {
       const query = new URLSearchParams()
       if (params?.startDate && params?.endDate) {
@@ -95,7 +93,6 @@ export default function TeamReport() {
 
       if (!res.ok || !data?.ok) {
         const msg = data?.error || 'Não foi possível carregar relatório.'
-        setError(msg)
         setToast({ type: 'error', message: msg })
         setTimeout(() => setToast(null), 2200)
         return
@@ -122,7 +119,6 @@ export default function TeamReport() {
       }
     } catch {
       const msg = 'Erro de conexão ao carregar relatório.'
-      setError(msg)
       setToast({ type: 'error', message: msg })
       setTimeout(() => setToast(null), 2200)
     } finally {
@@ -174,14 +170,12 @@ export default function TeamReport() {
   const onSearch = () => {
     if ((startDate && !endDate) || (!startDate && endDate)) {
       const msg = 'Selecione data inicial e final.'
-      setError(msg)
       setToast({ type: 'error', message: msg })
       setTimeout(() => setToast(null), 2200)
       return
     }
     if (startDate && endDate && startDate > endDate) {
       const msg = 'Data inicial não pode ser maior que a final.'
-      setError(msg)
       setToast({ type: 'error', message: msg })
       setTimeout(() => setToast(null), 2200)
       return

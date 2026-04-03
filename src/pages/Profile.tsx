@@ -56,128 +56,14 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-function NavIcon({
-  name,
-  className = 'icon-sm',
-}: {
-  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user'
-  className?: string
-}) {
-  switch (name) {
-    case 'home':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 10.5L12 3l9 7.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M6 9.5V20h12V9.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      )
-    case 'tasks':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 7h11M8 12h11M8 17h11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <circle cx="5" cy="7" r="1.2" fill="currentColor" />
-          <circle cx="5" cy="12" r="1.2" fill="currentColor" />
-          <circle cx="5" cy="17" r="1.2" fill="currentColor" />
-        </svg>
-      )
-    case 'vjp':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <circle cx="12" cy="12" r="2" fill="currentColor" />
-          <path d="M12 4v4M20 12h-4M12 20v-4M4 12h4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
-      )
-    case 'invite':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <circle cx="9" cy="12" r="2.3" fill="none" stroke="currentColor" strokeWidth="1.6" />
-          <circle cx="15.5" cy="12" r="1.7" fill="currentColor" />
-        </svg>
-      )
-    case 'user':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M5 20c.8-3 3.4-5 7-5s6.2 2 7 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      )
-    default:
-      return null
-  }
-}
-
-function ProfileCardIcon({
-  name,
-  className = 'profile-card-icon',
-}: {
-  name: 'user' | 'vip' | 'finance' | 'team' | 'withdraw' | 'cycle'
-  className?: string
-}) {
-  switch (name) {
-    case 'user':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M5 20c.8-3 3.4-5 7-5s6.2 2 7 5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      )
-    case 'vip':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 8.5l3.2 8h9.6l3.2-8-4.2 2.7L12 5.5l-3.8 5.7L4 8.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-          <path d="M7 18h10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      )
-    case 'finance':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3.5" y="6.5" width="17" height="11" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M15 10h5v4h-5a2 2 0 0 1 0-4z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <circle cx="16.8" cy="12" r="0.8" fill="currentColor" />
-        </svg>
-      )
-    case 'team':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="8" cy="9" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <circle cx="16" cy="9" r="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M3.8 19c.5-2.5 2.5-4 4.2-4s3.7 1.5 4.2 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M11.8 19c.5-2.5 2.5-4 4.2-4s3.7 1.5 4.2 4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      )
-    case 'withdraw':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 4v12M7.5 11.5L12 16l4.5-4.5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="4.5" y="18" width="15" height="2.5" rx="1" fill="currentColor" />
-        </svg>
-      )
-    case 'cycle':
-      return (
-        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 4v3m0 10v3M4 12h3m10 0h3M6.3 6.3l2.1 2.1m7.2 7.2 2.1 2.1m0-11.4-2.1 2.1m-7.2 7.2-2.1 2.1" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        </svg>
-      )
-    default:
-      return null
-  }
-}
 
 export default function Profile() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [balance, setBalance] = useState(0)
   const [totalDeposits, setTotalDeposits] = useState(0)
-  const [vipName, setVipName] = useState('Sem VIP')
-  const [vipExpiresAt, setVipExpiresAt] = useState<string | null>(null)
-  const [teamTotal, setTeamTotal] = useState(0)
   const [withdrawableBalance, setWithdrawableBalance] = useState(0)
   const [todayIncome, setTodayIncome] = useState(0)
-  const [hasActiveCyclePlan, setHasActiveCyclePlan] = useState(false)
-  const [activeCyclePlanName, setActiveCyclePlanName] = useState('Nenhum')
   const [copyFeedback, setCopyFeedback] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [giftCodeInput, setGiftCodeInput] = useState('')
@@ -220,15 +106,8 @@ export default function Profile() {
 
         if (vipRes.ok) {
           const vipData = (await vipRes.json()) as VipResponse
-          if (vipData?.ok && vipData?.hasVip && vipData.vip) {
-            setVipName(vipData.vip.levelName || 'VIP Ativo')
-            setVipExpiresAt(vipData.vip.expiresAt ?? null)
-            if (typeof vipData.balance === 'number') {
-              setBalance(Number(vipData.balance))
-            }
-          } else {
-            setVipName('Sem VIP')
-            setVipExpiresAt(null)
+          if (vipData?.ok && vipData?.hasVip && vipData.vip && typeof vipData.balance === 'number') {
+            setBalance(Number(vipData.balance))
           }
         }
 
@@ -236,14 +115,7 @@ export default function Profile() {
           const metricsData = (await metricsRes.json()) as ProfileMetricsResponse
           const metrics = metricsData?.metrics
           if (metrics) {
-            setTeamTotal(Number(metrics.teamTotal ?? 0))
             setWithdrawableBalance(Number(metrics.withdrawableBalance ?? 0))
-            setHasActiveCyclePlan(Boolean(metrics.hasActiveCyclePlan))
-            setActiveCyclePlanName(
-              metrics.hasActiveCyclePlan
-                ? String(metrics.activeCyclePlan?.productName ?? 'Plano ativo')
-                : 'Nenhum'
-            )
           }
         }
 

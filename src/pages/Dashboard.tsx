@@ -206,6 +206,7 @@ export default function Dashboard() {
           <section className="welcome-card">
             <h1>{getGreeting(user.name)}</h1>
             <p>Bem-vindo ao seu painel. Gerencie tudo com rapidez no celular.</p>
+            <p style={{ marginTop: 6, color: '#475569', fontWeight: 600 }}>VIP atual: {vipLabel}</p>
           </section>
 
           <section className="dash-notice-bar" aria-label="Avisos de convite">
