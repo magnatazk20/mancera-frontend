@@ -68,7 +68,7 @@ export default function AdminSidebar() {
 
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/dashboard'); setMenuOpen(false) }}>Ver App Usuário</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/profile'); setMenuOpen(false) }}>Logs</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/profile'); setMenuOpen(false) }}>Perfil</button>
         </nav>
 
         <button

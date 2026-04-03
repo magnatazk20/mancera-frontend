@@ -1,5 +1,16 @@
-# TODO
+- [x] Atualizar tipos em AdminUserDetails.tsx para incluir referralsLevel1/2/3
+- [x] Adicionar seção visual no fim da página com Convites Nível 1, 2 e 3
+- [x] Exibir status de depósito e total depositado por convidado
+- [x] Adicionar estado vazio quando não houver convidados por nível
+- [ ] Ajustar CSS se necessário
 
-- [x] Atualizar botão "Perfil" para "Logs" em `/adf/` no `AdminSidebar.tsx`
-- [ ] Commitar alteração
-- [ ] Fazer push
+- [x] Mapear erros de build TS6133 no deploy
+- [x] Corrigir Dashboard.tsx (uso de vipLabel)
+- [x] Corrigir Profile.tsx (remover símbolos/estados não usados)
+- [x] Corrigir TeamReport.tsx (remover estado error não usado)
+- [x] Ajustar engines Node em package.json (>=20.19.0)
+- [x] Rodar npm run build
+- [x] Commitar e subir para GitHub
+- [x] Permitir host pgl-m.com no Vite (preview.allowedHosts)
+- [x] Rodar npm run build após ajuste de host
+- [ ] Commitar e subir correção de host
