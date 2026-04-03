@@ -7,6 +7,9 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 type AdminLogRow = {
   id: number
   userId?: number | null
+  oldBalance?: number | null
+  newBalance?: number | null
+  amount?: number | null
   level?: string
   source?: string
   action?: string
@@ -31,6 +34,11 @@ const formatDateTime = (value?: string) => {
   const d = new Date(value)
   if (Number.isNaN(d.getTime())) return value
   return d.toLocaleString('pt-BR')
+}
+
+const formatMoney = (value?: number | null) => {
+  if (value == null || Number.isNaN(Number(value))) return '-'
+  return Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
 const mapLevelClass = (level?: string) => {
@@ -200,7 +208,14 @@ export default function AdminLogs() {
                         </span>
                       </td>
                       <td>{row.action ?? '-'}</td>
-                      <td>{row.message ?? '-'}</td>
+                      <td>
+                        <div style={{ display: 'grid', gap: 2 }}>
+                          <small><strong>{row.message ?? row.action ?? '-'}</strong></small>
+                          <small>Saldo antigo: {formatMoney(row.oldBalance)}</small>
+                          <small>Saldo novo: {formatMoney(row.newBalance)}</small>
+                          <small>Valor: {formatMoney(row.amount)}</small>
+                        </div>
+                      </td>
                       <td>{row.userId ?? row.user?.id ?? row.user?.name ?? row.user?.phone ?? '-'}</td>
                       <td>{row.source ?? 'db'}</td>
                       <td>
