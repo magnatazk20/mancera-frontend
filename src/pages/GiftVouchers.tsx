@@ -20,6 +20,13 @@ type GiftVoucher = {
   redeemRewardValue: number
 }
 
+type PurchaseSuccessData = {
+  message: string
+  voucherName: string
+  giftCode: string
+  rewardValue: number
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -31,6 +38,8 @@ export default function GiftVouchers() {
   const [vouchers, setVouchers] = useState<GiftVoucher[]>([])
   const [buyingId, setBuyingId] = useState<number | null>(null)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [confirmVoucher, setConfirmVoucher] = useState<GiftVoucher | null>(null)
+  const [successData, setSuccessData] = useState<PurchaseSuccessData | null>(null)
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -76,9 +85,9 @@ export default function GiftVouchers() {
     loadVouchers()
   }, [navigate, token, user?.id])
 
-  const buyVoucher = async (giftVoucherId: number) => {
+  const buyVoucher = async (voucher: GiftVoucher) => {
     if (!user?.id) return
-    setBuyingId(giftVoucherId)
+    setBuyingId(voucher.id)
     setFeedback(null)
 
     try {
@@ -90,18 +99,40 @@ export default function GiftVouchers() {
         },
         body: JSON.stringify({
           userId: user.id,
-          giftVoucherId,
+          giftVoucherId: voucher.id,
         }),
       })
 
-      const data = await res.json() as { ok?: boolean; message?: string; error?: string }
+      const data = await res.json() as {
+        ok?: boolean
+        message?: string
+        error?: string
+        generatedGiftCode?: string
+        purchase?: {
+          name?: string
+          generatedGiftCode?: string
+          redeemRewardValue?: number
+        }
+      }
 
       if (!res.ok || !data?.ok) {
         setFeedback({ type: 'error', message: data?.error || 'Não foi possível comprar o vale.' })
         return
       }
 
-      setFeedback({ type: 'success', message: data?.message || 'Vale presente comprado com sucesso.' })
+      const giftCode = String(data?.generatedGiftCode ?? data?.purchase?.generatedGiftCode ?? '').trim()
+      if (!giftCode) {
+        setFeedback({ type: 'error', message: 'Compra concluída, mas não foi possível obter o código.' })
+        return
+      }
+
+      setSuccessData({
+        message: data?.message || 'Vale presente comprado com sucesso.',
+        voucherName: String(data?.purchase?.name ?? voucher.name),
+        giftCode,
+        rewardValue: Number(data?.purchase?.redeemRewardValue ?? voucher.redeemRewardValue ?? 0),
+      })
+      setConfirmVoucher(null)
     } catch {
       setFeedback({ type: 'error', message: 'Erro de conexão ao comprar vale presente.' })
     } finally {
@@ -112,6 +143,71 @@ export default function GiftVouchers() {
   return (
     <main className="tasks-page gift-vouchers-page">
       <AppSidebar />
+
+      {confirmVoucher ? (
+        <div className="redeem-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="gift-buy-confirm-title">
+          <div className="redeem-modal-card">
+            <div className="redeem-modal-badge">Confirmação</div>
+            <h2 id="gift-buy-confirm-title">Confirmar compra</h2>
+            <p className="redeem-modal-message">
+              Deseja comprar <b>{confirmVoucher.name}</b> por <b>{formatBRL(confirmVoucher.price)}</b>?
+            </p>
+            <div className="redeem-modal-highlight">
+              <span>Valor de resgate</span>
+              <strong>{formatBRL(confirmVoucher.redeemRewardValue)}</strong>
+            </div>
+            <div className="gift-confirm-actions">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setConfirmVoucher(null)}
+                disabled={buyingId === confirmVoucher.id}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="redeem-modal-btn"
+                onClick={() => buyVoucher(confirmVoucher)}
+                disabled={buyingId === confirmVoucher.id}
+              >
+                {buyingId === confirmVoucher.id ? 'Comprando...' : 'Confirmar compra'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {successData ? (
+        <div className="redeem-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="gift-buy-success-title">
+          <div className="redeem-modal-confetti-layer" aria-hidden="true">
+            {Array.from({ length: 28 }).map((_, i) => (
+              <span key={i} className={`confetti confetti-${(i % 7) + 1}`} />
+            ))}
+          </div>
+          <div className="redeem-modal-card">
+            <div className="redeem-modal-badge">🎁 Compra concluída</div>
+            <h2 id="gift-buy-success-title">Seu código foi gerado</h2>
+            <p className="redeem-modal-message">{successData.message}</p>
+            <div className="redeem-modal-highlight">
+              <span>{successData.voucherName}</span>
+              <strong>{formatBRL(successData.rewardValue)}</strong>
+            </div>
+            <p className="redeem-modal-code">Código: <b>{successData.giftCode}</b></p>
+            <button
+              type="button"
+              className="redeem-modal-btn"
+              onClick={() => {
+                setSuccessData(null)
+                navigate('/profile')
+              }}
+            >
+              Ir para Perfil e Resgatar
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       <header className="tasks-header gift-vouchers-header">
         <div>
           <p className="tasks-kicker">Compras</p>
@@ -147,13 +243,12 @@ export default function GiftVouchers() {
                 <p className="gift-voucher-description">{voucher.description}</p>
                 <div className="gift-voucher-meta">
                   <span><b>Valor:</b> {formatBRL(voucher.price)}</span>
-                  <span><b>Cupom:</b> {voucher.discountCoupon}</span>
                   <span><b>Ganho no resgate:</b> {formatBRL(voucher.redeemRewardValue)}</span>
                 </div>
                 <button
                   type="button"
                   className="btn primary gift-voucher-buy-btn"
-                  onClick={() => buyVoucher(voucher.id)}
+                  onClick={() => setConfirmVoucher(voucher)}
                   disabled={buyingId === voucher.id}
                 >
                   {buyingId === voucher.id ? 'Comprando...' : 'Comprar'}
