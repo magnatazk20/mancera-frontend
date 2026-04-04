@@ -1,6 +1,5 @@
-- [x] Atualizar backend `/api/earnings/records/:userId` para mapear status reais de saque (paid, pending, processing, failed)
-- [x] Atualizar frontend `/earnings` para renderizar labels de status de saque conforme retorno SQL
-- [ ] Rodar build do backend
-- [ ] Rodar build do frontend
-- [ ] Commit e push no backend master
+- [x] Ajustar `/adf/withdrawals/users` para listar saques com todos os status exceto `pending`
+- [x] Exibir status dinâmico por linha (paid/processing/failed/outros)
+- [x] Atualizar textos da tela para refletir "não pendentes"
+- [x] Rodar build do frontend
 - [ ] Commit e push no frontend main

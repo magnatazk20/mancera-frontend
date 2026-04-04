@@ -33,9 +33,26 @@ const formatDateTime = (value?: string | null) => {
   return date.toLocaleString('pt-BR')
 }
 
-const isApprovedStatus = (status: string) => {
-  const normalized = String(status ?? '').toLowerCase()
-  return normalized === 'paid' || normalized === 'payment.paid'
+const isNonPendingStatus = (status: string) => {
+  const normalized = String(status ?? '').toLowerCase().trim()
+  return normalized !== 'pending'
+}
+
+const mapStatusClass = (status: string) => {
+  const normalized = String(status ?? '').toLowerCase().trim()
+  if (normalized === 'paid' || normalized === 'payment.paid') return 'paid'
+  if (normalized === 'processing') return 'pending'
+  if (normalized === 'failed' || normalized === 'canceled' || normalized === 'cancelled') return 'danger'
+  return 'pending'
+}
+
+const mapStatusLabel = (status: string) => {
+  const normalized = String(status ?? '').toLowerCase().trim()
+  if (normalized === 'paid' || normalized === 'payment.paid') return 'Pago'
+  if (normalized === 'processing') return 'Processando'
+  if (normalized === 'failed') return 'Falhou'
+  if (normalized === 'canceled' || normalized === 'cancelled') return 'Cancelado'
+  return String(status ?? '-').toUpperCase()
 }
 
 export default function AdminUserWithdrawals() {
@@ -66,8 +83,8 @@ export default function AdminUserWithdrawals() {
         }
 
         const allRows = Array.isArray(data.withdrawals) ? data.withdrawals : []
-        const approved = allRows.filter((item) => isApprovedStatus(item.status))
-        setRows(approved)
+        const nonPending = allRows.filter((item) => isNonPendingStatus(item.status))
+        setRows(nonPending)
       } catch {
         setError('Erro de conexão ao carregar saques dos usuários.')
         setRows([])
@@ -86,13 +103,13 @@ export default function AdminUserWithdrawals() {
         <header className="admin-header">
           <div>
             <h1>Saques Usuários</h1>
-            <p className="admin-subtitle">Histórico de saques aprovados dos usuários.</p>
+            <p className="admin-subtitle">Histórico de saques dos usuários (exceto pendentes).</p>
           </div>
         </header>
 
         <section className="admin-panel admin-panel-wide">
           <div className="admin-panel-head">
-            <h2>Saques Aprovados</h2>
+            <h2>Saques (Não Pendentes)</h2>
             <span>Total: {rows.length}</span>
           </div>
 
@@ -111,7 +128,7 @@ export default function AdminUserWithdrawals() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6}>Carregando saques aprovados...</td>
+                    <td colSpan={6}>Carregando saques...</td>
                   </tr>
                 ) : error ? (
                   <tr>
@@ -119,7 +136,7 @@ export default function AdminUserWithdrawals() {
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={6}>Nenhum saque aprovado encontrado.</td>
+                    <td colSpan={6}>Nenhum saque não pendente encontrado.</td>
                   </tr>
                 ) : (
                   rows.map((row) => (
@@ -129,7 +146,7 @@ export default function AdminUserWithdrawals() {
                       <td>{row.user?.phone || '-'}</td>
                       <td>{formatBRL(row.amount)}</td>
                       <td>
-                        <span className="status paid">Pago</span>
+                        <span className={`status ${mapStatusClass(row.status)}`}>{mapStatusLabel(row.status)}</span>
                       </td>
                       <td>{formatDateTime(row.paidAt ?? row.createdAt)}</td>
                     </tr>
