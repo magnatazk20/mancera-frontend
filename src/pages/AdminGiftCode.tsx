@@ -27,6 +27,7 @@ export default function AdminGiftCode() {
   const [createdCodes, setCreatedCodes] = useState<GiftCodeItem[]>([])
   const [loadingList, setLoadingList] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const totalCodes = useMemo(() => createdCodes.length, [createdCodes])
 
@@ -93,6 +94,42 @@ export default function AdminGiftCode() {
   useEffect(() => {
     loadCodes()
   }, [])
+
+  const handleDelete = async (giftCodeId: number, giftCodeLabel: string) => {
+    if (!token) {
+      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
+      return
+    }
+
+    const confirmed = window.confirm(`Deseja realmente apagar o código ${giftCodeLabel}?`)
+    if (!confirmed) return
+
+    setDeletingId(giftCodeId)
+    setMessage(null)
+
+    try {
+      const res = await fetch(`${API_URL}/api/admin/gift-codes/${giftCodeId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await res.json() as { ok?: boolean; error?: string; message?: string }
+
+      if (!res.ok || !data?.ok) {
+        setMessage({ type: 'error', text: data?.error || 'Erro ao apagar código.' })
+        return
+      }
+
+      setMessage({ type: 'success', text: data.message || `Código ${giftCodeLabel} apagado com sucesso.` })
+      await loadCodes()
+    } catch {
+      setMessage({ type: 'error', text: 'Erro de conexão ao apagar código.' })
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const handleCreate = async () => {
     const normalizedCode = code.trim().toUpperCase()
@@ -273,6 +310,24 @@ export default function AdminGiftCode() {
                     {item.notes ? (
                       <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>Obs: {item.notes}</p>
                     ) : null}
+
+                    <div style={{ marginTop: 10 }}>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(item.id, item.code)}
+                        disabled={deletingId === item.id}
+                        style={{
+                          background: '#7f1d1d',
+                          color: '#fff',
+                          border: '1px solid #ef4444',
+                          borderRadius: 8,
+                          padding: '6px 10px',
+                          cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        {deletingId === item.id ? 'Apagando...' : 'Apagar'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

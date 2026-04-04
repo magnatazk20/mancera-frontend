@@ -1,4 +1,5 @@
-- [ ] Backend: garantir criação das tabelas gift_codes e gift_code_redemptions
-- [ ] Backend: criar endpoints admin GET/POST /api/admin/gift-codes com requireMaxAdmin
-- [ ] Frontend: conectar AdminGiftCode.tsx com API real (listar e criar códigos)
-- [ ] Teste de caminho crítico: criar código no admin e resgatar no profile
+- [x] Adicionar endpoint backend para apagar gift code por ID (admin)
+- [x] Atualizar tela AdminGiftCode com ação de apagar código
+- [ ] Testar build frontend e backend
+- [ ] Commit e push frontend
+- [ ] Commit e push backend
