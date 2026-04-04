@@ -61,9 +61,17 @@ export default function Community() {
 
         const communityData = (await communityRes.json()) as CommunityLinksResponse
         if (communityRes.ok && communityData?.ok) {
-          setWhatsappGroupUrl(String(communityData.links?.whatsappGroupUrl ?? ''))
-          setManagerContact(String(communityData.links?.managerContact ?? ''))
-          setVipGroupUrl(String(communityData.links?.vipGroupUrl ?? ''))
+          const links = communityData.links ?? {}
+          const vipFromApi =
+            String(
+              links.vipGroupUrl ??
+              (links as { vip_group_url?: string }).vip_group_url ??
+              ''
+            ).trim()
+
+          setWhatsappGroupUrl(String(links.whatsappGroupUrl ?? ''))
+          setManagerContact(String(links.managerContact ?? ''))
+          setVipGroupUrl(vipFromApi)
         }
 
         if (paidRes && paidRes.ok) {
