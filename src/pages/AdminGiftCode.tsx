@@ -279,16 +279,25 @@ export default function AdminGiftCode() {
           </div>
 
           {message ? (
-            <p className="roulette-code-feedback" style={{ color: message.type === 'error' ? '#fca5a5' : '#86efac' }}>
+            <p
+              className="roulette-code-feedback"
+              style={{
+                color: message.type === 'error' ? '#fecaca' : '#bbf7d0',
+                background: message.type === 'error' ? 'rgba(127, 29, 29, 0.45)' : 'rgba(20, 83, 45, 0.45)',
+                border: `1px solid ${message.type === 'error' ? 'rgba(248, 113, 113, 0.55)' : 'rgba(74, 222, 128, 0.45)'}`,
+                borderRadius: 10,
+                padding: '10px 12px',
+              }}
+            >
               {message.text}
             </p>
           ) : null}
 
-          {loadingList ? <p className="roulette-code-hint">Carregando códigos...</p> : null}
+          {loadingList ? <p className="roulette-code-hint" style={{ color: '#cbd5e1' }}>Carregando códigos...</p> : null}
 
           {createdCodes.length ? (
             <div style={{ marginTop: 18 }}>
-              <h3 style={{ marginBottom: 10 }}>Códigos no Banco</h3>
+              <h3 style={{ marginBottom: 10, color: '#f8fafc' }}>Códigos no Banco</h3>
               <div style={{ display: 'grid', gap: 10 }}>
                 {createdCodes.map((item) => (
                   <div
@@ -300,7 +309,7 @@ export default function AdminGiftCode() {
                       background: 'rgba(15,23,42,0.6)',
                     }}
                   >
-                    <strong>{item.code}</strong>
+                    <strong style={{ color: '#f8fafc' }}>{item.code}</strong>
                     <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>
                       Recompensa: {formatBRL(item.rewardValue)} • Limite: {item.maxUses} • Usos: {item.usedCount}
                     </p>
@@ -317,11 +326,12 @@ export default function AdminGiftCode() {
                         onClick={() => handleDelete(item.id, item.code)}
                         disabled={deletingId === item.id}
                         style={{
-                          background: '#7f1d1d',
-                          color: '#fff',
-                          border: '1px solid #ef4444',
+                          background: deletingId === item.id ? '#3f3f46' : '#991b1b',
+                          color: '#ffffff',
+                          border: deletingId === item.id ? '1px solid #71717a' : '1px solid #f87171',
                           borderRadius: 8,
                           padding: '6px 10px',
+                          fontWeight: 600,
                           cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
                         }}
                       >

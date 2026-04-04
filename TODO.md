@@ -1,5 +1,8 @@
 - [x] Adicionar endpoint backend para apagar gift code por ID (admin)
 - [x] Atualizar tela AdminGiftCode com ação de apagar código
-- [ ] Testar build frontend e backend
-- [ ] Commit e push frontend
-- [ ] Commit e push backend
+- [x] Testar build frontend e backend
+- [x] Commit e push frontend
+- [x] Commit e push backend
+- [ ] Ajustar contraste de cores na página /adf/gift-codes
+- [ ] Testar build frontend
+- [ ] Commit e push frontend (fix contraste)
