@@ -3,4 +3,7 @@
 - [x] Criar página frontend de compra de vales presentes
 - [x] Adicionar rota `/gift-vouchers` no App.tsx
 - [x] Conectar botão "Comprar vale-presentes" no Profile para navegar para nova página
+- [ ] Ajustar compra para gerar código de presente automaticamente para resgate no /profile
+- [ ] Remover exibição de cupom de desconto na UI do usuário
+- [ ] Expor endpoint de "meus códigos" recebidos após compra
 - [ ] Validar estrutura final e realizar commit/push

@@ -503,7 +503,7 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Alterar Senha</span>
             </button>
-            <button type="button" className="profile-shortcut-btn">
+            <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/gift-vouchers')}>
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 9a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M12 8v13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
