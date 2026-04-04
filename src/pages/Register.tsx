@@ -81,9 +81,9 @@ export default function Register() {
         <aside className="hero-panel login-banner-panel" aria-hidden="true">
           <div className="pglm-banner-bg-glow" />
           <div className="pglm-banner-content">
-            <p className="pglm-banner-kicker">PLATAFORMA OFICIAL</p>
+            <p className="pglm-banner-kicker">BEM-VINDO À PLATAFORMA</p>
             <h2 className="pglm-banner-title">PGLM</h2>
-            <p className="pglm-banner-subtitle">Acesso seguro, experiência premium.</p>
+            <p className="pglm-banner-subtitle">Cadastre-se e receba benefícios exclusivos.</p>
           </div>
 
           <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
