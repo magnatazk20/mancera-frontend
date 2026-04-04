@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import heroImage from '../assets/hero.png'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -60,11 +59,18 @@ export default function Login() {
   return (
     <main className="auth-page">
       <section className="auth-shell">
-        <aside className="hero-panel">
-          <img src={heroImage} alt="Imagem decorativa" />
-          <div className="hero-overlay">
+        <aside className="hero-panel login-hero-panel" aria-hidden="true">
+          <div className="login-hero-content">
+            <p className="login-hero-kicker">ACESSO SEGURO</p>
             <h2>Bem-vindo de volta</h2>
-            <p>“Entre para continuar sua jornada com segurança e estilo”</p>
+            <p>
+              Entre para acessar sua conta com rapidez, segurança e uma experiência mais profissional.
+            </p>
+            <ul className="login-hero-list">
+              <li>Ambiente protegido</li>
+              <li>Painel otimizado para produtividade</li>
+              <li>Suporte contínuo para sua operação</li>
+            </ul>
           </div>
         </aside>
 

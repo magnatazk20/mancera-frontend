@@ -230,6 +230,79 @@ body {
   filter: saturate(1.15) brightness(0.9);
 }
 
+.login-hero-panel {
+  min-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 22px;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(56, 189, 248, 0.28), transparent 42%),
+    radial-gradient(circle at 84% 82%, rgba(139, 92, 246, 0.3), transparent 46%),
+    linear-gradient(155deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.92));
+}
+
+.login-hero-content {
+  width: 100%;
+  max-width: 360px;
+  color: #e2e8f0;
+}
+
+.login-hero-kicker {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 211, 252, 0.45);
+  background: rgba(56, 189, 248, 0.12);
+  color: #bae6fd;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.login-hero-content h2 {
+  margin: 0 0 10px;
+  color: #f8fafc;
+  font-size: 1.52rem;
+  line-height: 1.2;
+  letter-spacing: -0.4px;
+}
+
+.login-hero-content > p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.92);
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.login-hero-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.login-hero-list li {
+  position: relative;
+  padding-left: 22px;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.login-hero-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.46em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22d3ee, #6366f1);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16);
+}
+
 .hero-overlay {
   position: absolute;
   inset: auto 0 0 0;
