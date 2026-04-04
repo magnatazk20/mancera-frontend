@@ -511,6 +511,16 @@ export default function Profile() {
               <span className="profile-shortcut-label">Sair</span>
             </button>
           </section>
+
+          <section style={{ marginTop: 14, marginBottom: 8 }}>
+            <button
+              type="button"
+              className="profile-shortcut-btn"
+              style={{ width: '100%', justifyContent: 'center' }}
+            >
+              Comprar vale-presentes
+            </button>
+          </section>
         </>
       )}
 
