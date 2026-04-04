@@ -503,17 +503,6 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Alterar Senha</span>
             </button>
-            <button type="button" className="profile-shortcut-btn logout" onClick={handleLogout}>
-              <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M14 4h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M10 12h10M17 8l4 4l-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="profile-shortcut-label">Sair</span>
-            </button>
-          </section>
-
-          <section className="profile-shortcuts-grid" style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
-            <div />
             <button type="button" className="profile-shortcut-btn">
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 9a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -523,8 +512,13 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Comprar vale-presentes</span>
             </button>
-            <div />
-            <div />
+            <button type="button" className="profile-shortcut-btn logout" onClick={handleLogout}>
+              <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14 4h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M10 12h10M17 8l4 4l-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="profile-shortcut-label">Sair</span>
+            </button>
           </section>
         </>
       )}
