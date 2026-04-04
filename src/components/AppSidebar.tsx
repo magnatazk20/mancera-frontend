@@ -25,6 +25,7 @@ type CommunityLinksResponse = {
   ok?: boolean
   links?: {
     whatsappGroupUrl?: string
+    vipGroupUrl?: string
   }
 }
 
@@ -196,7 +197,7 @@ export default function AppSidebar() {
         }
 
         const data = await res.json() as CommunityLinksResponse
-        const url = String(data?.links?.whatsappGroupUrl ?? '').trim()
+        const url = String(data?.links?.vipGroupUrl ?? '').trim()
         setVipGroupUrl(url)
       } catch {
         setVipGroupUrl('')
