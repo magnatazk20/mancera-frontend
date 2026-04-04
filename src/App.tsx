@@ -31,6 +31,7 @@ import AdminLogs from './pages/AdminLogs'
 import AdminPendingWithdrawals from './pages/AdminPendingWithdrawals'
 import AdminUserWithdrawals from './pages/AdminUserWithdrawals'
 import AdminRouletteCode from './pages/AdminRouletteCode'
+import AdminGiftCode from './pages/AdminGiftCode'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -147,6 +148,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminRouletteCode />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/gift-codes"
+          element={(
+            <RequireMaxAdmin>
+              <AdminGiftCode />
             </RequireMaxAdmin>
           )}
         />
