@@ -1,5 +1,4 @@
-- [x] Atualizar botão "Ver App Usuário" no menu admin para abrir nova página de gestão de códigos de presente
-- [x] Criar página admin para gerar códigos resgatáveis no /profile (seção "Resgatar Código de Presente")
-- [x] Adicionar rota da nova página no App.tsx
-- [x] Conectar criação/listagem local de códigos com feedback visual para o admin
-- [ ] Validar rapidamente a consistência da navegação e integração visual
+- [ ] Backend: garantir criação das tabelas gift_codes e gift_code_redemptions
+- [ ] Backend: criar endpoints admin GET/POST /api/admin/gift-codes com requireMaxAdmin
+- [ ] Frontend: conectar AdminGiftCode.tsx com API real (listar e criar códigos)
+- [ ] Teste de caminho crítico: criar código no admin e resgatar no profile
