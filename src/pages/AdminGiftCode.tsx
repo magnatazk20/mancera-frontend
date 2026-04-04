@@ -1,15 +1,19 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './AdminRouletteCode.css'
 
 type GiftCodeItem = {
-  id: string
+  id: number
   code: string
   rewardValue: number
   maxUses: number
   notes: string
-  createdAt: string
+  createdAt: string | null
+  usedCount: number
+  isActive: boolean
 }
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -21,10 +25,76 @@ export default function AdminGiftCode() {
   const [notes, setNotes] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [createdCodes, setCreatedCodes] = useState<GiftCodeItem[]>([])
+  const [loadingList, setLoadingList] = useState(false)
+  const [creating, setCreating] = useState(false)
 
   const totalCodes = useMemo(() => createdCodes.length, [createdCodes])
 
-  const handleCreate = () => {
+  const token = useMemo(
+    () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
+    []
+  )
+
+  const loadCodes = async () => {
+    if (!token) {
+      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
+      return
+    }
+
+    setLoadingList(true)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/gift-codes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await res.json() as {
+        ok?: boolean
+        error?: string
+        giftCodes?: Array<{
+          id?: number
+          code?: string
+          rewardValue?: number
+          maxTotalUses?: number
+          notes?: string
+          createdAt?: string | null
+          usedCount?: number
+          isActive?: boolean
+        }>
+      }
+
+      if (!res.ok || !data?.ok) {
+        setMessage({ type: 'error', text: data?.error || 'Falha ao carregar códigos.' })
+        return
+      }
+
+      const mapped = Array.isArray(data.giftCodes)
+        ? data.giftCodes.map((item) => ({
+            id: Number(item.id ?? 0),
+            code: String(item.code ?? ''),
+            rewardValue: Number(item.rewardValue ?? 0),
+            maxUses: Number(item.maxTotalUses ?? 0),
+            notes: String(item.notes ?? ''),
+            createdAt: item.createdAt ?? null,
+            usedCount: Number(item.usedCount ?? 0),
+            isActive: Boolean(item.isActive),
+          }))
+        : []
+
+      setCreatedCodes(mapped)
+    } catch {
+      setMessage({ type: 'error', text: 'Erro de conexão ao carregar códigos.' })
+    } finally {
+      setLoadingList(false)
+    }
+  }
+
+  useEffect(() => {
+    loadCodes()
+  }, [])
+
+  const handleCreate = async () => {
     const normalizedCode = code.trim().toUpperCase()
     const numericReward = Number(rewardValue.replace(',', '.'))
     const numericMaxUses = Number(maxUses)
@@ -44,30 +114,59 @@ export default function AdminGiftCode() {
       return
     }
 
-    const alreadyExists = createdCodes.some((item) => item.code === normalizedCode)
-    if (alreadyExists) {
-      setMessage({ type: 'error', text: 'Esse código já foi criado nesta sessão.' })
+    if (!token) {
+      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
       return
     }
 
-    const newCode: GiftCodeItem = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      code: normalizedCode,
-      rewardValue: Number(numericReward.toFixed(2)),
-      maxUses: numericMaxUses,
-      notes: notes.trim(),
-      createdAt: new Date().toLocaleString('pt-BR'),
-    }
+    setCreating(true)
+    setMessage(null)
 
-    setCreatedCodes((prev) => [newCode, ...prev])
-    setCode('')
-    setRewardValue('')
-    setMaxUses('1')
-    setNotes('')
-    setMessage({
-      type: 'success',
-      text: `Código ${normalizedCode} criado. Agora ele pode ser usado no /profile na área "Resgatar Código de Presente" quando conectado ao backend.`,
-    })
+    try {
+      const res = await fetch(`${API_URL}/api/admin/gift-codes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          code: normalizedCode,
+          rewardType: 'balance_credit',
+          rewardValue: Number(numericReward.toFixed(2)),
+          maxTotalUses: numericMaxUses,
+          notes: notes.trim(),
+        }),
+      })
+
+      const data = await res.json() as {
+        ok?: boolean
+        error?: string
+        giftCode?: {
+          id?: number
+          code?: string
+          rewardValue?: number
+          maxTotalUses?: number
+          notes?: string
+        }
+      }
+
+      if (!res.ok || !data?.ok) {
+        setMessage({ type: 'error', text: data?.error || 'Erro ao criar código.' })
+        return
+      }
+
+      setCode('')
+      setRewardValue('')
+      setMaxUses('1')
+      setNotes('')
+      setMessage({ type: 'success', text: `Código ${normalizedCode} criado com sucesso.` })
+
+      await loadCodes()
+    } catch {
+      setMessage({ type: 'error', text: 'Erro de conexão ao criar código.' })
+    } finally {
+      setCreating(false)
+    }
   }
 
   return (
@@ -86,7 +185,7 @@ export default function AdminGiftCode() {
         <section className="roulette-code-card">
           <div className="roulette-code-card-head">
             <h2>Novo Código de Presente</h2>
-            <p>Total criado nesta sessão: {totalCodes}</p>
+            <p>Total cadastrado no banco: {totalCodes}</p>
           </div>
 
           <div className="roulette-code-grid">
@@ -137,8 +236,8 @@ export default function AdminGiftCode() {
           </div>
 
           <div className="roulette-code-actions">
-            <button type="button" className="roulette-code-btn" onClick={handleCreate}>
-              Criar Código
+            <button type="button" className="roulette-code-btn" onClick={handleCreate} disabled={creating}>
+              {creating ? 'Criando...' : 'Criar Código'}
             </button>
           </div>
 
@@ -148,9 +247,11 @@ export default function AdminGiftCode() {
             </p>
           ) : null}
 
+          {loadingList ? <p className="roulette-code-hint">Carregando códigos...</p> : null}
+
           {createdCodes.length ? (
             <div style={{ marginTop: 18 }}>
-              <h3 style={{ marginBottom: 10 }}>Códigos Criados</h3>
+              <h3 style={{ marginBottom: 10 }}>Códigos no Banco</h3>
               <div style={{ display: 'grid', gap: 10 }}>
                 {createdCodes.map((item) => (
                   <div
@@ -164,7 +265,10 @@ export default function AdminGiftCode() {
                   >
                     <strong>{item.code}</strong>
                     <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>
-                      Recompensa: {formatBRL(item.rewardValue)} • Limite: {item.maxUses} • Criado: {item.createdAt}
+                      Recompensa: {formatBRL(item.rewardValue)} • Limite: {item.maxUses} • Usos: {item.usedCount}
+                    </p>
+                    <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>
+                      Status: {item.isActive ? 'Ativo' : 'Inativo'} • Criado em: {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
                     </p>
                     {item.notes ? (
                       <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>Obs: {item.notes}</p>
@@ -174,10 +278,6 @@ export default function AdminGiftCode() {
               </div>
             </div>
           ) : null}
-
-          <p className="roulette-code-hint">
-            Integração com API de gift code pode ser conectada em seguida para persistir os códigos no banco.
-          </p>
         </section>
       </section>
     </main>
