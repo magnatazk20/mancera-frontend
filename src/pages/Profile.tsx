@@ -496,7 +496,7 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Baixar APP</span>
             </button>
-            <button type="button" className="profile-shortcut-btn">
+            <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/change-password')}>
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M4 20h4l10-10a2.1 2.1 0 1 0-3-3L5 17v3z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                 <path d="M13.5 6.5l3 3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

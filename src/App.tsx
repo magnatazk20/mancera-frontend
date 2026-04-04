@@ -20,6 +20,7 @@ import Community from './pages/Community'
 import Earnings from './pages/Earnings'
 import TaxDeclaration from './pages/TaxDeclaration'
 import WithdrawPassword from './pages/WithdrawPassword'
+import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
@@ -79,6 +80,7 @@ export default function App() {
         <Route path="/earnings" element={<Earnings />} />
         <Route path="/tax-declaration" element={<TaxDeclaration />} />
         <Route path="/withdraw-password" element={<WithdrawPassword />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route
           path="/saque"
           element={(
