@@ -103,6 +103,47 @@
   font-weight: 600;
 }
 
+.withdraw-highlight {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.withdraw-fee-highlight {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border-color: #93c5fd;
+  color: #1e3a8a;
+}
+
+.withdraw-net-highlight {
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: #86efac;
+  color: #14532d;
+}
+
+.withdraw-highlight-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.withdraw-highlight-value {
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.withdraw-highlight-note {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
 .withdraw-feedback.error {
   background: #fee2e2;
   color: #b91c1c;

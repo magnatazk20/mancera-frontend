@@ -280,13 +280,16 @@ export default function Withdraw() {
           Para alterar a chave PIX, use o botão abaixo.
         </p>
 
-        <div className="withdraw-feedback">
-          <strong>Taxa de saque:</strong> {withdrawFeePercent}%
+        <div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
+          <span className="withdraw-highlight-label">Taxa de saque</span>
+          <strong className="withdraw-highlight-value">{withdrawFeePercent}%</strong>
         </div>
 
         {hasValidPreviewAmount ? (
-          <div className="withdraw-feedback">
-            Valor líquido estimado: {formatBRL(netValuePreview)} (taxa: {formatBRL(feeValuePreview)})
+          <div className="withdraw-feedback withdraw-highlight withdraw-net-highlight">
+            <span className="withdraw-highlight-label">Valor líquido estimado</span>
+            <strong className="withdraw-highlight-value">{formatBRL(netValuePreview)}</strong>
+            <small className="withdraw-highlight-note">Taxa aplicada: {formatBRL(feeValuePreview)}</small>
           </div>
         ) : null}
 
