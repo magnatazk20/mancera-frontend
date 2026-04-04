@@ -281,10 +281,7 @@ export default function Withdraw() {
         </p>
 
         <div className="withdraw-feedback">
-          <strong>Configuração atual:</strong>{' '}
-          Taxa de saque: {withdrawFeePercent}% •
-          Mínimo: {formatBRL(minWithdrawAmount)} •
-          Máximo: {maxWithdrawAmount > 0 ? formatBRL(maxWithdrawAmount) : 'Sem limite'}
+          <strong>Taxa de saque:</strong> {withdrawFeePercent}%
         </div>
 
         {hasValidPreviewAmount ? (
