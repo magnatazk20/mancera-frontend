@@ -8,8 +8,24 @@ type CommunityLinksResponse = {
   ok?: boolean
   links?: {
     whatsappGroupUrl?: string
+    vipGroupUrl?: string
     managerContact?: string
   }
+}
+
+type PaidTransactionResponse = {
+  ok?: boolean
+  total?: number
+  transactions?: Array<{
+    type?: 'deposit' | 'withdraw'
+    status?: 'paid' | 'pending'
+  }>
+}
+
+type StoredUser = {
+  id: number
+  name: string
+  phone: string
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -19,21 +35,49 @@ export default function Community() {
   const [loading, setLoading] = useState(true)
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState('')
   const [managerContact, setManagerContact] = useState('')
+  const [vipGroupUrl, setVipGroupUrl] = useState('')
+  const [canAccessVipGroup, setCanAccessVipGroup] = useState(false)
   const [feedback, setFeedback] = useState('')
 
   useEffect(() => {
+    const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
+    let user: StoredUser | null = null
+
+    if (rawUser) {
+      try {
+        user = JSON.parse(rawUser) as StoredUser
+      } catch {
+        user = null
+      }
+    }
+
     const loadLinks = async () => {
       setLoading(true)
       try {
-        const res = await fetch(`${API_URL}/api/community-links`)
-        const data = (await res.json()) as CommunityLinksResponse
+        const [communityRes, paidRes] = await Promise.all([
+          fetch(`${API_URL}/api/community-links`),
+          user?.id ? fetch(`${API_URL}/api/transactions/paid/${user.id}?limit=1`) : Promise.resolve(null),
+        ])
 
-        if (res.ok && data?.ok) {
-          setWhatsappGroupUrl(String(data.links?.whatsappGroupUrl ?? ''))
-          setManagerContact(String(data.links?.managerContact ?? ''))
+        const communityData = (await communityRes.json()) as CommunityLinksResponse
+        if (communityRes.ok && communityData?.ok) {
+          setWhatsappGroupUrl(String(communityData.links?.whatsappGroupUrl ?? ''))
+          setManagerContact(String(communityData.links?.managerContact ?? ''))
+          setVipGroupUrl(String(communityData.links?.vipGroupUrl ?? ''))
+        }
+
+        if (paidRes && paidRes.ok) {
+          const paidData = (await paidRes.json()) as PaidTransactionResponse
+          const hasPaidDeposit = Array.isArray(paidData?.transactions)
+            ? paidData.transactions.some((tx) => tx?.type === 'deposit' && tx?.status === 'paid')
+            : Number(paidData?.total ?? 0) > 0
+          setCanAccessVipGroup(hasPaidDeposit)
+        } else {
+          setCanAccessVipGroup(false)
         }
       } catch {
         setFeedback('Erro ao carregar dados da comunidade.')
+        setCanAccessVipGroup(false)
       } finally {
         setLoading(false)
       }
@@ -101,6 +145,16 @@ export default function Community() {
               >
                 Grupo do WhatsApp
               </button>
+
+              {canAccessVipGroup ? (
+                <button
+                  type="button"
+                  className="community-btn whatsapp"
+                  onClick={() => openExternal(vipGroupUrl, 'Link do grupo VIP ainda não configurado.')}
+                >
+                  Grupo VIP
+                </button>
+              ) : null}
 
               <button
                 type="button"
