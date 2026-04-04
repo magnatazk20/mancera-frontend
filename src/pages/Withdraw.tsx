@@ -12,6 +12,15 @@ type StoredUser = {
 
 type PixType = 'CPF' | 'CNPJ' | 'EMAIL' | 'TELEFONE' | 'CHAVE_ALEATORIA'
 
+type WithdrawConfigResponse = {
+  ok?: boolean
+  config?: {
+    withdrawFeePercent?: number
+    minWithdrawAmount?: number
+    maxWithdrawAmount?: number
+  }
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -45,6 +54,9 @@ export default function Withdraw() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [withdrawFeePercent, setWithdrawFeePercent] = useState(0)
+  const [minWithdrawAmount, setMinWithdrawAmount] = useState(0)
+  const [maxWithdrawAmount, setMaxWithdrawAmount] = useState(0)
 
   const [lastRequest, setLastRequest] = useState<{
     amount: number
@@ -108,7 +120,22 @@ export default function Withdraw() {
       }
     }
 
+    const loadWithdrawConfig = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
+        const data = (await res.json()) as WithdrawConfigResponse
+        if (!res.ok || !data?.ok || !data.config) return
+
+        setWithdrawFeePercent(Number(data.config.withdrawFeePercent ?? 0))
+        setMinWithdrawAmount(Number(data.config.minWithdrawAmount ?? 0))
+        setMaxWithdrawAmount(Number(data.config.maxWithdrawAmount ?? 0))
+      } catch {
+        // fallback silencioso
+      }
+    }
+
     loadStoredPix()
+    loadWithdrawConfig()
   }, [navigate, token, user?.id])
 
   const submitWithdraw = async () => {
@@ -128,6 +155,16 @@ export default function Withdraw() {
     const parsedAmount = Number(amount.replace(',', '.'))
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       setError('Informe um valor de saque válido.')
+      return
+    }
+
+    if (parsedAmount < minWithdrawAmount) {
+      setError(`O valor mínimo de saque é ${formatBRL(minWithdrawAmount)}.`)
+      return
+    }
+
+    if (maxWithdrawAmount > 0 && parsedAmount > maxWithdrawAmount) {
+      setError(`O valor máximo de saque é ${formatBRL(maxWithdrawAmount)}.`)
       return
     }
 
@@ -214,6 +251,11 @@ export default function Withdraw() {
     }
   }
 
+  const parsedAmountPreview = Number(String(amount).replace(',', '.'))
+  const hasValidPreviewAmount = Number.isFinite(parsedAmountPreview) && parsedAmountPreview > 0
+  const feeValuePreview = hasValidPreviewAmount ? (parsedAmountPreview * withdrawFeePercent) / 100 : 0
+  const netValuePreview = hasValidPreviewAmount ? parsedAmountPreview - feeValuePreview : 0
+
   return (
     <main className="tasks-page withdraw-page">
       <AppSidebar />
@@ -237,6 +279,19 @@ export default function Withdraw() {
           Seus dados PIX são carregados automaticamente e ficam bloqueados aqui.
           Para alterar a chave PIX, use o botão abaixo.
         </p>
+
+        <div className="withdraw-feedback">
+          <strong>Configuração atual:</strong>{' '}
+          Taxa de saque: {withdrawFeePercent}% •
+          Mínimo: {formatBRL(minWithdrawAmount)} •
+          Máximo: {maxWithdrawAmount > 0 ? formatBRL(maxWithdrawAmount) : 'Sem limite'}
+        </div>
+
+        {hasValidPreviewAmount ? (
+          <div className="withdraw-feedback">
+            Valor líquido estimado: {formatBRL(netValuePreview)} (taxa: {formatBRL(feeValuePreview)})
+          </div>
+        ) : null}
 
         <div className="withdraw-grid">
           <label>
