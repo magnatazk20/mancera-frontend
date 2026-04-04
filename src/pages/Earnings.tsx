@@ -23,7 +23,7 @@ type EarningsApiResponse = {
     withdrawals?: Array<{
       id: number
       amount: number
-      status: 'paid' | 'pending'
+      status: 'paid' | 'pending' | 'processing' | 'failed'
       createdAt?: string
       type?: 'withdraw'
     }>
@@ -235,15 +235,27 @@ export default function Earnings() {
                 </div>
               ) : visibleRecords && visibleRecords.length > 0 ? (
                 <div className="space-y-3">
-                  {visibleRecords.map((item: NonNullable<(typeof visibleRecords)[number]>) => (
-                    <article key={`${tab}-${item.id}`} className="record-card">
-                      <div>
-                        <h3>{tab === 'income' ? 'Depósito' : 'Saque'}</h3>
-                        <p>{item.status === 'paid' ? 'Pago' : 'Pendente'}</p>
-                      </div>
-                      <strong>{formatBRL(Number(item.amount ?? 0))}</strong>
-                    </article>
-                  ))}
+                  {visibleRecords.map((item: NonNullable<(typeof visibleRecords)[number]>) => {
+                    const statusRaw = String(item.status ?? '').toLowerCase()
+                    const statusLabel =
+                      statusRaw === 'paid'
+                        ? 'Pago'
+                        : statusRaw === 'processing'
+                          ? 'Processando'
+                          : statusRaw === 'failed'
+                            ? 'Falhou'
+                            : 'Pendente'
+
+                    return (
+                      <article key={`${tab}-${item.id}`} className="record-card">
+                        <div>
+                          <h3>{tab === 'income' ? 'Depósito' : 'Saque'}</h3>
+                          <p>{statusLabel}</p>
+                        </div>
+                        <strong>{formatBRL(Number(item.amount ?? 0))}</strong>
+                      </article>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="earnings-empty-state">

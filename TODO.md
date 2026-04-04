@@ -1,5 +1,6 @@
-- [x] Atualizar AppSidebar no /dashboard para mostrar botão VIP ao lado direito do user-chip
-- [x] Habilitar clique no botão VIP somente para usuário com depósito pago
-- [x] Ajustar estilos em AppSidebar.css para layout correto do botão VIP no topo
-- [x] Alterar clique do botão VIP para abrir link configurado em community_links
-- [ ] Testar build frontend
+- [x] Atualizar backend `/api/earnings/records/:userId` para mapear status reais de saque (paid, pending, processing, failed)
+- [x] Atualizar frontend `/earnings` para renderizar labels de status de saque conforme retorno SQL
+- [ ] Rodar build do backend
+- [ ] Rodar build do frontend
+- [ ] Commit e push no backend master
+- [ ] Commit e push no frontend main
