@@ -29,6 +29,8 @@ export default function AdminGiftCode() {
   const [isListedForSale, setIsListedForSale] = useState(false)
   const [salePrice, setSalePrice] = useState('')
   const [discountPercent, setDiscountPercent] = useState('')
+  const [productName, setProductName] = useState('')
+  const [productDescription, setProductDescription] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [createdCodes, setCreatedCodes] = useState<GiftCodeItem[]>([])
   const [loadingList, setLoadingList] = useState(false)
@@ -165,6 +167,16 @@ export default function AdminGiftCode() {
       return
     }
 
+    if (isListedForSale && !productName.trim()) {
+      setMessage({ type: 'error', text: 'Informe o nome do produto para venda.' })
+      return
+    }
+
+    if (isListedForSale && !productDescription.trim()) {
+      setMessage({ type: 'error', text: 'Informe a descrição do produto para venda.' })
+      return
+    }
+
     if (isListedForSale && (!Number.isFinite(numericSalePrice) || numericSalePrice <= 0)) {
       setMessage({ type: 'error', text: 'Informe um valor de vale presente válido para venda.' })
       return
@@ -200,6 +212,7 @@ export default function AdminGiftCode() {
           rewardValue: Number(numericReward.toFixed(2)),
           maxTotalUses: numericMaxUses,
           notes: notes.trim(),
+          description: isListedForSale ? productDescription.trim() : '',
           isListedForSale,
           salePrice: isListedForSale ? Number(numericSalePrice.toFixed(2)) : null,
           discountPercent: isListedForSale && numericDiscountPercent != null
@@ -232,6 +245,8 @@ export default function AdminGiftCode() {
       setIsListedForSale(false)
       setSalePrice('')
       setDiscountPercent('')
+      setProductName('')
+      setProductDescription('')
       setMessage({ type: 'success', text: `Código ${normalizedCode} criado com sucesso.` })
 
       await loadCodes()
@@ -320,6 +335,29 @@ export default function AdminGiftCode() {
 
             {isListedForSale ? (
               <>
+                <div className="roulette-code-field">
+                  <label htmlFor="gift-product-name-input">Nome do Produto</label>
+                  <input
+                    id="gift-product-name-input"
+                    type="text"
+                    value={productName}
+                    onChange={(event) => setProductName(event.target.value)}
+                    placeholder="Ex.: Vale Presente Premium"
+                    maxLength={120}
+                  />
+                </div>
+
+                <div className="roulette-code-field full">
+                  <label htmlFor="gift-product-description-input">Descrição do Produto</label>
+                  <textarea
+                    id="gift-product-description-input"
+                    value={productDescription}
+                    onChange={(event) => setProductDescription(event.target.value)}
+                    rows={3}
+                    placeholder="Descreva o produto que será exibido na loja"
+                  />
+                </div>
+
                 <div className="roulette-code-field">
                   <label htmlFor="gift-sale-price-input">Valor do Vale Presente (R$)</label>
                   <input
