@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import heroImage from '../assets/hero.png'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -79,12 +78,21 @@ export default function Register() {
   return (
     <main className="auth-page">
       <section className="auth-shell">
-        <aside className="hero-panel">
-          <img src={heroImage} alt="Imagem decorativa" />
-          <div className="hero-overlay">
-            <h2>Crie sua conta</h2>
-            <p>Junte-se a nós e comece sua jornada hoje mesmo.</p>
+        <aside className="hero-panel login-banner-panel" aria-hidden="true">
+          <div className="pglm-banner-bg-glow" />
+          <div className="pglm-banner-content">
+            <p className="pglm-banner-kicker">PLATAFORMA OFICIAL</p>
+            <h2 className="pglm-banner-title">PGLM</h2>
+            <p className="pglm-banner-subtitle">Acesso seguro, experiência premium.</p>
           </div>
+
+          <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
+            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+          </svg>
+
+          <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
+            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+          </svg>
         </aside>
 
         <section className="form-panel" aria-labelledby="register-title">
