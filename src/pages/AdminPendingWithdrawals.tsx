@@ -44,8 +44,35 @@ export default function AdminPendingWithdrawals() {
   const [withdrawals, setWithdrawals] = useState<PendingWithdrawal[]>([])
   const [actingIds, setActingIds] = useState<number[]>([])
   const [cancelModal, setCancelModal] = useState<CancelModalState>({ open: false, withdrawalId: null })
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing'>('all')
+  const [minAmountFilter, setMinAmountFilter] = useState('')
+  const [maxAmountFilter, setMaxAmountFilter] = useState('')
 
-  const pendingCount = useMemo(() => withdrawals.length, [withdrawals])
+  const filteredWithdrawals = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    const minValue = Number(String(minAmountFilter).replace(',', '.'))
+    const maxValue = Number(String(maxAmountFilter).replace(',', '.'))
+
+    return withdrawals.filter((item) => {
+      const matchesTerm = !term
+        ? true
+        : String(item.user?.name ?? '').toLowerCase().includes(term) ||
+          String(item.user?.phone ?? '').toLowerCase().includes(term) ||
+          String(item.id).includes(term)
+
+      const normalizedStatus = String(item.status ?? '').toLowerCase()
+      const matchesStatus = statusFilter === 'all' ? true : normalizedStatus === statusFilter
+
+      const amount = Number(item.amount ?? 0)
+      const matchesMin = !Number.isFinite(minValue) || minAmountFilter === '' ? true : amount >= minValue
+      const matchesMax = !Number.isFinite(maxValue) || maxAmountFilter === '' ? true : amount <= maxValue
+
+      return matchesTerm && matchesStatus && matchesMin && matchesMax
+    })
+  }, [withdrawals, searchTerm, statusFilter, minAmountFilter, maxAmountFilter])
+
+  const pendingCount = useMemo(() => filteredWithdrawals.length, [filteredWithdrawals])
 
   const fetchPending = async () => {
     setLoading(true)
@@ -130,7 +157,58 @@ export default function AdminPendingWithdrawals() {
         <section className="admin-panel admin-panel-wide">
           <div className="admin-panel-head">
             <h2>Fila de Saques</h2>
-            <span>{pendingCount} pendente(s)</span>
+            <span>
+              exibindo {pendingCount} de {withdrawals.length}
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginBottom: 12 }}>
+            <input
+              type="text"
+              className="admin-input"
+              placeholder="Buscar por telefone, nome ou ID"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+            />
+
+            <select
+              className="admin-input"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing')}
+            >
+              <option value="all">Todos os status</option>
+              <option value="pending">Pendente</option>
+              <option value="processing">Processando</option>
+            </select>
+
+            <input
+              type="text"
+              className="admin-input"
+              placeholder="Valor mínimo"
+              value={minAmountFilter}
+              onChange={(event) => setMinAmountFilter(event.target.value)}
+            />
+
+            <input
+              type="text"
+              className="admin-input"
+              placeholder="Valor máximo"
+              value={maxAmountFilter}
+              onChange={(event) => setMaxAmountFilter(event.target.value)}
+            />
+
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => {
+                setSearchTerm('')
+                setStatusFilter('all')
+                setMinAmountFilter('')
+                setMaxAmountFilter('')
+              }}
+            >
+              Limpar filtros
+            </button>
           </div>
 
           {loading ? <p className="admin-log-hint">Carregando saques pendentes...</p> : null}
@@ -138,11 +216,14 @@ export default function AdminPendingWithdrawals() {
           {!loading && !error && withdrawals.length === 0 ? (
             <p className="admin-log-hint">Não há saques pendentes no momento.</p>
           ) : null}
+          {!loading && !error && withdrawals.length > 0 && filteredWithdrawals.length === 0 ? (
+            <p className="admin-log-hint">Nenhum saque encontrado com os filtros aplicados.</p>
+          ) : null}
 
           {!loading && actionError ? <p className="admin-log-hint">{actionError}</p> : null}
           {!loading && actionSuccess ? <p className="admin-log-hint">{actionSuccess}</p> : null}
 
-          {!loading && !error && withdrawals.length > 0 ? (
+          {!loading && !error && filteredWithdrawals.length > 0 ? (
             <div style={{ overflowX: 'auto' }}>
               <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
@@ -159,7 +240,7 @@ export default function AdminPendingWithdrawals() {
                   </tr>
                 </thead>
                 <tbody>
-                  {withdrawals.map((item) => {
+                  {filteredWithdrawals.map((item) => {
                     const isActing = actingIds.includes(item.id)
                     return (
                       <tr key={item.id}>
