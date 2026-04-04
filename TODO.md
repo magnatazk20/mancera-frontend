@@ -1,8 +1,5 @@
-# TODO
-
-- [x] Criar página `src/pages/AdminLogs.tsx` com listagem organizada de logs
-- [x] Registrar rota protegida `/adf/logs` em `src/App.tsx`
-- [x] Atualizar botão "Logs" no `AdminSidebar.tsx` para navegar para `/adf/logs`
-- [x] Adicionar botão "Ver metadata" por log em `AdminLogs.tsx`
-- [ ] Commitar alterações
-- [ ] Fazer push para `main`
+- [x] Atualizar botão "Ver App Usuário" no menu admin para abrir nova página de gestão de códigos de presente
+- [x] Criar página admin para gerar códigos resgatáveis no /profile (seção "Resgatar Código de Presente")
+- [x] Adicionar rota da nova página no App.tsx
+- [x] Conectar criação/listagem local de códigos com feedback visual para o admin
+- [ ] Validar rapidamente a consistência da navegação e integração visual
