@@ -234,73 +234,88 @@ body {
   position: relative;
   min-height: 280px;
   overflow: hidden;
-  background: #0f172a;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(56, 189, 248, 0.24), transparent 42%),
+    radial-gradient(circle at 78% 76%, rgba(37, 99, 235, 0.24), transparent 46%),
+    linear-gradient(155deg, #020617 0%, #0b1633 48%, #10224a 100%);
 }
 
-.login-banner-track {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-height: 280px;
-  transition: transform 0.8s ease;
-  will-change: transform;
-}
-
-.login-banner-slide {
-  flex: 0 0 100%;
-  min-height: 280px;
-}
-
-.login-banner-slide img {
-  width: 100%;
-  height: 100%;
-  min-height: 280px;
-  object-fit: cover;
-  display: block;
-  filter: saturate(1.05) contrast(1.03) brightness(0.78);
-}
-
-.login-banner-overlay {
+.pglm-banner-bg-glow {
   position: absolute;
-  inset: auto 0 0 0;
-  padding: 22px 22px 18px;
-  color: #f8fafc;
-  background: linear-gradient(transparent, rgba(2, 6, 23, 0.82));
+  inset: 14% 16%;
+  border-radius: 26px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.28), transparent 72%);
+  filter: blur(18px);
 }
 
-.login-banner-overlay h2 {
-  margin: 0 0 6px;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.3px;
+.pglm-banner-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 16px;
 }
 
-.login-banner-overlay p {
+.pglm-banner-kicker {
+  margin: 0 0 10px;
+  color: rgba(186, 230, 253, 0.9);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.pglm-banner-title {
   margin: 0;
-  color: rgba(226, 232, 240, 0.88);
-  font-size: 0.9rem;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #dbeafe;
+  text-shadow:
+    0 0 18px rgba(59, 130, 246, 0.55),
+    0 0 44px rgba(37, 99, 235, 0.4);
 }
 
-.login-banner-dots {
+.pglm-banner-subtitle {
+  margin: 10px 0 0;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.92rem;
+}
+
+.pglm-banner-lightning {
   position: absolute;
-  left: 50%;
-  bottom: 10px;
-  transform: translateX(-50%);
-  display: inline-flex;
-  gap: 8px;
+  width: 78px;
+  height: 140px;
+  z-index: 2;
+  fill: #38bdf8;
+  filter:
+    drop-shadow(0 0 6px rgba(56, 189, 248, 0.95))
+    drop-shadow(0 0 16px rgba(59, 130, 246, 0.75));
+  animation: pglmLightningPulse 1.8s ease-in-out infinite;
 }
 
-.login-banner-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(226, 232, 240, 0.45);
-  transition: all 0.25s ease;
+.pglm-banner-lightning.left {
+  left: 9%;
+  top: 23%;
+  transform: rotate(-8deg);
 }
 
-.login-banner-dot.active {
-  width: 22px;
-  background: #38bdf8;
+.pglm-banner-lightning.right {
+  right: 9%;
+  top: 34%;
+  transform: scaleX(-1) rotate(-6deg);
+  animation-delay: 0.35s;
+}
+
+@keyframes pglmLightningPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.06);
+  }
 }
 
 .hero-overlay {

@@ -1,15 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
-
-const LOGIN_BANNER_IMAGES = [
-  'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80',
-  'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80',
-]
 
 interface AuthResponse {
   message?: string
@@ -26,15 +19,6 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [activeBannerIndex, setActiveBannerIndex] = useState(0)
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setActiveBannerIndex((prev) => (prev + 1) % LOGIN_BANNER_IMAGES.length)
-    }, 3800)
-
-    return () => window.clearInterval(timer)
-  }, [])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -76,24 +60,20 @@ export default function Login() {
     <main className="auth-page">
       <section className="auth-shell">
         <aside className="hero-panel login-banner-panel" aria-hidden="true">
-          <div className="login-banner-track" style={{ transform: `translateX(-${activeBannerIndex * 100}%)` }}>
-            {LOGIN_BANNER_IMAGES.map((imageUrl, index) => (
-              <div key={imageUrl} className="login-banner-slide">
-                <img src={imageUrl} alt={`Banner profissional ${index + 1}`} loading="lazy" />
-              </div>
-            ))}
+          <div className="pglm-banner-bg-glow" />
+          <div className="pglm-banner-content">
+            <p className="pglm-banner-kicker">PLATAFORMA OFICIAL</p>
+            <h2 className="pglm-banner-title">PGLM</h2>
+            <p className="pglm-banner-subtitle">Acesso seguro, experiência premium.</p>
           </div>
 
-          <div className="login-banner-overlay">
-            <h2>Ambiente profissional para acessar sua conta</h2>
-            <p>Interface moderna com foco em desempenho e confiança.</p>
-          </div>
+          <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
+            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+          </svg>
 
-          <div className="login-banner-dots">
-            {LOGIN_BANNER_IMAGES.map((_, index) => (
-              <span key={index} className={`login-banner-dot ${index === activeBannerIndex ? 'active' : ''}`} />
-            ))}
-          </div>
+          <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
+            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+          </svg>
         </aside>
 
         <section className="form-panel" aria-labelledby="login-title">
