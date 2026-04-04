@@ -50,7 +50,6 @@ export default function AdminPendingWithdrawals() {
   const [actingIds, setActingIds] = useState<number[]>([])
   const [cancelModal, setCancelModal] = useState<CancelModalState>({ open: false, withdrawalId: null })
   const [approveModal, setApproveModal] = useState<ApproveModalState>({ open: false, withdrawalId: null })
-  const [selectedProvider, setSelectedProvider] = useState<'syncpay' | 'connectpay'>('connectpay')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing'>('all')
   const [minAmountFilter, setMinAmountFilter] = useState('')
@@ -293,7 +292,6 @@ export default function AdminPendingWithdrawals() {
                               className="btn primary"
                               disabled={isActing}
                               onClick={() => {
-                                setSelectedProvider('connectpay')
                                 setApproveModal({ open: true, withdrawalId: item.id })
                               }}
                             >
@@ -322,7 +320,7 @@ export default function AdminPendingWithdrawals() {
               style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(15, 23, 42, 0.45)',
+                background: 'rgba(15, 23, 42, 0.52)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -334,35 +332,19 @@ export default function AdminPendingWithdrawals() {
                 style={{
                   width: '100%',
                   maxWidth: 440,
-                  background: '#fff',
-                  borderRadius: 12,
-                  border: '1px solid #e2e8f0',
-                  padding: 16,
+                  background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+                  borderRadius: 14,
+                  border: '1px solid #dbe4f0',
+                  boxShadow: '0 20px 40px rgba(2, 6, 23, 0.18)',
+                  padding: 18,
                 }}
               >
-                <h3 style={{ margin: 0, color: '#0f172a' }}>Aprovar saque</h3>
-                <p style={{ marginTop: 10, color: '#334155' }}>
-                  Escolha o provedor para processar o saque.
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: 18 }}>Aprovar saque</h3>
+                <p style={{ marginTop: 10, color: '#475569', lineHeight: 1.45 }}>
+                  Confirme a aprovação deste saque para iniciar o processamento.
                 </p>
 
-                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                  <button
-                    type="button"
-                    className={selectedProvider === 'syncpay' ? 'btn primary' : 'btn ghost'}
-                    onClick={() => setSelectedProvider('syncpay')}
-                  >
-                    SYNCPAY
-                  </button>
-                  <button
-                    type="button"
-                    className={selectedProvider === 'connectpay' ? 'btn primary' : 'btn ghost'}
-                    onClick={() => setSelectedProvider('connectpay')}
-                  >
-                    CONNECTPAY
-                  </button>
-                </div>
-
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 18 }}>
                   <button
                     type="button"
                     className="btn ghost"
@@ -375,11 +357,11 @@ export default function AdminPendingWithdrawals() {
                     className="btn primary"
                     onClick={async () => {
                       if (!approveModal.withdrawalId) return
-                      await processAction(approveModal.withdrawalId, 'approve', false, selectedProvider)
+                      await processAction(approveModal.withdrawalId, 'approve', false, 'connectpay')
                       setApproveModal({ open: false, withdrawalId: null })
                     }}
                   >
-                    Confirmar aprovação
+                    Aprovar
                   </button>
                 </div>
               </div>
