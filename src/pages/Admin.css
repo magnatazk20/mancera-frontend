@@ -364,6 +364,61 @@
   font-size: 0.88rem;
 }
 
+.admin-withdraw-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.3fr) repeat(3, minmax(140px, 0.9fr)) auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #25375e;
+  border-radius: 12px;
+  background: rgba(12, 20, 37, 0.72);
+}
+
+.admin-withdraw-filter-field {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-withdraw-filter-field label {
+  font-size: 0.77rem;
+  color: #9cb0df;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.admin-withdraw-filter-input {
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #334a7a;
+  background: #101a30;
+  color: #e6eeff;
+  padding: 0 12px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.admin-withdraw-filter-input::placeholder {
+  color: #7f95c2;
+}
+
+.admin-withdraw-filter-input:focus {
+  border-color: #4a6fb8;
+  box-shadow: 0 0 0 2px rgba(74, 111, 184, 0.28);
+}
+
+.admin-withdraw-filter-actions {
+  display: flex;
+  align-items: stretch;
+}
+
+.admin-withdraw-filter-actions .btn {
+  width: 100%;
+  min-height: 38px;
+}
+
 .admin-withdraw-cards {
   display: none;
 }
@@ -371,6 +426,15 @@
 @media (max-width: 640px) {
   .admin-kpis {
     grid-template-columns: 1fr;
+  }
+
+  .admin-withdraw-filters {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .admin-withdraw-filter-actions .btn {
+    width: 100%;
   }
 
   .admin-header-meta {

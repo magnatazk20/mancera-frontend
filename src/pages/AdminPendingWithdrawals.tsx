@@ -162,53 +162,71 @@ export default function AdminPendingWithdrawals() {
             </span>
           </div>
 
-          <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', marginBottom: 12 }}>
-            <input
-              type="text"
-              className="admin-input"
-              placeholder="Buscar por telefone, nome ou ID"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
+          <div className="admin-withdraw-filters">
+            <div className="admin-withdraw-filter-field admin-withdraw-filter-search">
+              <label htmlFor="pending-withdraw-search">Busca</label>
+              <input
+                id="pending-withdraw-search"
+                type="text"
+                className="admin-withdraw-filter-input"
+                placeholder="Telefone, nome ou ID"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
 
-            <select
-              className="admin-input"
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing')}
-            >
-              <option value="all">Todos os status</option>
-              <option value="pending">Pendente</option>
-              <option value="processing">Processando</option>
-            </select>
+            <div className="admin-withdraw-filter-field">
+              <label htmlFor="pending-withdraw-status">Status</label>
+              <select
+                id="pending-withdraw-status"
+                className="admin-withdraw-filter-input"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing')}
+              >
+                <option value="all">Todos</option>
+                <option value="pending">Pendente</option>
+                <option value="processing">Processando</option>
+              </select>
+            </div>
 
-            <input
-              type="text"
-              className="admin-input"
-              placeholder="Valor mínimo"
-              value={minAmountFilter}
-              onChange={(event) => setMinAmountFilter(event.target.value)}
-            />
+            <div className="admin-withdraw-filter-field">
+              <label htmlFor="pending-withdraw-min">Valor mín.</label>
+              <input
+                id="pending-withdraw-min"
+                type="text"
+                className="admin-withdraw-filter-input"
+                placeholder="0,00"
+                value={minAmountFilter}
+                onChange={(event) => setMinAmountFilter(event.target.value)}
+              />
+            </div>
 
-            <input
-              type="text"
-              className="admin-input"
-              placeholder="Valor máximo"
-              value={maxAmountFilter}
-              onChange={(event) => setMaxAmountFilter(event.target.value)}
-            />
+            <div className="admin-withdraw-filter-field">
+              <label htmlFor="pending-withdraw-max">Valor máx.</label>
+              <input
+                id="pending-withdraw-max"
+                type="text"
+                className="admin-withdraw-filter-input"
+                placeholder="0,00"
+                value={maxAmountFilter}
+                onChange={(event) => setMaxAmountFilter(event.target.value)}
+              />
+            </div>
 
-            <button
-              type="button"
-              className="btn ghost"
-              onClick={() => {
-                setSearchTerm('')
-                setStatusFilter('all')
-                setMinAmountFilter('')
-                setMaxAmountFilter('')
-              }}
-            >
-              Limpar filtros
-            </button>
+            <div className="admin-withdraw-filter-actions">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => {
+                  setSearchTerm('')
+                  setStatusFilter('all')
+                  setMinAmountFilter('')
+                  setMaxAmountFilter('')
+                }}
+              >
+                Limpar filtros
+              </button>
+            </div>
           </div>
 
           {loading ? <p className="admin-log-hint">Carregando saques pendentes...</p> : null}
