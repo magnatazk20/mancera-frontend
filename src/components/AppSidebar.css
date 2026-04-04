@@ -115,6 +115,40 @@
   margin-bottom: 14px;
 }
 
+.app-sidebar-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.app-sidebar-vip-btn {
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  background: linear-gradient(135deg, rgba(14, 116, 144, 0.55), rgba(37, 99, 235, 0.55));
+  color: #e0f2fe;
+  border-radius: 12px;
+  height: 42px;
+  padding: 0 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.app-sidebar-vip-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(125, 211, 252, 0.8);
+}
+
+.app-sidebar-vip-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(51, 65, 85, 0.45);
+  color: #94a3b8;
+}
+
 .menu-toggle {
   width: 42px;
   height: 42px;

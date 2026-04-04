@@ -1,17 +1,4 @@
-- [x] Adicionar endpoint backend para apagar gift code por ID (admin)
-- [x] Atualizar tela AdminGiftCode com ação de apagar código
-- [x] Testar build frontend e backend
-- [x] Commit e push frontend
-- [x] Commit e push backend
-- [x] Ajustar contraste de cores na página /adf/gift-codes
-- [x] Testar build frontend
-- [x] Commit e push frontend (fix contraste)
-- [x] Registrar logs ao resgatar código em /profile
-- [x] Testar build backend
-- [x] Commit e push backend (logs resgate)
-- [ ] Criar endpoint backend para alterar senha de login do usuário
-- [ ] Criar página frontend de alteração de senha de login
-- [ ] Adicionar rota da nova página no App.tsx
-- [ ] Conectar botão "Alterar Senha" em /profile
-- [ ] Testar build frontend e backend
-- [ ] Commit e push frontend/backend (alterar senha)
+- [x] Atualizar AppSidebar no /dashboard para mostrar botão VIP ao lado direito do user-chip
+- [x] Habilitar clique no botão VIP somente para usuário com depósito pago
+- [x] Ajustar estilos em AppSidebar.css para layout correto do botão VIP no topo
+- [ ] Testar build frontend

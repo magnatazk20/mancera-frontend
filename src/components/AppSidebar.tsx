@@ -16,6 +16,11 @@ type VipResponse = {
   } | null
 }
 
+type PaidTransactionResponse = {
+  ok?: boolean
+  total?: number
+}
+
 function SideIcon({
   name,
   className = 'icon-sm',
@@ -109,6 +114,7 @@ export default function AppSidebar() {
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [vipLabel, setVipLabel] = useState('Sem VIP')
+  const [canClickVip, setCanClickVip] = useState(false)
 
   const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
   let user: StoredUser | null = null
@@ -148,6 +154,30 @@ export default function AppSidebar() {
     loadVip()
   }, [user?.id])
 
+  useEffect(() => {
+    const loadPaidDepositStatus = async () => {
+      if (!user?.id) {
+        setCanClickVip(false)
+        return
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/transactions/paid/${user.id}?limit=1`)
+        if (!res.ok) {
+          setCanClickVip(false)
+          return
+        }
+
+        const data = await res.json() as PaidTransactionResponse
+        setCanClickVip(Number(data?.total ?? 0) > 0)
+      } catch {
+        setCanClickVip(false)
+      }
+    }
+
+    loadPaidDepositStatus()
+  }, [user?.id])
+
   const go = (route: string) => {
     navigate(route)
     setMenuOpen(false)
@@ -175,12 +205,25 @@ export default function AppSidebar() {
         >
           <SideIcon name="menu" className="icon" />
         </button>
-        <div className="user-chip app-sidebar-chip">
-          <div className="avatar">{(user?.name?.[0] ?? 'U').toUpperCase()}</div>
-          <div>
-            <strong>{user?.name ?? 'Usuário'}</strong>
-            <p>{user?.phone ?? '-'} • VIP: {vipLabel}</p>
+
+        <div className="app-sidebar-user-row">
+          <div className="user-chip app-sidebar-chip">
+            <div className="avatar">{(user?.name?.[0] ?? 'U').toUpperCase()}</div>
+            <div>
+              <strong>{user?.name ?? 'Usuário'}</strong>
+              <p>{user?.phone ?? '-'} • VIP: {vipLabel}</p>
+            </div>
           </div>
+
+          <button
+            type="button"
+            className="app-sidebar-vip-btn"
+            onClick={() => canClickVip && navigate('/vip')}
+            disabled={!canClickVip}
+            title={canClickVip ? 'Acessar VIP' : 'Disponível apenas para quem tem depósito com status pago'}
+          >
+            VIP
+          </button>
         </div>
       </header>
 
