@@ -22,6 +22,7 @@ import TaxDeclaration from './pages/TaxDeclaration'
 import WithdrawPassword from './pages/WithdrawPassword'
 import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
+import GiftVouchers from './pages/GiftVouchers'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -81,6 +82,14 @@ export default function App() {
         <Route path="/tax-declaration" element={<TaxDeclaration />} />
         <Route path="/withdraw-password" element={<WithdrawPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route
+          path="/gift-vouchers"
+          element={(
+            <RequireAuth>
+              <GiftVouchers />
+            </RequireAuth>
+          )}
+        />
         <Route
           path="/saque"
           element={(

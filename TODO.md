@@ -1,5 +1,6 @@
-- [x] Ajustar `/adf/withdrawals/users` para listar saques com todos os status exceto `pending`
-- [x] Exibir status dinâmico por linha (paid/processing/failed/outros)
-- [x] Atualizar textos da tela para refletir "não pendentes"
-- [x] Rodar build do frontend
-- [ ] Commit e push no frontend main
+- [x] Criar backend para vales presentes (tabela + endpoints GET/POST)
+- [x] Adicionar script SQL para phpMyAdmin com campos solicitados
+- [x] Criar página frontend de compra de vales presentes
+- [x] Adicionar rota `/gift-vouchers` no App.tsx
+- [x] Conectar botão "Comprar vale-presentes" no Profile para navegar para nova página
+- [ ] Validar estrutura final e realizar commit/push

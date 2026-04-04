@@ -1,0 +1,61 @@
+.gift-vouchers-page {
+  padding-bottom: 5rem;
+}
+
+.gift-vouchers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.gift-vouchers-list {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.gift-voucher-card {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.gift-voucher-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: #111;
+}
+
+.gift-voucher-content {
+  padding: 0.9rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gift-voucher-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.gift-voucher-description {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  min-height: 38px;
+}
+
+.gift-voucher-meta {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.gift-voucher-buy-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+}
