@@ -64,7 +64,6 @@ export default function Dashboard() {
   const [balance, setBalance] = useState(0)
   const [totalDeposits, setTotalDeposits] = useState(0)
   const [cyclePlans, setCyclePlans] = useState<CycleProduct[]>([])
-  const [vipLabel, setVipLabel] = useState('Sem VIP')
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
 
@@ -111,24 +110,8 @@ export default function Dashboard() {
       }
     }
 
-    const loadUserVip = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/vip/user/${user.id}`)
-        if (!response.ok) return
-        const data = (await response.json()) as { ok?: boolean; userVip?: { nivelNome?: string; nivel?: string | number } }
-        if (!data?.ok || !data.userVip) {
-          setVipLabel('Sem VIP')
-          return
-        }
-        setVipLabel(data.userVip.nivelNome || String(data.userVip.nivel || 'Sem VIP'))
-      } catch {
-        // silencioso para não quebrar dashboard
-      }
-    }
-
     loadSummary()
     loadCyclePlans()
-    loadUserVip()
   }, [user?.id])
 
   const formatBRL = (value: number) =>
