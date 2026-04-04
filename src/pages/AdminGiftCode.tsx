@@ -11,6 +11,9 @@ type GiftCodeItem = {
   createdAt: string | null
   usedCount: number
   isActive: boolean
+  isListedForSale: boolean
+  salePrice: number | null
+  discountPercent: number | null
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -23,6 +26,9 @@ export default function AdminGiftCode() {
   const [rewardValue, setRewardValue] = useState('')
   const [maxUses, setMaxUses] = useState('1')
   const [notes, setNotes] = useState('')
+  const [isListedForSale, setIsListedForSale] = useState(false)
+  const [salePrice, setSalePrice] = useState('')
+  const [discountPercent, setDiscountPercent] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [createdCodes, setCreatedCodes] = useState<GiftCodeItem[]>([])
   const [loadingList, setLoadingList] = useState(false)
@@ -62,6 +68,9 @@ export default function AdminGiftCode() {
           createdAt?: string | null
           usedCount?: number
           isActive?: boolean
+          isListedForSale?: boolean
+          salePrice?: number | null
+          discountPercent?: number | null
         }>
       }
 
@@ -80,6 +89,9 @@ export default function AdminGiftCode() {
             createdAt: item.createdAt ?? null,
             usedCount: Number(item.usedCount ?? 0),
             isActive: Boolean(item.isActive),
+            isListedForSale: Boolean(item.isListedForSale),
+            salePrice: item.salePrice == null ? null : Number(item.salePrice),
+            discountPercent: item.discountPercent == null ? null : Number(item.discountPercent),
           }))
         : []
 
@@ -135,6 +147,8 @@ export default function AdminGiftCode() {
     const normalizedCode = code.trim().toUpperCase()
     const numericReward = Number(rewardValue.replace(',', '.'))
     const numericMaxUses = Number(maxUses)
+    const numericSalePrice = Number(salePrice.replace(',', '.'))
+    const numericDiscountPercent = discountPercent.trim() ? Number(discountPercent.replace(',', '.')) : null
 
     if (!normalizedCode) {
       setMessage({ type: 'error', text: 'Informe um código.' })
@@ -148,6 +162,20 @@ export default function AdminGiftCode() {
 
     if (!Number.isInteger(numericMaxUses) || numericMaxUses <= 0) {
       setMessage({ type: 'error', text: 'Informe um limite de resgates válido.' })
+      return
+    }
+
+    if (isListedForSale && (!Number.isFinite(numericSalePrice) || numericSalePrice <= 0)) {
+      setMessage({ type: 'error', text: 'Informe um valor de vale presente válido para venda.' })
+      return
+    }
+
+    if (
+      isListedForSale &&
+      numericDiscountPercent != null &&
+      (!Number.isFinite(numericDiscountPercent) || numericDiscountPercent < 0 || numericDiscountPercent > 100)
+    ) {
+      setMessage({ type: 'error', text: 'Cupom em % deve estar entre 0 e 100.' })
       return
     }
 
@@ -172,6 +200,11 @@ export default function AdminGiftCode() {
           rewardValue: Number(numericReward.toFixed(2)),
           maxTotalUses: numericMaxUses,
           notes: notes.trim(),
+          isListedForSale,
+          salePrice: isListedForSale ? Number(numericSalePrice.toFixed(2)) : null,
+          discountPercent: isListedForSale && numericDiscountPercent != null
+            ? Number(numericDiscountPercent.toFixed(2))
+            : null,
         }),
       })
 
@@ -196,6 +229,9 @@ export default function AdminGiftCode() {
       setRewardValue('')
       setMaxUses('1')
       setNotes('')
+      setIsListedForSale(false)
+      setSalePrice('')
+      setDiscountPercent('')
       setMessage({ type: 'success', text: `Código ${normalizedCode} criado com sucesso.` })
 
       await loadCodes()
@@ -270,6 +306,43 @@ export default function AdminGiftCode() {
                 placeholder="Ex.: campanha do fim de semana"
               />
             </div>
+
+            <div className="roulette-code-field full">
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={isListedForSale}
+                  onChange={(event) => setIsListedForSale(event.target.checked)}
+                />
+                Vender na loja
+              </label>
+            </div>
+
+            {isListedForSale ? (
+              <>
+                <div className="roulette-code-field">
+                  <label htmlFor="gift-sale-price-input">Valor do Vale Presente (R$)</label>
+                  <input
+                    id="gift-sale-price-input"
+                    type="text"
+                    value={salePrice}
+                    onChange={(event) => setSalePrice(event.target.value)}
+                    placeholder="Ex.: 30"
+                  />
+                </div>
+
+                <div className="roulette-code-field">
+                  <label htmlFor="gift-discount-percent-input">Cupom de desconto em % (opcional)</label>
+                  <input
+                    id="gift-discount-percent-input"
+                    type="text"
+                    value={discountPercent}
+                    onChange={(event) => setDiscountPercent(event.target.value)}
+                    placeholder="Ex.: 10"
+                  />
+                </div>
+              </>
+            ) : null}
           </div>
 
           <div className="roulette-code-actions">
@@ -315,6 +388,11 @@ export default function AdminGiftCode() {
                     </p>
                     <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>
                       Status: {item.isActive ? 'Ativo' : 'Inativo'} • Criado em: {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
+                    </p>
+                    <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>
+                      Loja: {item.isListedForSale ? 'Sim' : 'Não'}
+                      {item.isListedForSale ? ` • Valor: ${formatBRL(Number(item.salePrice ?? 0))}` : ''}
+                      {item.isListedForSale && item.discountPercent != null ? ` • Cupom: ${item.discountPercent}%` : ''}
                     </p>
                     {item.notes ? (
                       <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>Obs: {item.notes}</p>
