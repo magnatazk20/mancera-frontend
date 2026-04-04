@@ -10,6 +10,7 @@ type WithdrawConfigResponse = {
     withdrawFeePercent: number
     minWithdrawAmount: number
     maxWithdrawAmount: number
+    withdrawAutoApprove?: boolean
   }
   message?: string
 }
@@ -30,6 +31,7 @@ export default function AdminWithdrawConfig() {
   const [withdrawFeePercent, setWithdrawFeePercent] = useState('')
   const [minWithdrawAmount, setMinWithdrawAmount] = useState('')
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState('')
+  const [withdrawAutoApprove, setWithdrawAutoApprove] = useState(false)
 
   const loadConfig = async () => {
     setLoading(true)
@@ -48,6 +50,7 @@ export default function AdminWithdrawConfig() {
       setWithdrawFeePercent(String(Number(data.config.withdrawFeePercent ?? 0)))
       setMinWithdrawAmount(String(Number(data.config.minWithdrawAmount ?? 0)))
       setMaxWithdrawAmount(String(Number(data.config.maxWithdrawAmount ?? 0)))
+      setWithdrawAutoApprove(Boolean(data.config.withdrawAutoApprove))
     } catch {
       setError('Erro de conexão ao carregar configurações.')
     } finally {
@@ -100,6 +103,7 @@ export default function AdminWithdrawConfig() {
           withdrawFeePercent: fee,
           minWithdrawAmount: min,
           maxWithdrawAmount: max,
+          withdrawAutoApprove,
         }),
       })
 
@@ -125,7 +129,7 @@ export default function AdminWithdrawConfig() {
         <header className="admin-header">
           <div>
             <h1>Configuração de Saque</h1>
-            <p className="admin-subtitle">Defina taxa de saque, valor mínimo e valor máximo.</p>
+            <p className="admin-subtitle">Defina taxa, limites e se o saque será automático.</p>
           </div>
         </header>
 
@@ -171,6 +175,17 @@ export default function AdminWithdrawConfig() {
                   />
                 </label>
               </div>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                <input
+                  type="checkbox"
+                  checked={withdrawAutoApprove}
+                  onChange={(e) => setWithdrawAutoApprove(e.target.checked)}
+                />
+                <span>
+                  Permitir saques automáticos (quando ativado, não precisa aprovação em /adf/withdrawals/pending)
+                </span>
+              </label>
 
               <button type="submit" className="admin-toggle-logs-btn" disabled={saving}>
                 {saving ? 'Salvando...' : 'Salvar configurações'}
