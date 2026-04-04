@@ -1,8 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+
+const LOGIN_BANNER_IMAGES = [
+  'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80',
+  'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80',
+  'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80',
+  'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80',
+]
 
 interface AuthResponse {
   message?: string
@@ -19,6 +26,15 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveBannerIndex((prev) => (prev + 1) % LOGIN_BANNER_IMAGES.length)
+    }, 3800)
+
+    return () => window.clearInterval(timer)
+  }, [])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -59,18 +75,24 @@ export default function Login() {
   return (
     <main className="auth-page">
       <section className="auth-shell">
-        <aside className="hero-panel login-hero-panel" aria-hidden="true">
-          <div className="login-hero-content">
-            <p className="login-hero-kicker">ACESSO SEGURO</p>
-            <h2>Bem-vindo de volta</h2>
-            <p>
-              Entre para acessar sua conta com rapidez, segurança e uma experiência mais profissional.
-            </p>
-            <ul className="login-hero-list">
-              <li>Ambiente protegido</li>
-              <li>Painel otimizado para produtividade</li>
-              <li>Suporte contínuo para sua operação</li>
-            </ul>
+        <aside className="hero-panel login-banner-panel" aria-hidden="true">
+          <div className="login-banner-track" style={{ transform: `translateX(-${activeBannerIndex * 100}%)` }}>
+            {LOGIN_BANNER_IMAGES.map((imageUrl, index) => (
+              <div key={imageUrl} className="login-banner-slide">
+                <img src={imageUrl} alt={`Banner profissional ${index + 1}`} loading="lazy" />
+              </div>
+            ))}
+          </div>
+
+          <div className="login-banner-overlay">
+            <h2>Ambiente profissional para acessar sua conta</h2>
+            <p>Interface moderna com foco em desempenho e confiança.</p>
+          </div>
+
+          <div className="login-banner-dots">
+            {LOGIN_BANNER_IMAGES.map((_, index) => (
+              <span key={index} className={`login-banner-dot ${index === activeBannerIndex ? 'active' : ''}`} />
+            ))}
           </div>
         </aside>
 
