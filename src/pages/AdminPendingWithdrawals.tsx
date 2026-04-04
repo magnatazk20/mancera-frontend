@@ -24,6 +24,11 @@ type CancelModalState = {
   withdrawalId: number | null
 }
 
+type ApproveModalState = {
+  open: boolean
+  withdrawalId: number | null
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -44,6 +49,8 @@ export default function AdminPendingWithdrawals() {
   const [withdrawals, setWithdrawals] = useState<PendingWithdrawal[]>([])
   const [actingIds, setActingIds] = useState<number[]>([])
   const [cancelModal, setCancelModal] = useState<CancelModalState>({ open: false, withdrawalId: null })
+  const [approveModal, setApproveModal] = useState<ApproveModalState>({ open: false, withdrawalId: null })
+  const [selectedProvider, setSelectedProvider] = useState<'syncpay' | 'connectpay'>('connectpay')
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing'>('all')
   const [minAmountFilter, setMinAmountFilter] = useState('')
@@ -111,7 +118,12 @@ export default function AdminPendingWithdrawals() {
     })
   }
 
-  const processAction = async (withdrawalId: number, action: 'approve' | 'cancel', refundOnCancel: boolean) => {
+  const processAction = async (
+    withdrawalId: number,
+    action: 'approve' | 'cancel',
+    refundOnCancel: boolean,
+    provider?: 'syncpay' | 'connectpay'
+  ) => {
     setActionError('')
     setActionSuccess('')
     setActing(withdrawalId, true)
@@ -124,7 +136,7 @@ export default function AdminPendingWithdrawals() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ action, refundOnCancel }),
+        body: JSON.stringify({ action, refundOnCancel, provider }),
       })
 
       const data = await response.json().catch(() => ({}))
@@ -280,7 +292,10 @@ export default function AdminPendingWithdrawals() {
                               type="button"
                               className="btn primary"
                               disabled={isActing}
-                              onClick={() => processAction(item.id, 'approve', false)}
+                              onClick={() => {
+                                setSelectedProvider('connectpay')
+                                setApproveModal({ open: true, withdrawalId: item.id })
+                              }}
                             >
                               {isActing ? 'Processando...' : 'Aprovar'}
                             </button>
@@ -299,6 +314,75 @@ export default function AdminPendingWithdrawals() {
                   })}
                 </tbody>
               </table>
+            </div>
+          ) : null}
+
+          {approveModal.open ? (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(15, 23, 42, 0.45)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+                padding: 16,
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: 440,
+                  background: '#fff',
+                  borderRadius: 12,
+                  border: '1px solid #e2e8f0',
+                  padding: 16,
+                }}
+              >
+                <h3 style={{ margin: 0, color: '#0f172a' }}>Aprovar saque</h3>
+                <p style={{ marginTop: 10, color: '#334155' }}>
+                  Escolha o provedor para processar o saque.
+                </p>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                  <button
+                    type="button"
+                    className={selectedProvider === 'syncpay' ? 'btn primary' : 'btn ghost'}
+                    onClick={() => setSelectedProvider('syncpay')}
+                  >
+                    SYNCPAY
+                  </button>
+                  <button
+                    type="button"
+                    className={selectedProvider === 'connectpay' ? 'btn primary' : 'btn ghost'}
+                    onClick={() => setSelectedProvider('connectpay')}
+                  >
+                    CONNECTPAY
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16 }}>
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={() => setApproveModal({ open: false, withdrawalId: null })}
+                  >
+                    Fechar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn primary"
+                    onClick={async () => {
+                      if (!approveModal.withdrawalId) return
+                      await processAction(approveModal.withdrawalId, 'approve', false, selectedProvider)
+                      setApproveModal({ open: false, withdrawalId: null })
+                    }}
+                  >
+                    Confirmar aprovação
+                  </button>
+                </div>
+              </div>
             </div>
           ) : null}
 
