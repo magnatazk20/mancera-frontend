@@ -21,6 +21,13 @@ type PaidTransactionResponse = {
   total?: number
 }
 
+type CommunityLinksResponse = {
+  ok?: boolean
+  links?: {
+    whatsappGroupUrl?: string
+  }
+}
+
 function SideIcon({
   name,
   className = 'icon-sm',
@@ -115,6 +122,7 @@ export default function AppSidebar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [vipLabel, setVipLabel] = useState('Sem VIP')
   const [canClickVip, setCanClickVip] = useState(false)
+  const [vipGroupUrl, setVipGroupUrl] = useState('')
 
   const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
   let user: StoredUser | null = null
@@ -178,6 +186,31 @@ export default function AppSidebar() {
     loadPaidDepositStatus()
   }, [user?.id])
 
+  useEffect(() => {
+    const loadCommunityLinks = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/community-links`)
+        if (!res.ok) {
+          setVipGroupUrl('')
+          return
+        }
+
+        const data = await res.json() as CommunityLinksResponse
+        const url = String(data?.links?.whatsappGroupUrl ?? '').trim()
+        setVipGroupUrl(url)
+      } catch {
+        setVipGroupUrl('')
+      }
+    }
+
+    loadCommunityLinks()
+  }, [])
+
+  const openVipGroup = () => {
+    if (!canClickVip || !vipGroupUrl) return
+    window.open(vipGroupUrl, '_blank', 'noopener,noreferrer')
+  }
+
   const go = (route: string) => {
     navigate(route)
     setMenuOpen(false)
@@ -218,9 +251,15 @@ export default function AppSidebar() {
           <button
             type="button"
             className="app-sidebar-vip-btn"
-            onClick={() => canClickVip && navigate('/vip')}
-            disabled={!canClickVip}
-            title={canClickVip ? 'Acessar VIP' : 'Disponível apenas para quem tem depósito com status pago'}
+            onClick={openVipGroup}
+            disabled={!canClickVip || !vipGroupUrl}
+            title={
+              !canClickVip
+                ? 'Disponível apenas para quem tem depósito com status pago'
+                : !vipGroupUrl
+                  ? 'Link do grupo VIP não configurado'
+                  : 'Abrir grupo VIP'
+            }
           >
             VIP
           </button>

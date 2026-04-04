@@ -1,4 +1,5 @@
 - [x] Atualizar AppSidebar no /dashboard para mostrar botão VIP ao lado direito do user-chip
 - [x] Habilitar clique no botão VIP somente para usuário com depósito pago
 - [x] Ajustar estilos em AppSidebar.css para layout correto do botão VIP no topo
+- [x] Alterar clique do botão VIP para abrir link configurado em community_links
 - [ ] Testar build frontend
