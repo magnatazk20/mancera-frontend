@@ -19,6 +19,10 @@ type VipResponse = {
 type PaidTransactionResponse = {
   ok?: boolean
   total?: number
+  transactions?: Array<{
+    type?: 'deposit' | 'withdraw'
+    status?: 'paid' | 'pending'
+  }>
 }
 
 type CommunityLinksResponse = {
@@ -178,7 +182,10 @@ export default function AppSidebar() {
         }
 
         const data = await res.json() as PaidTransactionResponse
-        setCanClickVip(Number(data?.total ?? 0) > 0)
+        const hasPaidDeposit = Array.isArray(data?.transactions)
+          ? data.transactions.some((tx) => tx?.type === 'deposit' && tx?.status === 'paid')
+          : Number(data?.total ?? 0) > 0
+        setCanClickVip(hasPaidDeposit)
       } catch {
         setCanClickVip(false)
       }
