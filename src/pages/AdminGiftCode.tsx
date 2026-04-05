@@ -108,6 +108,13 @@ export default function AdminGiftCode() {
 
   useEffect(() => {
     loadCodes()
+    const intervalId = window.setInterval(() => {
+      loadCodes()
+    }, 10000)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
   }, [])
 
   const handleDelete = async (giftCodeId: number, giftCodeLabel: string) => {
@@ -425,20 +432,42 @@ export default function AdminGiftCode() {
             <div style={{ marginTop: 18 }}>
               <h3 style={{ marginBottom: 10, color: '#f8fafc' }}>Códigos no Banco</h3>
               <div style={{ display: 'grid', gap: 10 }}>
-                {createdCodes.map((item) => (
+                {createdCodes.map((item) => {
+                  const isLimitReached = item.maxUses > 0 && item.usedCount >= item.maxUses
+
+                  return (
                   <div
                     key={item.id}
                     style={{
-                      border: '1px solid rgba(148,163,184,0.3)',
+                      border: isLimitReached ? '1px solid rgba(248,113,113,0.65)' : '1px solid rgba(148,163,184,0.3)',
                       borderRadius: 12,
                       padding: 12,
-                      background: 'rgba(15,23,42,0.6)',
+                      background: isLimitReached ? 'rgba(127,29,29,0.25)' : 'rgba(15,23,42,0.6)',
                     }}
                   >
                     <strong style={{ color: '#f8fafc' }}>{item.code}</strong>
                     <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>
                       Recompensa: {formatBRL(item.rewardValue)} • Limite: {item.maxUses} • Usos: {item.usedCount}
                     </p>
+                    <p style={{ margin: '6px 0 0', color: isLimitReached ? '#fca5a5' : '#93c5fd', fontWeight: 600 }}>
+                      Pessoas que já resgataram (tempo real): {item.usedCount}
+                    </p>
+                    {isLimitReached ? (
+                      <p
+                        style={{
+                          margin: '6px 0 0',
+                          color: '#fecaca',
+                          background: 'rgba(127, 29, 29, 0.45)',
+                          border: '1px solid rgba(248, 113, 113, 0.55)',
+                          borderRadius: 8,
+                          padding: '6px 8px',
+                          display: 'inline-block',
+                          fontWeight: 700,
+                        }}
+                      >
+                        Limite atingido
+                      </p>
+                    ) : null}
                     <p style={{ margin: '6px 0 0', color: '#94a3b8' }}>
                       Status: {item.isActive ? 'Ativo' : 'Inativo'} • Criado em: {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
                     </p>
@@ -470,7 +499,7 @@ export default function AdminGiftCode() {
                       </button>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
           ) : null}
