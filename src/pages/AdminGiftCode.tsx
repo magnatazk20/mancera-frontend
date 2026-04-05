@@ -31,6 +31,7 @@ export default function AdminGiftCode() {
   const [discountPercent, setDiscountPercent] = useState('')
   const [productName, setProductName] = useState('')
   const [productDescription, setProductDescription] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [createdCodes, setCreatedCodes] = useState<GiftCodeItem[]>([])
   const [loadingList, setLoadingList] = useState(false)
@@ -214,6 +215,7 @@ export default function AdminGiftCode() {
           notes: notes.trim(),
           productName: isListedForSale ? productName.trim() : '',
           description: isListedForSale ? productDescription.trim() : '',
+          imageUrl: isListedForSale ? imageUrl.trim() : '',
           isListedForSale,
           salePrice: isListedForSale ? Number(numericSalePrice.toFixed(2)) : null,
           discountPercent: isListedForSale && numericDiscountPercent != null
@@ -248,6 +250,7 @@ export default function AdminGiftCode() {
       setDiscountPercent('')
       setProductName('')
       setProductDescription('')
+      setImageUrl('')
       setMessage({ type: 'success', text: `Código ${normalizedCode} criado com sucesso.` })
 
       await loadCodes()
@@ -332,6 +335,17 @@ export default function AdminGiftCode() {
                 />
                 Vender na loja
               </label>
+            </div>
+
+            <div className="roulette-code-field full">
+              <label htmlFor="gift-image-url-input">Link da Foto (opcional)</label>
+              <input
+                id="gift-image-url-input"
+                type="url"
+                value={imageUrl}
+                onChange={(event) => setImageUrl(event.target.value)}
+                placeholder="https://exemplo.com/imagem.jpg"
+              />
             </div>
 
             {isListedForSale ? (
