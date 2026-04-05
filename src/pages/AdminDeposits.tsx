@@ -17,6 +17,11 @@ type DepositRow = {
     name: string
     phone: string
   }
+  referrer?: {
+    id: number
+    name: string
+    phone: string
+  } | null
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -217,6 +222,7 @@ export default function AdminDeposits() {
                     <th>ID</th>
                     <th>Usuário</th>
                     <th>Telefone</th>
+                    <th>Indicado por</th>
                     <th>Valor</th>
                     <th>Método</th>
                     <th>Status</th>
@@ -238,6 +244,11 @@ export default function AdminDeposits() {
                         <td>#{item.id}</td>
                         <td>{item.user?.name ?? '-'}</td>
                         <td>{item.user?.phone ?? '-'}</td>
+                        <td>
+                          {item.referrer
+                            ? `${item.referrer.name || '-'} (${item.referrer.phone || '-'})`
+                            : '-'}
+                        </td>
                         <td>{formatBRL(item.amount)}</td>
                         <td>{String(item.method ?? 'pix').toUpperCase()}</td>
                         <td>{String(item.status ?? 'pending').toUpperCase()}</td>
