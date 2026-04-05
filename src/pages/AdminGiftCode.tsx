@@ -212,6 +212,7 @@ export default function AdminGiftCode() {
           rewardValue: Number(numericReward.toFixed(2)),
           maxTotalUses: numericMaxUses,
           notes: notes.trim(),
+          productName: isListedForSale ? productName.trim() : '',
           description: isListedForSale ? productDescription.trim() : '',
           isListedForSale,
           salePrice: isListedForSale ? Number(numericSalePrice.toFixed(2)) : null,
