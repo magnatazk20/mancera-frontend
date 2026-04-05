@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './CashIn.css'
@@ -17,6 +17,10 @@ export default function CashIn() {
   const method = 'pix'
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [depositEnabled, setDepositEnabled] = useState(true)
+  const [minDepositAmount, setMinDepositAmount] = useState(1)
+  const [maxDepositAmount, setMaxDepositAmount] = useState(1000)
+  const [quickAmounts, setQuickAmounts] = useState<number[]>([20, 50, 100, 200, 500])
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -26,6 +30,45 @@ export default function CashIn() {
     } catch {
       return null
     }
+  }, [])
+
+  useEffect(() => {
+    const loadDepositConfig = async () => {
+      try {
+        const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+        const response = await fetch(`${API_URL}/api/admin/deposit-config`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        })
+
+        const data = await response.json().catch(() => ({} as any))
+        if (!response.ok || !data?.ok || !data?.config) return
+
+        const cfg = data.config as {
+          depositEnabled?: boolean
+          minDepositAmount?: number
+          maxDepositAmount?: number
+          quickPresetValues?: Array<number | string>
+        }
+
+        const min = Number(cfg.minDepositAmount ?? 1)
+        const max = Number(cfg.maxDepositAmount ?? 1000)
+        const presets = Array.isArray(cfg.quickPresetValues)
+          ? cfg.quickPresetValues
+              .map((v) => Number(v))
+              .filter((v) => Number.isFinite(v) && v > 0)
+              .map((v) => Number(v.toFixed(2)))
+          : []
+
+        setDepositEnabled(Boolean(cfg.depositEnabled ?? true))
+        setMinDepositAmount(Number.isFinite(min) && min >= 0 ? min : 1)
+        setMaxDepositAmount(Number.isFinite(max) && max > 0 ? max : 1000)
+        if (presets.length > 0) setQuickAmounts(presets)
+      } catch {
+        // mantém fallback local
+      }
+    }
+
+    loadDepositConfig()
   }, [])
 
   const submitCashIn = async (event: FormEvent) => {
@@ -40,6 +83,21 @@ export default function CashIn() {
     const normalized = Number(amount.replace(',', '.'))
     if (!Number.isFinite(normalized) || normalized <= 0) {
       setMessage({ type: 'error', text: 'Informe um valor válido maior que zero.' })
+      return
+    }
+
+    if (!depositEnabled) {
+      setMessage({ type: 'error', text: 'Depósitos estão desativados no momento.' })
+      return
+    }
+
+    if (normalized < minDepositAmount) {
+      setMessage({ type: 'error', text: `Valor mínimo para depósito é R$ ${minDepositAmount.toFixed(2).replace('.', ',')}.` })
+      return
+    }
+
+    if (maxDepositAmount > 0 && normalized > maxDepositAmount) {
+      setMessage({ type: 'error', text: `Valor máximo para depósito é R$ ${maxDepositAmount.toFixed(2).replace('.', ',')}.` })
       return
     }
 
@@ -94,7 +152,6 @@ export default function CashIn() {
     }
   }
 
-  const quickAmounts = [20, 50, 100, 200, 500]
   const normalized = Number(amount.replace(',', '.'))
   const displayValue = Number.isFinite(normalized) && normalized > 0 ? normalized : 0
 
@@ -115,7 +172,9 @@ export default function CashIn() {
           <form className="cashin-form" onSubmit={submitCashIn}>
             <div className="cashin-label-row">
               <span>Valor do depósito</span>
-              <small>mín. R$ 1,00 • máx. R$ 1.000,00</small>
+              <small>
+                mín. R$ {minDepositAmount.toFixed(2).replace('.', ',')} • máx. R$ {maxDepositAmount.toFixed(2).replace('.', ',')}
+              </small>
             </div>
 
             <label>

@@ -1,8 +1,8 @@
-# TODO - Configuração de valores pré-selecionados em /cashin
+# TODO - CashIn dinâmico com config de depósitos
 
-- [ ] Backend: adicionar campo de valores rápidos na `system_deposit_config` (GET/POST)
-- [ ] Frontend Admin: adicionar campo de edição dos valores rápidos em `/adf/deposit-config`
-- [ ] Frontend CashIn: consumir valores rápidos da API e usar fallback padrão
-- [ ] Validar build backend e frontend
-- [ ] Commit e push backend (master)
-- [ ] Commit e push frontend (main)
+- [x] Backend `/api/admin/deposit-config` com `quickPresetValues`
+- [x] Admin `/adf/deposit-config` com campo de valores pré-selecionados
+- [ ] Atualizar `/cashin` para carregar config dinâmica
+- [ ] Aplicar validações de min/max/depositEnabled no `/cashin`
+- [ ] Build frontend
+- [ ] Commit e push frontend
