@@ -10,6 +10,7 @@ export default function AdminDepositConfig() {
   const [saving, setSaving] = useState(false)
   const [minDepositAmount, setMinDepositAmount] = useState('0')
   const [maxDepositAmount, setMaxDepositAmount] = useState('0')
+  const [depositEnabled, setDepositEnabled] = useState(true)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const fetchConfig = async () => {
@@ -28,6 +29,7 @@ export default function AdminDepositConfig() {
 
       setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? 0)))
       setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? 0)))
+      setDepositEnabled(Boolean(data?.config?.depositEnabled ?? true))
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração de depósitos.' })
     } finally {
@@ -70,6 +72,7 @@ export default function AdminDepositConfig() {
         body: JSON.stringify({
           minDepositAmount: Number(min.toFixed(2)),
           maxDepositAmount: Number(max.toFixed(2)),
+          depositEnabled,
         }),
       })
 
@@ -83,6 +86,7 @@ export default function AdminDepositConfig() {
       setToast({ type: 'success', message: String(data?.message ?? 'Configuração de depósitos salva com sucesso.') })
       setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? min)))
       setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? max)))
+      setDepositEnabled(Boolean(data?.config?.depositEnabled ?? depositEnabled))
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao salvar configuração de depósitos.' })
     } finally {
@@ -134,13 +138,23 @@ export default function AdminDepositConfig() {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                <button type="button" className="btn primary" onClick={handleSave} disabled={saving}>
-                  {saving ? 'Salvando...' : 'Salvar configuração'}
-                </button>
-                <button type="button" className="btn ghost" onClick={fetchConfig} disabled={saving}>
-                  Recarregar
-                </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}>
+                  <input
+                    type="checkbox"
+                    checked={depositEnabled}
+                    onChange={(event) => setDepositEnabled(event.target.checked)}
+                  />
+                  Depósitos ativos
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button type="button" className="btn primary" onClick={handleSave} disabled={saving}>
+                    {saving ? 'Salvando...' : 'Salvar configuração'}
+                  </button>
+                  <button type="button" className="btn ghost" onClick={fetchConfig} disabled={saving}>
+                    Recarregar
+                  </button>
+                </div>
               </div>
             </div>
           )}
