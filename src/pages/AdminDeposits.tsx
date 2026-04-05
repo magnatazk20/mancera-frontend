@@ -22,6 +22,13 @@ type DepositRow = {
     name: string
     phone: string
   } | null
+  referred?: {
+    count: number
+    users: Array<{
+      name: string
+      phone: string
+    }>
+  }
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -223,6 +230,7 @@ export default function AdminDeposits() {
                     <th>Usuário</th>
                     <th>Telefone</th>
                     <th>Indicado por</th>
+                    <th>Indicados cadastrados</th>
                     <th>Valor</th>
                     <th>Método</th>
                     <th>Status</th>
@@ -248,6 +256,22 @@ export default function AdminDeposits() {
                           {item.referrer
                             ? `${item.referrer.name || '-'} (${item.referrer.phone || '-'})`
                             : '-'}
+                        </td>
+                        <td>
+                          {item.referred?.count ? (
+                            <details>
+                              <summary>{item.referred.count} cadastrado(s)</summary>
+                              <ul style={{ margin: '6px 0 0 16px', padding: 0 }}>
+                                {item.referred.users.map((u, idx) => (
+                                  <li key={`${item.id}-referred-${idx}`}>
+                                    {u.name || '-'} ({u.phone || '-'})
+                                  </li>
+                                ))}
+                              </ul>
+                            </details>
+                          ) : (
+                            '0'
+                          )}
                         </td>
                         <td>{formatBRL(item.amount)}</td>
                         <td>{String(item.method ?? 'pix').toUpperCase()}</td>
