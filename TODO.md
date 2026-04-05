@@ -1,11 +1,8 @@
-# TODO - Configuração de Depósitos (Admin)
+# TODO - Configuração de valores pré-selecionados em /cashin
 
-- [ ] Backend: criar endpoint GET `/api/admin/deposit-config`
-- [ ] Backend: criar endpoint POST `/api/admin/deposit-config`
-- [ ] Frontend: criar página `AdminDepositConfig.tsx`
-- [ ] Frontend: adicionar rota `/adf/deposit-config`
-- [ ] Frontend: adicionar botão "Config Depósitos" na sidebar admin
-- [ ] Testar build backend
-- [ ] Testar build frontend
-- [ ] Commit e push backend
-- [ ] Commit e push frontend
+- [ ] Backend: adicionar campo de valores rápidos na `system_deposit_config` (GET/POST)
+- [ ] Frontend Admin: adicionar campo de edição dos valores rápidos em `/adf/deposit-config`
+- [ ] Frontend CashIn: consumir valores rápidos da API e usar fallback padrão
+- [ ] Validar build backend e frontend
+- [ ] Commit e push backend (master)
+- [ ] Commit e push frontend (main)
