@@ -36,6 +36,9 @@ export default function AdminDeposits() {
   const [deposits, setDeposits] = useState<DepositRow[]>([])
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<'all' | 'paid' | 'pending' | 'processing' | 'failed'>('all')
+  const [actionError, setActionError] = useState('')
+  const [actionSuccess, setActionSuccess] = useState('')
+  const [actingIds, setActingIds] = useState<number[]>([])
 
   const filteredDeposits = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -91,6 +94,45 @@ export default function AdminDeposits() {
     fetchDeposits()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
+
+  const setActing = (depositId: number, value: boolean) => {
+    setActingIds((prev) => {
+      if (value) return prev.includes(depositId) ? prev : [...prev, depositId]
+      return prev.filter((id) => id !== depositId)
+    })
+  }
+
+  const processDepositAction = async (depositId: number, action: 'approve' | 'cancel') => {
+    setActionError('')
+    setActionSuccess('')
+    setActing(depositId, true)
+
+    try {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+      const response = await fetch(`${API_URL}/api/admin/deposits/${depositId}/action`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ action }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok || !data?.ok) {
+        setActionError(String(data?.error ?? 'Não foi possível processar a ação do depósito.'))
+        return
+      }
+
+      setActionSuccess(String(data?.message ?? 'Ação processada com sucesso.'))
+      await fetchDeposits()
+    } catch {
+      setActionError('Falha de conexão ao processar ação do depósito.')
+    } finally {
+      setActing(depositId, false)
+    }
+  }
 
   return (
     <main className="admin-page">
@@ -161,6 +203,9 @@ export default function AdminDeposits() {
             <p className="admin-log-hint">Nenhum depósito encontrado.</p>
           ) : null}
 
+          {!loading && actionError ? <p className="admin-log-hint">{actionError}</p> : null}
+          {!loading && actionSuccess ? <p className="admin-log-hint">{actionSuccess}</p> : null}
+
           {!loading && !error && filteredDeposits.length > 0 ? (
             <div style={{ overflowX: 'auto' }}>
               <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -175,22 +220,50 @@ export default function AdminDeposits() {
                     <th>TxId</th>
                     <th>Criado em</th>
                     <th>Pago em</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDeposits.map((item) => (
-                    <tr key={item.id}>
-                      <td>#{item.id}</td>
-                      <td>{item.user?.name ?? '-'}</td>
-                      <td>{item.user?.phone ?? '-'}</td>
-                      <td>{formatBRL(item.amount)}</td>
-                      <td>{String(item.method ?? 'pix').toUpperCase()}</td>
-                      <td>{String(item.status ?? 'pending').toUpperCase()}</td>
-                      <td>{item.providerTransactionId ?? '-'}</td>
-                      <td>{formatDate(item.createdAt)}</td>
-                      <td>{formatDate(item.paidAt)}</td>
-                    </tr>
-                  ))}
+                  {filteredDeposits.map((item) => {
+                    const normalizedStatus = String(item.status ?? '').toLowerCase()
+                    const isActing = actingIds.includes(item.id)
+                    const canApprove = normalizedStatus !== 'paid'
+                    const canCancel = normalizedStatus !== 'failed' && normalizedStatus !== 'canceled' && normalizedStatus !== 'cancelled'
+
+                    return (
+                      <tr key={item.id}>
+                        <td>#{item.id}</td>
+                        <td>{item.user?.name ?? '-'}</td>
+                        <td>{item.user?.phone ?? '-'}</td>
+                        <td>{formatBRL(item.amount)}</td>
+                        <td>{String(item.method ?? 'pix').toUpperCase()}</td>
+                        <td>{String(item.status ?? 'pending').toUpperCase()}</td>
+                        <td>{item.providerTransactionId ?? '-'}</td>
+                        <td>{formatDate(item.createdAt)}</td>
+                        <td>{formatDate(item.paidAt)}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                            <button
+                              type="button"
+                              className="btn primary"
+                              disabled={isActing || !canApprove}
+                              onClick={() => processDepositAction(item.id, 'approve')}
+                            >
+                              {isActing ? 'Processando...' : 'Aprovar'}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn ghost"
+                              disabled={isActing || !canCancel}
+                              onClick={() => processDepositAction(item.id, 'cancel')}
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
