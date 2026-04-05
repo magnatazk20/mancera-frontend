@@ -71,6 +71,23 @@ export default function AdminDeposits() {
     })
   }, [deposits, search, status])
 
+  const depositStats = useMemo(() => {
+    const paidCount = deposits.filter((item) => {
+      const normalizedStatus = String(item.status ?? '').toLowerCase()
+      return normalizedStatus === 'paid' || normalizedStatus === 'payment.paid'
+    }).length
+
+    const pendingCount = deposits.filter((item) => {
+      const normalizedStatus = String(item.status ?? '').toLowerCase()
+      return normalizedStatus === 'pending' || normalizedStatus === 'processing'
+    }).length
+
+    return {
+      paidCount,
+      pendingCount,
+    }
+  }, [deposits])
+
   const fetchDeposits = async () => {
     setLoading(true)
     setError('')
@@ -161,6 +178,19 @@ export default function AdminDeposits() {
             <p className="admin-subtitle">Visualize depósitos pagos e pendentes dos usuários.</p>
           </div>
         </header>
+
+        <section className="admin-kpis">
+          <article className="admin-kpi-card">
+            <h3>Depósitos pagos</h3>
+            <strong>{depositStats.paidCount}</strong>
+            <p>Quantidade total de depósitos com status pago.</p>
+          </article>
+          <article className="admin-kpi-card">
+            <h3>Depósitos pendentes</h3>
+            <strong>{depositStats.pendingCount}</strong>
+            <p>Quantidade total de depósitos pendentes/processando.</p>
+          </article>
+        </section>
 
         <section className="admin-panel admin-panel-wide">
           <div className="admin-panel-head">
