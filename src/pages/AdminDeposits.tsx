@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
+import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 
 type DepositRow = {
@@ -36,9 +37,8 @@ export default function AdminDeposits() {
   const [deposits, setDeposits] = useState<DepositRow[]>([])
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<'all' | 'paid' | 'pending' | 'processing' | 'failed'>('all')
-  const [actionError, setActionError] = useState('')
-  const [actionSuccess, setActionSuccess] = useState('')
   const [actingIds, setActingIds] = useState<number[]>([])
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const filteredDeposits = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -76,14 +76,18 @@ export default function AdminDeposits() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || !data?.ok) {
-        setError(String(data?.error ?? 'Não foi possível carregar entradas de pagamentos.'))
+        const msg = String(data?.error ?? 'Não foi possível carregar entradas de pagamentos.')
+        setError(msg)
+        setToast({ type: 'error', message: msg })
         setDeposits([])
         return
       }
 
       setDeposits(Array.isArray(data.deposits) ? data.deposits : [])
     } catch {
-      setError('Falha de conexão ao carregar entradas de pagamentos.')
+      const msg = 'Falha de conexão ao carregar entradas de pagamentos.'
+      setError(msg)
+      setToast({ type: 'error', message: msg })
       setDeposits([])
     } finally {
       setLoading(false)
@@ -103,8 +107,6 @@ export default function AdminDeposits() {
   }
 
   const processDepositAction = async (depositId: number, action: 'approve' | 'cancel') => {
-    setActionError('')
-    setActionSuccess('')
     setActing(depositId, true)
 
     try {
@@ -121,14 +123,17 @@ export default function AdminDeposits() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || !data?.ok) {
-        setActionError(String(data?.error ?? 'Não foi possível processar a ação do depósito.'))
+        const msg = String(data?.error ?? 'Não foi possível processar a ação do depósito.')
+        setToast({ type: 'error', message: msg })
         return
       }
 
-      setActionSuccess(String(data?.message ?? 'Ação processada com sucesso.'))
+      const msg = String(data?.message ?? 'Ação processada com sucesso.')
+      setToast({ type: 'success', message: msg })
       await fetchDeposits()
     } catch {
-      setActionError('Falha de conexão ao processar ação do depósito.')
+      const msg = 'Falha de conexão ao processar ação do depósito.'
+      setToast({ type: 'error', message: msg })
     } finally {
       setActing(depositId, false)
     }
@@ -203,8 +208,6 @@ export default function AdminDeposits() {
             <p className="admin-log-hint">Nenhum depósito encontrado.</p>
           ) : null}
 
-          {!loading && actionError ? <p className="admin-log-hint">{actionError}</p> : null}
-          {!loading && actionSuccess ? <p className="admin-log-hint">{actionSuccess}</p> : null}
 
           {!loading && !error && filteredDeposits.length > 0 ? (
             <div style={{ overflowX: 'auto' }}>
@@ -270,6 +273,12 @@ export default function AdminDeposits() {
           ) : null}
         </section>
       </section>
+      <FloatingToast
+        open={Boolean(toast?.message)}
+        type={toast?.type ?? 'success'}
+        message={toast?.message ?? ''}
+        onClose={() => setToast(null)}
+      />
     </main>
   )
 }
