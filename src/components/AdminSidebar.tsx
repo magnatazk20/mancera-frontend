@@ -72,6 +72,7 @@ export default function AdminSidebar() {
 
           <p className="dash-nav-group-title">Entradas de Pagamentos</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos Pagos e Pendentes</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Config Depósitos</button>
 
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Ver App Usuário</button>

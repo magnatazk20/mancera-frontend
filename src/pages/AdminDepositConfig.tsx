@@ -1,0 +1,158 @@
+import { useEffect, useState } from 'react'
+import AdminSidebar from '../components/AdminSidebar'
+import FloatingToast from '../components/FloatingToast'
+import './Admin.css'
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+
+export default function AdminDepositConfig() {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [minDepositAmount, setMinDepositAmount] = useState('0')
+  const [maxDepositAmount, setMaxDepositAmount] = useState('0')
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  const fetchConfig = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+      const response = await fetch(`${API_URL}/api/admin/deposit-config`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      })
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok || !data?.ok) {
+        setToast({ type: 'error', message: String(data?.error ?? 'Erro ao carregar configuração de depósitos.') })
+        return
+      }
+
+      setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? 0)))
+      setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? 0)))
+    } catch {
+      setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração de depósitos.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchConfig()
+  }, [])
+
+  const handleSave = async () => {
+    const min = Number(String(minDepositAmount).replace(',', '.'))
+    const max = Number(String(maxDepositAmount).replace(',', '.'))
+
+    if (!Number.isFinite(min) || min < 0) {
+      setToast({ type: 'error', message: 'Valor mínimo inválido.' })
+      return
+    }
+
+    if (!Number.isFinite(max) || max < 0) {
+      setToast({ type: 'error', message: 'Valor máximo inválido.' })
+      return
+    }
+
+    if (max > 0 && min > max) {
+      setToast({ type: 'error', message: 'Valor mínimo não pode ser maior que o máximo.' })
+      return
+    }
+
+    setSaving(true)
+    try {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+      const response = await fetch(`${API_URL}/api/admin/deposit-config`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          minDepositAmount: Number(min.toFixed(2)),
+          maxDepositAmount: Number(max.toFixed(2)),
+        }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok || !data?.ok) {
+        setToast({ type: 'error', message: String(data?.error ?? 'Erro ao salvar configuração de depósitos.') })
+        return
+      }
+
+      setToast({ type: 'success', message: String(data?.message ?? 'Configuração de depósitos salva com sucesso.') })
+      setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? min)))
+      setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? max)))
+    } catch {
+      setToast({ type: 'error', message: 'Falha de conexão ao salvar configuração de depósitos.' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <main className="admin-page">
+      <AdminSidebar />
+      <section className="admin-content admin-users-page">
+        <header className="admin-header">
+          <div>
+            <h1>Config Depósitos</h1>
+            <p className="admin-subtitle">Defina valor mínimo e máximo permitido para depósitos.</p>
+          </div>
+        </header>
+
+        <section className="admin-panel admin-panel-wide" style={{ maxWidth: 560 }}>
+          {loading ? (
+            <p className="admin-log-hint">Carregando configurações...</p>
+          ) : (
+            <div style={{ display: 'grid', gap: 12 }}>
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="min-deposit">Valor mínimo de depósito</label>
+                <input
+                  id="min-deposit"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="admin-withdraw-filter-input"
+                  value={minDepositAmount}
+                  onChange={(event) => setMinDepositAmount(event.target.value)}
+                  placeholder="Ex.: 20.00"
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="max-deposit">Valor máximo de depósito</label>
+                <input
+                  id="max-deposit"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  className="admin-withdraw-filter-input"
+                  value={maxDepositAmount}
+                  onChange={(event) => setMaxDepositAmount(event.target.value)}
+                  placeholder="Ex.: 1000.00"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                <button type="button" className="btn primary" onClick={handleSave} disabled={saving}>
+                  {saving ? 'Salvando...' : 'Salvar configuração'}
+                </button>
+                <button type="button" className="btn ghost" onClick={fetchConfig} disabled={saving}>
+                  Recarregar
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </section>
+
+      <FloatingToast
+        open={Boolean(toast?.message)}
+        type={toast?.type ?? 'success'}
+        message={toast?.message ?? ''}
+        onClose={() => setToast(null)}
+      />
+    </main>
+  )
+}
