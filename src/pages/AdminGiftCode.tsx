@@ -47,7 +47,9 @@ export default function AdminGiftCode() {
 
   const loadCodes = async () => {
     if (!token) {
-      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
+      const msg = 'Token não encontrado. Faça login novamente.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
@@ -78,7 +80,9 @@ export default function AdminGiftCode() {
       }
 
       if (!res.ok || !data?.ok) {
-        setMessage({ type: 'error', text: data?.error || 'Falha ao carregar códigos.' })
+        const msg = data?.error || 'Falha ao carregar códigos.'
+        setMessage({ type: 'error', text: msg })
+        window.alert(msg)
         return
       }
 
@@ -100,7 +104,9 @@ export default function AdminGiftCode() {
 
       setCreatedCodes(mapped)
     } catch {
-      setMessage({ type: 'error', text: 'Erro de conexão ao carregar códigos.' })
+      const msg = 'Erro de conexão ao carregar códigos.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
     } finally {
       setLoadingList(false)
     }
@@ -119,7 +125,9 @@ export default function AdminGiftCode() {
 
   const handleDelete = async (giftCodeId: number, giftCodeLabel: string) => {
     if (!token) {
-      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
+      const msg = 'Token não encontrado. Faça login novamente.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
@@ -140,14 +148,20 @@ export default function AdminGiftCode() {
       const data = await res.json() as { ok?: boolean; error?: string; message?: string }
 
       if (!res.ok || !data?.ok) {
-        setMessage({ type: 'error', text: data?.error || 'Erro ao apagar código.' })
+        const msg = data?.error || 'Erro ao apagar código.'
+        setMessage({ type: 'error', text: msg })
+        window.alert(msg)
         return
       }
 
-      setMessage({ type: 'success', text: data.message || `Código ${giftCodeLabel} apagado com sucesso.` })
+      const msg = data.message || `Código ${giftCodeLabel} apagado com sucesso.`
+      setMessage({ type: 'success', text: msg })
+      window.alert(msg)
       await loadCodes()
     } catch {
-      setMessage({ type: 'error', text: 'Erro de conexão ao apagar código.' })
+      const msg = 'Erro de conexão ao apagar código.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
     } finally {
       setDeletingId(null)
     }
@@ -161,32 +175,44 @@ export default function AdminGiftCode() {
     const numericDiscountPercent = discountPercent.trim() ? Number(discountPercent.replace(',', '.')) : null
 
     if (!normalizedCode) {
-      setMessage({ type: 'error', text: 'Informe um código.' })
+      const msg = 'Informe um código.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (!Number.isFinite(numericReward) || numericReward <= 0) {
-      setMessage({ type: 'error', text: 'Informe um valor de recompensa válido.' })
+      const msg = 'Informe um valor de recompensa válido.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (!Number.isInteger(numericMaxUses) || numericMaxUses <= 0) {
-      setMessage({ type: 'error', text: 'Informe um limite de resgates válido.' })
+      const msg = 'Informe um limite de resgates válido.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (isListedForSale && !productName.trim()) {
-      setMessage({ type: 'error', text: 'Informe o nome do produto para venda.' })
+      const msg = 'Informe o nome do produto para venda.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (isListedForSale && !productDescription.trim()) {
-      setMessage({ type: 'error', text: 'Informe a descrição do produto para venda.' })
+      const msg = 'Informe a descrição do produto para venda.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (isListedForSale && (!Number.isFinite(numericSalePrice) || numericSalePrice <= 0)) {
-      setMessage({ type: 'error', text: 'Informe um valor de vale presente válido para venda.' })
+      const msg = 'Informe um valor de vale presente válido para venda.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
@@ -195,12 +221,16 @@ export default function AdminGiftCode() {
       numericDiscountPercent != null &&
       (!Number.isFinite(numericDiscountPercent) || numericDiscountPercent < 0 || numericDiscountPercent > 100)
     ) {
-      setMessage({ type: 'error', text: 'Cupom em % deve estar entre 0 e 100.' })
+      const msg = 'Cupom em % deve estar entre 0 e 100.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
     if (!token) {
-      setMessage({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
+      const msg = 'Token não encontrado. Faça login novamente.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
       return
     }
 
@@ -244,7 +274,9 @@ export default function AdminGiftCode() {
       }
 
       if (!res.ok || !data?.ok) {
-        setMessage({ type: 'error', text: data?.error || 'Erro ao criar código.' })
+        const msg = data?.error || 'Erro ao criar código.'
+        setMessage({ type: 'error', text: msg })
+        window.alert(msg)
         return
       }
 
@@ -258,11 +290,15 @@ export default function AdminGiftCode() {
       setProductName('')
       setProductDescription('')
       setImageUrl('')
-      setMessage({ type: 'success', text: `Código ${normalizedCode} criado com sucesso.` })
+      const msg = `Código ${normalizedCode} criado com sucesso.`
+      setMessage({ type: 'success', text: msg })
+      window.alert(msg)
 
       await loadCodes()
     } catch {
-      setMessage({ type: 'error', text: 'Erro de conexão ao criar código.' })
+      const msg = 'Erro de conexão ao criar código.'
+      setMessage({ type: 'error', text: msg })
+      window.alert(msg)
     } finally {
       setCreating(false)
     }

@@ -92,14 +92,18 @@ export default function AdminPendingWithdrawals() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || !data?.ok) {
-        setError(String(data?.error ?? 'Não foi possível carregar os saques pendentes.'))
+        const msg = String(data?.error ?? 'Não foi possível carregar os saques pendentes.')
+        setError(msg)
+        window.alert(msg)
         setWithdrawals([])
         return
       }
 
       setWithdrawals(Array.isArray(data.withdrawals) ? data.withdrawals : [])
     } catch {
-      setError('Falha de conexão ao carregar saques pendentes.')
+      const msg = 'Falha de conexão ao carregar saques pendentes.'
+      setError(msg)
+      window.alert(msg)
       setWithdrawals([])
     } finally {
       setLoading(false)
@@ -141,14 +145,20 @@ export default function AdminPendingWithdrawals() {
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || !data?.ok) {
-        setActionError(String(data?.error ?? 'Não foi possível processar a ação no saque.'))
+        const msg = String(data?.error ?? 'Não foi possível processar a ação no saque.')
+        setActionError(msg)
+        window.alert(msg)
         return
       }
 
-      setActionSuccess(String(data?.message ?? 'Ação executada com sucesso.'))
+      const msg = String(data?.message ?? 'Ação executada com sucesso.')
+      setActionSuccess(msg)
+      window.alert(msg)
       await fetchPending()
     } catch {
-      setActionError('Falha de conexão ao processar ação do saque.')
+      const msg = 'Falha de conexão ao processar ação do saque.'
+      setActionError(msg)
+      window.alert(msg)
     } finally {
       setActing(withdrawalId, false)
     }

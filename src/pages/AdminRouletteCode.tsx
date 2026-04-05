@@ -10,11 +10,15 @@ export default function AdminRouletteCode() {
 
   const handleCreate = () => {
     if (!code.trim()) {
-      setMessage('Informe um código para a roleta.')
+      const msg = 'Informe um código para a roleta.'
+      setMessage(msg)
+      window.alert(msg)
       return
     }
 
-    setMessage(`Código "${code.trim()}" preparado para criação (integração backend pendente).`)
+    const msg = `Código "${code.trim()}" preparado para criação (integração backend pendente).`
+    setMessage(msg)
+    window.alert(msg)
   }
 
   return (
