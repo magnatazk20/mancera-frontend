@@ -240,23 +240,47 @@ export default function AdminLogs() {
           </div>
         </section>
         {selectedMetadata ? (
-          <section className="admin-panel admin-panel-wide" style={{ marginTop: 16 }}>
-            <div className="admin-panel-head">
-              <h2>Metadata do log #{selectedMetadata.id}</h2>
-              <button
-                type="button"
-                className="admin-toggle-logs-btn"
-                onClick={() => setSelectedMetadata(null)}
-              >
-                Fechar
-              </button>
-            </div>
-            <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-              {selectedMetadata.metadata
-                ? JSON.stringify(selectedMetadata.metadata, null, 2)
-                : 'Sem metadata'}
-            </pre>
-          </section>
+          <div
+            onClick={() => setSelectedMetadata(null)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(2, 6, 23, 0.66)',
+              zIndex: 1200,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 16,
+            }}
+          >
+            <section
+              className="admin-panel admin-panel-wide"
+              onClick={(event) => event.stopPropagation()}
+              style={{
+                marginTop: 0,
+                width: '100%',
+                maxWidth: 760,
+                maxHeight: '80vh',
+                overflow: 'auto',
+              }}
+            >
+              <div className="admin-panel-head">
+                <h2>Metadata do log #{selectedMetadata.id}</h2>
+                <button
+                  type="button"
+                  className="admin-toggle-logs-btn"
+                  onClick={() => setSelectedMetadata(null)}
+                >
+                  Fechar
+                </button>
+              </div>
+              <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {selectedMetadata.metadata
+                  ? JSON.stringify(selectedMetadata.metadata, null, 2)
+                  : 'Sem metadata'}
+              </pre>
+            </section>
+          </div>
         ) : null}
       </section>
     </main>
