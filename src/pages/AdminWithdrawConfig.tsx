@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
+import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminUsers.css'
 
@@ -25,8 +26,7 @@ export default function AdminWithdrawConfig() {
 
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const [withdrawFeePercent, setWithdrawFeePercent] = useState('')
   const [minWithdrawAmount, setMinWithdrawAmount] = useState('')
@@ -35,7 +35,6 @@ export default function AdminWithdrawConfig() {
 
   const loadConfig = async () => {
     setLoading(true)
-    setError('')
     try {
       const res = await fetch(`${API_URL}/api/admin/withdraw-config`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -43,7 +42,8 @@ export default function AdminWithdrawConfig() {
 
       const data = (await res.json()) as WithdrawConfigResponse
       if (!res.ok || !data?.ok || !data.config) {
-        setError(data?.error ?? 'Falha ao carregar configurações de saque.')
+        const msg = data?.error ?? 'Falha ao carregar configurações de saque.'
+        setToast({ type: 'error', message: msg })
         return
       }
 
@@ -52,7 +52,8 @@ export default function AdminWithdrawConfig() {
       setMaxWithdrawAmount(String(Number(data.config.maxWithdrawAmount ?? 0)))
       setWithdrawAutoApprove(Boolean(data.config.withdrawAutoApprove))
     } catch {
-      setError('Erro de conexão ao carregar configurações.')
+      const msg = 'Erro de conexão ao carregar configurações.'
+      setToast({ type: 'error', message: msg })
     } finally {
       setLoading(false)
     }
@@ -64,30 +65,33 @@ export default function AdminWithdrawConfig() {
 
   const saveConfig = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
+    setToast(null)
 
     const fee = Number(String(withdrawFeePercent).replace(',', '.'))
     const min = Number(String(minWithdrawAmount).replace(',', '.'))
     const max = Number(String(maxWithdrawAmount).replace(',', '.'))
 
     if (!Number.isFinite(fee) || fee < 0) {
-      setError('Taxa de saque inválida.')
+      const msg = 'Taxa de saque inválida.'
+      setToast({ type: 'error', message: msg })
       return
     }
 
     if (!Number.isFinite(min) || min < 0) {
-      setError('Valor mínimo de saque inválido.')
+      const msg = 'Valor mínimo de saque inválido.'
+      setToast({ type: 'error', message: msg })
       return
     }
 
     if (!Number.isFinite(max) || max <= 0) {
-      setError('Valor máximo de saque inválido.')
+      const msg = 'Valor máximo de saque inválido.'
+      setToast({ type: 'error', message: msg })
       return
     }
 
     if (min > max) {
-      setError('O valor mínimo não pode ser maior que o valor máximo.')
+      const msg = 'O valor mínimo não pode ser maior que o valor máximo.'
+      setToast({ type: 'error', message: msg })
       return
     }
 
@@ -109,14 +113,17 @@ export default function AdminWithdrawConfig() {
 
       const data = (await res.json()) as WithdrawConfigResponse
       if (!res.ok || !data?.ok) {
-        setError(data?.error ?? 'Falha ao salvar configurações.')
+        const msg = data?.error ?? 'Falha ao salvar configurações.'
+        setToast({ type: 'error', message: msg })
         return
       }
 
-      setSuccess(data?.message ?? 'Configurações salvas com sucesso.')
+      const msg = data?.message ?? 'Configurações salvas com sucesso.'
+      setToast({ type: 'success', message: msg })
       await loadConfig()
     } catch {
-      setError('Erro de conexão ao salvar configurações.')
+      const msg = 'Erro de conexão ao salvar configurações.'
+      setToast({ type: 'error', message: msg })
     } finally {
       setSaving(false)
     }
@@ -132,9 +139,6 @@ export default function AdminWithdrawConfig() {
             <p className="admin-subtitle">Defina taxa, limites e se o saque será automático.</p>
           </div>
         </header>
-
-        {error ? <p className="admin-kpi-error">{error}</p> : null}
-        {success ? <p className="admin-kpi-ok">{success}</p> : null}
 
         <section className="admin-panel admin-users-panel">
           {loading ? (
@@ -194,6 +198,12 @@ export default function AdminWithdrawConfig() {
           )}
         </section>
       </section>
+      <FloatingToast
+        open={Boolean(toast?.message)}
+        type={toast?.type ?? 'success'}
+        message={toast?.message ?? ''}
+        onClose={() => setToast(null)}
+      />
     </main>
   )
 }
