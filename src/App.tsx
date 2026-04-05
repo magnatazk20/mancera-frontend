@@ -34,6 +34,7 @@ import AdminPendingWithdrawals from './pages/AdminPendingWithdrawals'
 import AdminUserWithdrawals from './pages/AdminUserWithdrawals'
 import AdminRouletteCode from './pages/AdminRouletteCode'
 import AdminGiftCode from './pages/AdminGiftCode'
+import AdminDeposits from './pages/AdminDeposits'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -183,6 +184,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminPendingWithdrawals />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/deposits"
+          element={(
+            <RequireMaxAdmin>
+              <AdminDeposits />
             </RequireMaxAdmin>
           )}
         />
