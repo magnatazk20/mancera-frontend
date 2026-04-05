@@ -11,6 +11,7 @@ export default function AdminDepositConfig() {
   const [minDepositAmount, setMinDepositAmount] = useState('0')
   const [maxDepositAmount, setMaxDepositAmount] = useState('0')
   const [depositEnabled, setDepositEnabled] = useState(true)
+  const [quickPresetValues, setQuickPresetValues] = useState('20,50,100,200,500')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const fetchConfig = async () => {
@@ -30,6 +31,15 @@ export default function AdminDepositConfig() {
       setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? 0)))
       setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? 0)))
       setDepositEnabled(Boolean(data?.config?.depositEnabled ?? true))
+      const serverPresets = data?.config?.quickPresetValues
+      if (Array.isArray(serverPresets) && serverPresets.length > 0) {
+        const normalized = serverPresets
+          .map((value: unknown) => Number(value))
+          .filter((value: number) => Number.isFinite(value) && value > 0)
+        if (normalized.length > 0) {
+          setQuickPresetValues(normalized.join(','))
+        }
+      }
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração de depósitos.' })
     } finally {
@@ -60,6 +70,17 @@ export default function AdminDepositConfig() {
       return
     }
 
+    const normalizedPresets = String(quickPresetValues)
+      .split(',')
+      .map((item) => Number(item.trim().replace(',', '.')))
+      .filter((value) => Number.isFinite(value) && value > 0)
+      .map((value) => Number(value.toFixed(2)))
+
+    if (normalizedPresets.length === 0) {
+      setToast({ type: 'error', message: 'Informe ao menos um valor pré-selecionado válido.' })
+      return
+    }
+
     setSaving(true)
     try {
       const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -73,6 +94,7 @@ export default function AdminDepositConfig() {
           minDepositAmount: Number(min.toFixed(2)),
           maxDepositAmount: Number(max.toFixed(2)),
           depositEnabled,
+          quickPresetValues: normalizedPresets,
         }),
       })
 
@@ -87,6 +109,17 @@ export default function AdminDepositConfig() {
       setMinDepositAmount(String(Number(data?.config?.minDepositAmount ?? min)))
       setMaxDepositAmount(String(Number(data?.config?.maxDepositAmount ?? max)))
       setDepositEnabled(Boolean(data?.config?.depositEnabled ?? depositEnabled))
+      const persistedPresets = data?.config?.quickPresetValues
+      if (Array.isArray(persistedPresets) && persistedPresets.length > 0) {
+        const normalized = persistedPresets
+          .map((value: unknown) => Number(value))
+          .filter((value: number) => Number.isFinite(value) && value > 0)
+        if (normalized.length > 0) {
+          setQuickPresetValues(normalized.join(','))
+        }
+      } else {
+        setQuickPresetValues(normalizedPresets.join(','))
+      }
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao salvar configuração de depósitos.' })
     } finally {
@@ -136,6 +169,21 @@ export default function AdminDepositConfig() {
                   onChange={(event) => setMaxDepositAmount(event.target.value)}
                   placeholder="Ex.: 1000.00"
                 />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="quick-presets">Botões pré-selecionados no /cashin</label>
+                <input
+                  id="quick-presets"
+                  type="text"
+                  className="admin-withdraw-filter-input"
+                  value={quickPresetValues}
+                  onChange={(event) => setQuickPresetValues(event.target.value)}
+                  placeholder="Ex.: 20,50,100,200,500"
+                />
+                <small style={{ color: '#94a3b8' }}>
+                  Separe por vírgula. Exemplo: 20,50,100,200,500
+                </small>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
