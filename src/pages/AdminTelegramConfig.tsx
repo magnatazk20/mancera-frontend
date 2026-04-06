@@ -11,6 +11,7 @@ export default function AdminTelegramConfig() {
   const [botToken, setBotToken] = useState('')
   const [groupId, setGroupId] = useState('')
   const [welcomeMessage, setWelcomeMessage] = useState('')
+  const [privateChatOnlyMessage, setPrivateChatOnlyMessage] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -42,6 +43,9 @@ export default function AdminTelegramConfig() {
       setBotToken(String(data?.config?.botToken ?? ''))
       setGroupId(String(data?.config?.groupId ?? ''))
       setWelcomeMessage(String(data?.config?.welcomeMessage ?? ''))
+      setPrivateChatOnlyMessage(
+        String(data?.config?.privateChatOnlyMessage ?? 'Conexão permitida somente no chat privado do bot.')
+      )
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração do Telegram.' })
     } finally {
@@ -62,6 +66,8 @@ export default function AdminTelegramConfig() {
     const normalizedBotToken = botToken.trim()
     const normalizedGroupId = groupId.trim()
     const normalizedWelcomeMessage = welcomeMessage.trim()
+    const normalizedPrivateChatOnlyMessage =
+      privateChatOnlyMessage.trim() || 'Conexão permitida somente no chat privado do bot.'
 
     if (!normalizedBotToken) {
       setToast({ type: 'error', message: 'Bot token é obrigatório.' })
@@ -85,6 +91,7 @@ export default function AdminTelegramConfig() {
           botToken: normalizedBotToken,
           groupId: normalizedGroupId,
           welcomeMessage: normalizedWelcomeMessage,
+          privateChatOnlyMessage: normalizedPrivateChatOnlyMessage,
         }),
       })
 
@@ -110,7 +117,7 @@ export default function AdminTelegramConfig() {
         <header className="admin-header">
           <div>
             <h1>Bot Telegram</h1>
-            <p className="admin-subtitle">Configure o token do bot, o ID do grupo e a mensagem de boas-vindas no /start.</p>
+            <p className="admin-subtitle">Configure o token do bot, o ID do grupo e as mensagens do Telegram.</p>
           </div>
         </header>
 
@@ -158,6 +165,19 @@ export default function AdminTelegramConfig() {
                   onChange={(event) => setWelcomeMessage(event.target.value)}
                   rows={5}
                   style={{ resize: 'vertical', minHeight: 120 }}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-private-chat-only-message">Mensagem para quem falar no grupo</label>
+                <textarea
+                  id="telegram-private-chat-only-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Conexão permitida somente no chat privado do bot."
+                  value={privateChatOnlyMessage}
+                  onChange={(event) => setPrivateChatOnlyMessage(event.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical', minHeight: 100 }}
                 />
               </div>
 
