@@ -37,6 +37,7 @@ import AdminGiftCode from './pages/AdminGiftCode'
 import AdminDeposits from './pages/AdminDeposits'
 import AdminDepositConfig from './pages/AdminDepositConfig'
 import AdminCommissionConfig from './pages/AdminCommissionConfig'
+import AdminTelegramConfig from './pages/AdminTelegramConfig'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -210,6 +211,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCommissionConfig />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/telegram-config"
+          element={(
+            <RequireMaxAdmin>
+              <AdminTelegramConfig />
             </RequireMaxAdmin>
           )}
         />
