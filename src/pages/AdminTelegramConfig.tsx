@@ -12,6 +12,7 @@ export default function AdminTelegramConfig() {
   const [groupId, setGroupId] = useState('')
   const [welcomeMessage, setWelcomeMessage] = useState('')
   const [privateChatOnlyMessage, setPrivateChatOnlyMessage] = useState('')
+  const [privateLinkSuccessMessage, setPrivateLinkSuccessMessage] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -46,6 +47,9 @@ export default function AdminTelegramConfig() {
       setPrivateChatOnlyMessage(
         String(data?.config?.privateChatOnlyMessage ?? 'Conexão permitida somente no chat privado do bot.')
       )
+      setPrivateLinkSuccessMessage(
+        String(data?.config?.privateLinkSuccessMessage ?? 'Conta conectada com sucesso.')
+      )
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração do Telegram.' })
     } finally {
@@ -68,6 +72,8 @@ export default function AdminTelegramConfig() {
     const normalizedWelcomeMessage = welcomeMessage.trim()
     const normalizedPrivateChatOnlyMessage =
       privateChatOnlyMessage.trim() || 'Conexão permitida somente no chat privado do bot.'
+    const normalizedPrivateLinkSuccessMessage =
+      privateLinkSuccessMessage.trim() || 'Conta conectada com sucesso.'
 
     if (!normalizedBotToken) {
       setToast({ type: 'error', message: 'Bot token é obrigatório.' })
@@ -92,6 +98,7 @@ export default function AdminTelegramConfig() {
           groupId: normalizedGroupId,
           welcomeMessage: normalizedWelcomeMessage,
           privateChatOnlyMessage: normalizedPrivateChatOnlyMessage,
+          privateLinkSuccessMessage: normalizedPrivateLinkSuccessMessage,
         }),
       })
 
@@ -176,6 +183,19 @@ export default function AdminTelegramConfig() {
                   placeholder="Ex.: Conexão permitida somente no chat privado do bot."
                   value={privateChatOnlyMessage}
                   onChange={(event) => setPrivateChatOnlyMessage(event.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical', minHeight: 100 }}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-private-link-success-message">Mensagem de sucesso ao vincular no privado</label>
+                <textarea
+                  id="telegram-private-link-success-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Conta conectada com sucesso."
+                  value={privateLinkSuccessMessage}
+                  onChange={(event) => setPrivateLinkSuccessMessage(event.target.value)}
                   rows={4}
                   style={{ resize: 'vertical', minHeight: 100 }}
                 />
