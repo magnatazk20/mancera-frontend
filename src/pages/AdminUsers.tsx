@@ -9,6 +9,9 @@ type AdminUser = {
   phone: string
   is_admin: number
   is_banned: number
+  balance?: number
+  referred_by_user_id?: number | null
+  referrer_name?: string | null
   created_at?: string
 }
 
@@ -200,8 +203,10 @@ export default function AdminUsers() {
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Telefone</th>
+                    <th>Saldo</th>
                     <th>Admin</th>
                     <th>Status</th>
+                    <th>Indicado por</th>
                     <th>Criado em</th>
                     <th>Ações</th>
                   </tr>
@@ -235,11 +240,22 @@ export default function AdminUsers() {
                               user.phone
                             )}
                           </td>
+                          <td>
+                            {Number(user.balance ?? 0).toLocaleString('pt-BR', {
+                              style: 'currency',
+                              currency: 'BRL',
+                            })}
+                          </td>
                           <td>{user.is_admin ? 'Sim' : 'Não'}</td>
                           <td>
                             <span className={`status ${user.is_banned ? 'pending' : 'paid'}`}>
                               {user.is_banned ? 'Banido' : 'Ativo'}
                             </span>
+                          </td>
+                          <td>
+                            {user.referred_by_user_id
+                              ? `${user.referrer_name ?? 'Usuário'} (#${user.referred_by_user_id})`
+                              : '-'}
                           </td>
                           <td>{user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</td>
                           <td>
@@ -270,7 +286,7 @@ export default function AdminUsers() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={7}>Nenhum usuário encontrado.</td>
+                      <td colSpan={9}>Nenhum usuário encontrado.</td>
                     </tr>
                   )}
                 </tbody>
