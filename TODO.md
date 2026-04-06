@@ -1,8 +1,8 @@
-# TODO - CashIn dinâmico com config de depósitos
+# TODO - Configuração de Níveis de Comissão (/adf)
 
-- [x] Backend `/api/admin/deposit-config` com `quickPresetValues`
-- [x] Admin `/adf/deposit-config` com campo de valores pré-selecionados
-- [ ] Atualizar `/cashin` para carregar config dinâmica
-- [ ] Aplicar validações de min/max/depositEnabled no `/cashin`
-- [ ] Build frontend
-- [ ] Commit e push frontend
+- [x] Criar página `AdminCommissionConfig.tsx`
+- [x] Adicionar rota `/adf/commission-config` em `App.tsx`
+- [x] Adicionar botão no menu em `AdminSidebar.tsx`
+- [x] Integrar feedback de sucesso/erro com `FloatingToast`
+- [x] Validar build do frontend
+- [ ] Commit e push das alterações

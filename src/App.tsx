@@ -36,6 +36,7 @@ import AdminRouletteCode from './pages/AdminRouletteCode'
 import AdminGiftCode from './pages/AdminGiftCode'
 import AdminDeposits from './pages/AdminDeposits'
 import AdminDepositConfig from './pages/AdminDepositConfig'
+import AdminCommissionConfig from './pages/AdminCommissionConfig'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -201,6 +202,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminDepositConfig />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/commission-config"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCommissionConfig />
             </RequireMaxAdmin>
           )}
         />
