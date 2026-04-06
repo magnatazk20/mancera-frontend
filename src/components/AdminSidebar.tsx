@@ -60,24 +60,28 @@ export default function AdminSidebar() {
         </div>
 
         <nav className="dash-nav">
-          <p className="dash-nav-group-title">Gestão</p>
+          <p className="dash-nav-group-title">Visão Geral</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf'); setMenuOpen(false) }}>Dashboard Admin</button>
+
+          <p className="dash-nav-group-title">Usuários e Rede</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/users'); setMenuOpen(false) }}>Usuários</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdraw-config'); setMenuOpen(false) }}>Configuração de Saque</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Ganhos e Saques</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
 
           <p className="dash-nav-group-title">Saques</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdraw-config'); setMenuOpen(false) }}>Configuração de Saque</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/users'); setMenuOpen(false) }}>Saques Usuários</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/pending'); setMenuOpen(false) }}>Saques Pendentes</button>
 
-          <p className="dash-nav-group-title">Entradas de Pagamentos</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos Pagos e Pendentes</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Config Depósitos</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Config Comissão</button>
+          <p className="dash-nav-group-title">Depósitos e Comissão</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Configuração de Depósitos</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Configuração de Comissão</button>
+
+          <p className="dash-nav-group-title">Promoções</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>
 
           <p className="dash-nav-group-title">Sistema</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Ver App Usuário</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Criar Código da Roleta</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
         </nav>
 
