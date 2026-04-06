@@ -12,6 +12,7 @@ type AdminUser = {
   balance?: number
   referred_by_user_id?: number | null
   referrer_name?: string | null
+  referrer_phone?: string | null
   created_at?: string
 }
 
@@ -254,7 +255,7 @@ export default function AdminUsers() {
                           </td>
                           <td>
                             {user.referred_by_user_id
-                              ? `${user.referrer_name ?? 'Usuário'} (#${user.referred_by_user_id})`
+                              ? `${user.referrer_phone ?? 'Sem telefone'} (#${user.referred_by_user_id})`
                               : '-'}
                           </td>
                           <td>{user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</td>
