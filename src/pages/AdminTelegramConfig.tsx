@@ -10,6 +10,7 @@ export default function AdminTelegramConfig() {
   const [saving, setSaving] = useState(false)
   const [botToken, setBotToken] = useState('')
   const [groupId, setGroupId] = useState('')
+  const [welcomeMessage, setWelcomeMessage] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -40,6 +41,7 @@ export default function AdminTelegramConfig() {
 
       setBotToken(String(data?.config?.botToken ?? ''))
       setGroupId(String(data?.config?.groupId ?? ''))
+      setWelcomeMessage(String(data?.config?.welcomeMessage ?? ''))
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração do Telegram.' })
     } finally {
@@ -59,6 +61,7 @@ export default function AdminTelegramConfig() {
 
     const normalizedBotToken = botToken.trim()
     const normalizedGroupId = groupId.trim()
+    const normalizedWelcomeMessage = welcomeMessage.trim()
 
     if (!normalizedBotToken) {
       setToast({ type: 'error', message: 'Bot token é obrigatório.' })
@@ -81,6 +84,7 @@ export default function AdminTelegramConfig() {
         body: JSON.stringify({
           botToken: normalizedBotToken,
           groupId: normalizedGroupId,
+          welcomeMessage: normalizedWelcomeMessage,
         }),
       })
 
@@ -106,7 +110,7 @@ export default function AdminTelegramConfig() {
         <header className="admin-header">
           <div>
             <h1>Bot Telegram</h1>
-            <p className="admin-subtitle">Configure o token do bot e o ID do grupo do Telegram.</p>
+            <p className="admin-subtitle">Configure o token do bot, o ID do grupo e a mensagem de boas-vindas no /start.</p>
           </div>
         </header>
 
@@ -141,6 +145,19 @@ export default function AdminTelegramConfig() {
                   placeholder="Ex.: -1001234567890"
                   value={groupId}
                   onChange={(event) => setGroupId(event.target.value)}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-welcome-message">Mensagem de boas-vindas (/start no privado)</label>
+                <textarea
+                  id="telegram-welcome-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Bem-vindo! Envie seu telefone cadastrado para conectar."
+                  value={welcomeMessage}
+                  onChange={(event) => setWelcomeMessage(event.target.value)}
+                  rows={5}
+                  style={{ resize: 'vertical', minHeight: 120 }}
                 />
               </div>
 
