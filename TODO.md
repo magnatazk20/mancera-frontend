@@ -1,4 +1,4 @@
-- [x] Atualizar backend para suportar mensagem configurável de chat privado no Telegram
-- [x] Atualizar frontend AdminTelegramConfig com novo campo configurável
+- [x] Adicionar campo/editável para mensagem de conta já vinculada em /adf/telegram-config
+- [x] Carregar e salvar `alreadyLinkedMessage` no AdminTelegramConfig
 - [x] Revisar alterações e validar consistência
 - [ ] Commit e push das mudanças

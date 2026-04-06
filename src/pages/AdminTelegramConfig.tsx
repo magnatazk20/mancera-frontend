@@ -13,6 +13,7 @@ export default function AdminTelegramConfig() {
   const [welcomeMessage, setWelcomeMessage] = useState('')
   const [privateChatOnlyMessage, setPrivateChatOnlyMessage] = useState('')
   const [privateLinkSuccessMessage, setPrivateLinkSuccessMessage] = useState('')
+  const [alreadyLinkedMessage, setAlreadyLinkedMessage] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -50,6 +51,12 @@ export default function AdminTelegramConfig() {
       setPrivateLinkSuccessMessage(
         String(data?.config?.privateLinkSuccessMessage ?? 'Conta conectada com sucesso.')
       )
+      setAlreadyLinkedMessage(
+        String(
+          data?.config?.alreadyLinkedMessage ??
+            'Esta conta já foi conectada anteriormente e não pode ser vinculada novamente.'
+        )
+      )
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração do Telegram.' })
     } finally {
@@ -74,6 +81,9 @@ export default function AdminTelegramConfig() {
       privateChatOnlyMessage.trim() || 'Conexão permitida somente no chat privado do bot.'
     const normalizedPrivateLinkSuccessMessage =
       privateLinkSuccessMessage.trim() || 'Conta conectada com sucesso.'
+    const normalizedAlreadyLinkedMessage =
+      alreadyLinkedMessage.trim() ||
+      'Esta conta já foi conectada anteriormente e não pode ser vinculada novamente.'
 
     if (!normalizedBotToken) {
       setToast({ type: 'error', message: 'Bot token é obrigatório.' })
@@ -99,6 +109,7 @@ export default function AdminTelegramConfig() {
           welcomeMessage: normalizedWelcomeMessage,
           privateChatOnlyMessage: normalizedPrivateChatOnlyMessage,
           privateLinkSuccessMessage: normalizedPrivateLinkSuccessMessage,
+          alreadyLinkedMessage: normalizedAlreadyLinkedMessage,
         }),
       })
 
@@ -196,6 +207,19 @@ export default function AdminTelegramConfig() {
                   placeholder="Ex.: Conta conectada com sucesso."
                   value={privateLinkSuccessMessage}
                   onChange={(event) => setPrivateLinkSuccessMessage(event.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical', minHeight: 100 }}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-already-linked-message">Mensagem quando conta já estiver vinculada</label>
+                <textarea
+                  id="telegram-already-linked-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Esta conta já foi conectada anteriormente e não pode ser vinculada novamente."
+                  value={alreadyLinkedMessage}
+                  onChange={(event) => setAlreadyLinkedMessage(event.target.value)}
                   rows={4}
                   style={{ resize: 'vertical', minHeight: 100 }}
                 />
