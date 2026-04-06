@@ -26,6 +26,7 @@ export default function AdminUsers() {
   const [editName, setEditName] = useState('')
   const [editPhone, setEditPhone] = useState('')
   const [saving, setSaving] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
@@ -157,6 +158,17 @@ export default function AdminUsers() {
     }
   }
 
+  const filteredUsers = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase()
+    if (!term) return users
+
+    return users.filter((user) => {
+      const name = String(user.name ?? '').toLowerCase()
+      const phone = String(user.phone ?? '').toLowerCase()
+      return name.includes(term) || phone.includes(term)
+    })
+  }, [users, searchTerm])
+
   const totalUsers = users.length
   const usersCreatedToday = users.filter((user) => {
     if (!user.created_at) return false
@@ -183,6 +195,19 @@ export default function AdminUsers() {
         {error ? <p className="admin-kpi-error">{error}</p> : null}
 
         <section className="admin-users-summary-grid">
+          <article className="admin-panel" style={{ gridColumn: '1 / -1' }}>
+            <label htmlFor="admin-users-search" style={{ display: 'block', marginBottom: 8, color: '#cbd5e1', fontWeight: 600 }}>
+              Buscar por nome ou telefone
+            </label>
+            <input
+              id="admin-users-search"
+              className="admin-users-input"
+              type="text"
+              placeholder="Digite nome ou telefone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </article>
           <article className="admin-kpi-card">
             <p>Usuários no total</p>
             <strong>{totalUsers}</strong>
@@ -213,8 +238,8 @@ export default function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.length ? (
-                    users.map((user) => {
+                  {filteredUsers.length ? (
+                    filteredUsers.map((user) => {
                       const isEditing = editingId === user.id
                       return (
                         <tr key={user.id}>
