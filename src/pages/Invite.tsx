@@ -56,70 +56,57 @@ export default function Invite() {
           return
         }
 
-        const apiBasesRaw = [API_URL, window.location.origin, 'http://localhost:3333']
-        const apiBases = Array.from(
-          new Set(
-            apiBasesRaw
-              .map((base) => String(base ?? '').trim().replace(/\/+$/, ''))
-              .filter((base) => Boolean(base))
-          )
-        )
+        const apiBase = String(API_URL ?? '').trim().replace(/\/+$/, '') || 'http://localhost:3333'
 
         let referralLoaded = false
-        for (const base of apiBases) {
-          try {
-            const response = await fetch(`${base}/api/referral/${parsedUserId}`)
-            if (!response.ok) continue
-            const referralData = await response.json()
-            if (!referralData?.ok) continue
-            setRefCode(String(referralData.referralCode ?? ''))
-            referralLoaded = true
-            break
-          } catch {
-            // tenta próxima base
+        try {
+          const referralResponse = await fetch(`${apiBase}/api/referral/${parsedUserId}`)
+          if (referralResponse.ok) {
+            const referralData = await referralResponse.json()
+            if (referralData?.ok) {
+              setRefCode(String(referralData.referralCode ?? ''))
+              referralLoaded = true
+            }
           }
+        } catch (err) {
+          console.error('[invite] erro ao buscar referral', err)
         }
 
         if (!referralLoaded) {
           setError('Não foi possível carregar seu link de convite.')
         }
 
-        const commissionUrls = apiBases.map((base) => `${base}/api/referral/commission-levels`)
-
         let commissionLoaded = false
-
-        for (const url of commissionUrls) {
-          try {
-            const response = await fetch(url)
-            if (!response.ok) continue
-
+        const commissionUrl = `${apiBase}/api/referral/commission-levels`
+        try {
+          const response = await fetch(commissionUrl)
+          if (response.ok) {
             const commissionData = await response.json()
-            if (!commissionData?.ok || !Array.isArray(commissionData.levels)) continue
+            if (commissionData?.ok && Array.isArray(commissionData.levels)) {
+              const mappedLevels = commissionData.levels
+                .map((item: any) => ({
+                  id: Number(item?.id ?? 0),
+                  level: Number(item?.level ?? 0),
+                  name: String(item?.name ?? ''),
+                  commissionPercent: Number(item?.commissionPercent ?? item?.commission_percent ?? 0),
+                  isActive:
+                    item?.isActive !== undefined
+                      ? Number(item.isActive) === 1 || item.isActive === true
+                      : item?.is_active !== undefined
+                        ? Number(item.is_active) === 1 || item.is_active === true
+                        : true,
+                }))
+                .filter((item: CommissionLevel) => item.level > 0 && item.isActive)
+                .sort((a: CommissionLevel, b: CommissionLevel) => a.level - b.level)
 
-            const mappedLevels = commissionData.levels
-              .map((item: any) => ({
-                id: Number(item?.id ?? 0),
-                level: Number(item?.level ?? 0),
-                name: String(item?.name ?? ''),
-                commissionPercent: Number(item?.commissionPercent ?? item?.commission_percent ?? 0),
-                isActive:
-                  item?.isActive !== undefined
-                    ? Number(item.isActive) === 1 || item.isActive === true
-                    : item?.is_active !== undefined
-                      ? Number(item.is_active) === 1 || item.is_active === true
-                      : true,
-              }))
-              .filter((item: CommissionLevel) => item.level > 0 && item.isActive)
-              .sort((a: CommissionLevel, b: CommissionLevel) => a.level - b.level)
-
-            setCommissionLevels(mappedLevels)
-            setCommissionError('')
-            setCommissionSource(url)
-            commissionLoaded = true
-            break
-          } catch {
-            // tenta próxima URL
+              setCommissionLevels(mappedLevels)
+              setCommissionError('')
+              setCommissionSource(commissionUrl)
+              commissionLoaded = true
+            }
           }
+        } catch (err) {
+          console.error('[invite] erro ao buscar commission levels', err)
         }
 
         if (!commissionLoaded) {

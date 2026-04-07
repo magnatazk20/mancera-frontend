@@ -1,8 +1,6 @@
-# TODO - Ajuste comissão dinâmica na página /invite
+# TODO - Fix /invite comissões por nível
 
-- [x] Implementar carregamento de níveis de comissão via API `/api/referral/commission-levels` em `src/pages/Invite.tsx`
-- [x] Remover percentuais hardcoded e renderizar lista dinâmica dos níveis
-- [x] Adicionar fallback seguro caso API falhe
-- [x] Marcar tarefas concluídas
-- [ ] Executar validação rápida (build)
-- [ ] Commit e push das alterações
+- [x] Validar endpoint backend `/api/referral/commission-levels`
+- [x] Ajustar `src/pages/Invite.tsx` para usar fonte única `${VITE_API_URL}/api/referral/commission-levels`
+- [x] Testar fluxo crítico da página `/invite`
+- [ ] Commit e push
