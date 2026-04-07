@@ -10,6 +10,14 @@ type StoredUser = {
   phone: string
 }
 
+type CommissionLevel = {
+  id: number
+  level: number
+  name: string
+  commissionPercent: number
+  isActive: boolean
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function Invite() {
@@ -18,6 +26,7 @@ export default function Invite() {
   const [error, setError] = useState('')
   const [refCode, setRefCode] = useState('')
   const [copied, setCopied] = useState(false)
+  const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -38,16 +47,38 @@ export default function Invite() {
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/referral/${user.id}`)
-        const data = await response.json()
+        const [referralResponse, commissionResponse] = await Promise.all([
+          fetch(`${API_URL}/api/referral/${user.id}`),
+          fetch(`${API_URL}/api/referral/commission-levels`),
+        ])
 
-        if (!response.ok || !data?.ok) {
-          setError(data?.error ?? 'Não foi possível carregar seu link de convite.')
+        const referralData = await referralResponse.json()
+
+        if (!referralResponse.ok || !referralData?.ok) {
+          setError(referralData?.error ?? 'Não foi possível carregar seu link de convite.')
           setLoading(false)
           return
         }
 
-        setRefCode(String(data.referralCode ?? ''))
+        setRefCode(String(referralData.referralCode ?? ''))
+
+        if (commissionResponse.ok) {
+          const commissionData = await commissionResponse.json()
+          if (commissionData?.ok && Array.isArray(commissionData.levels)) {
+            const mappedLevels = commissionData.levels
+              .map((item: any) => ({
+                id: Number(item?.id ?? 0),
+                level: Number(item?.level ?? 0),
+                name: String(item?.name ?? ''),
+                commissionPercent: Number(item?.commissionPercent ?? 0),
+                isActive: Boolean(item?.isActive ?? true),
+              }))
+              .filter((item: CommissionLevel) => item.level > 0 && item.isActive)
+              .sort((a: CommissionLevel, b: CommissionLevel) => a.level - b.level)
+
+            setCommissionLevels(mappedLevels)
+          }
+        }
       } catch {
         setError('Erro de conexão ao carregar convite.')
       } finally {
@@ -73,6 +104,24 @@ export default function Invite() {
     if (!inviteMessage) return ''
     return `https://wa.me/?text=${encodeURIComponent(inviteMessage)}`
   }, [inviteMessage])
+
+  const fallbackCommissionLevels = useMemo<CommissionLevel[]>(
+    () => [
+      { id: 1, level: 1, name: 'Nível 1', commissionPercent: 15, isActive: true },
+      { id: 2, level: 2, name: 'Nível 2', commissionPercent: 5, isActive: true },
+      { id: 3, level: 3, name: 'Nível 3', commissionPercent: 3, isActive: true },
+    ],
+    []
+  )
+
+  const displayedCommissionLevels = commissionLevels.length > 0 ? commissionLevels : fallbackCommissionLevels
+
+  const getCommissionColor = (level: number) => {
+    if (level === 1) return '#16a34a'
+    if (level === 2) return '#2563eb'
+    if (level === 3) return '#7c3aed'
+    return '#111827'
+  }
 
   const copyLink = async () => {
     if (!referralLink) return
@@ -182,18 +231,18 @@ export default function Invite() {
             background: '#fff',
           }}
         >
-          <div className="invite-level-row" style={{ background: '#f9fafb' }}>
-            <span className="invite-level-label">NÍVEL 1</span>
-            <strong style={{ color: '#16a34a' }}>15%</strong>
-          </div>
-          <div className="invite-level-row">
-            <span className="invite-level-label">NÍVEL 2</span>
-            <strong style={{ color: '#2563eb' }}>5%</strong>
-          </div>
-          <div className="invite-level-row">
-            <span className="invite-level-label">NÍVEL 3</span>
-            <strong style={{ color: '#7c3aed' }}>3%</strong>
-          </div>
+          {displayedCommissionLevels.map((item, index) => (
+            <div
+              key={`${item.level}-${item.id}`}
+              className="invite-level-row"
+              style={index === 0 ? { background: '#f9fafb' } : undefined}
+            >
+              <span className="invite-level-label">{`NÍVEL ${item.level}`}</span>
+              <strong style={{ color: getCommissionColor(item.level) }}>
+                {`${Number(item.commissionPercent).toFixed(2).replace(/\.00$/, '')}%`}
+              </strong>
+            </div>
+          ))}
         </div>
       </section>
 
