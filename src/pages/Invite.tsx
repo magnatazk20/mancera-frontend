@@ -49,16 +49,26 @@ export default function Invite() {
       }
 
       try {
-        const referralUrls = [
-          `${API_URL}/api/referral/${user.id}`,
-          `${window.location.origin}/api/referral/${user.id}`,
-          `http://localhost:3333/api/referral/${user.id}`,
-        ]
+        const parsedUserId = Number(user?.id ?? 0)
+        if (!Number.isFinite(parsedUserId) || parsedUserId <= 0) {
+          setError('Usuário inválido para carregar convite.')
+          setLoading(false)
+          return
+        }
+
+        const apiBasesRaw = [API_URL, window.location.origin, 'http://localhost:3333']
+        const apiBases = Array.from(
+          new Set(
+            apiBasesRaw
+              .map((base) => String(base ?? '').trim().replace(/\/+$/, ''))
+              .filter((base) => Boolean(base))
+          )
+        )
 
         let referralLoaded = false
-        for (const url of referralUrls) {
+        for (const base of apiBases) {
           try {
-            const response = await fetch(url)
+            const response = await fetch(`${base}/api/referral/${parsedUserId}`)
             if (!response.ok) continue
             const referralData = await response.json()
             if (!referralData?.ok) continue
@@ -66,7 +76,7 @@ export default function Invite() {
             referralLoaded = true
             break
           } catch {
-            // tenta próxima URL
+            // tenta próxima base
           }
         }
 
@@ -74,11 +84,7 @@ export default function Invite() {
           setError('Não foi possível carregar seu link de convite.')
         }
 
-        const commissionUrls = [
-          `${API_URL}/api/referral/commission-levels`,
-          `${window.location.origin}/api/referral/commission-levels`,
-          `http://localhost:3333/api/referral/commission-levels`,
-        ]
+        const commissionUrls = apiBases.map((base) => `${base}/api/referral/commission-levels`)
 
         let commissionLoaded = false
 
