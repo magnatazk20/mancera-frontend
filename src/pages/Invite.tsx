@@ -28,6 +28,7 @@ export default function Invite() {
   const [copied, setCopied] = useState(false)
   const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
   const [commissionError, setCommissionError] = useState('')
+  const [commissionSource, setCommissionSource] = useState('')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -62,6 +63,7 @@ export default function Invite() {
         const commissionUrls = [
           `${API_URL}/api/referral/commission-levels`,
           `${window.location.origin}/api/referral/commission-levels`,
+          `http://localhost:3333/api/referral/commission-levels`,
         ]
 
         let commissionLoaded = false
@@ -92,6 +94,7 @@ export default function Invite() {
 
             setCommissionLevels(mappedLevels)
             setCommissionError('')
+            setCommissionSource(url)
             commissionLoaded = true
             break
           } catch {
@@ -101,6 +104,7 @@ export default function Invite() {
 
         if (!commissionLoaded) {
           setCommissionLevels([])
+          setCommissionSource('')
           setCommissionError('Não foi possível carregar comissões do banco de dados (API indisponível).')
         }
       } catch {
@@ -235,7 +239,7 @@ export default function Invite() {
       <section className="progress-card">
         <div className="progress-top">
           <span>Comissões por nível</span>
-          <strong>Ganhos do convite</strong>
+          <strong>{commissionSource ? `Ganhos do convite (${commissionSource})` : 'Ganhos do convite'}</strong>
         </div>
         <div
           style={{
