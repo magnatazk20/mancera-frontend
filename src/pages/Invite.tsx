@@ -49,16 +49,30 @@ export default function Invite() {
       }
 
       try {
-        const referralResponse = await fetch(`${API_URL}/api/referral/${user.id}`)
-        const referralData = await referralResponse.json()
+        const referralUrls = [
+          `${API_URL}/api/referral/${user.id}`,
+          `${window.location.origin}/api/referral/${user.id}`,
+          `http://localhost:3333/api/referral/${user.id}`,
+        ]
 
-        if (!referralResponse.ok || !referralData?.ok) {
-          setError(referralData?.error ?? 'Não foi possível carregar seu link de convite.')
-          setLoading(false)
-          return
+        let referralLoaded = false
+        for (const url of referralUrls) {
+          try {
+            const response = await fetch(url)
+            if (!response.ok) continue
+            const referralData = await response.json()
+            if (!referralData?.ok) continue
+            setRefCode(String(referralData.referralCode ?? ''))
+            referralLoaded = true
+            break
+          } catch {
+            // tenta próxima URL
+          }
         }
 
-        setRefCode(String(referralData.referralCode ?? ''))
+        if (!referralLoaded) {
+          setError('Não foi possível carregar seu link de convite.')
+        }
 
         const commissionUrls = [
           `${API_URL}/api/referral/commission-levels`,
