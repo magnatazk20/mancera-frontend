@@ -22,18 +22,6 @@ type CheckinStatusResponse = {
   error?: string
 }
 
-type CheckinClaimResponse = {
-  ok?: boolean
-  message?: string
-  claim?: {
-    day?: number
-    rewardAmount?: number
-    checkinDate?: string
-  }
-  balance?: number
-  error?: string
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -42,7 +30,7 @@ const formatBRL = (value: number) =>
 export default function Checkin() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [claiming, setClaiming] = useState(false)
+  const [updating, setUpdating] = useState(false)
   const [canClaim, setCanClaim] = useState(false)
   const [currentDay, setCurrentDay] = useState(1)
   const [rewards, setRewards] = useState<number[]>([2, 2, 3, 3, 4, 4, 5, 5, 6, 10])
@@ -101,37 +89,19 @@ export default function Checkin() {
     run()
   }, [navigate, user?.id])
 
-  const handleClaim = async () => {
-    if (!user?.id || claiming || !canClaim) return
-    setClaiming(true)
-    setFeedback(null)
-
+  const handleRefreshStatus = async () => {
+    if (!user?.id || updating) return
+    setUpdating(true)
     try {
-      const res = await fetch(`${API_URL}/api/checkin/claim`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
-      })
-
-      const data = (await res.json()) as CheckinClaimResponse
-
-      if (!res.ok || !data?.ok) {
-        setFeedback({ type: 'error', message: data?.error ?? 'Não foi possível resgatar.' })
-        setClaiming(false)
-        return
-      }
-
-      const rewardAmount = Number(data.claim?.rewardAmount ?? 0)
+      await loadStatus()
       setFeedback({
         type: 'success',
-        message: `${data.message ?? 'Check-in realizado!'} (+${formatBRL(rewardAmount)})`,
+        message: 'Status atualizado. Se você já enviou /checkin no grupo, seu progresso aparecerá aqui.',
       })
-
-      await loadStatus()
     } catch {
-      setFeedback({ type: 'error', message: 'Falha de conexão ao resgatar check-in.' })
+      setFeedback({ type: 'error', message: 'Falha ao atualizar status do check-in.' })
     } finally {
-      setClaiming(false)
+      setUpdating(false)
     }
   }
 
@@ -159,7 +129,7 @@ export default function Checkin() {
 
           <div>
             <h2>Ciclo de 10 dias</h2>
-            <p>Faça check-in uma vez por dia para desbloquear recompensas progressivas.</p>
+            <p>O check-in diário agora é feito no bot do Telegram.</p>
           </div>
         </div>
 
@@ -199,14 +169,37 @@ export default function Checkin() {
               })}
             </div>
 
-            <button
-              type="button"
-              className="checkin-claim-btn"
-              onClick={handleClaim}
-              disabled={!canClaim || claiming}
-            >
-              {claiming ? 'Resgatando recompensa...' : canClaim ? `Resgatar recompensa do Dia ${currentDay}` : 'Você já resgatou hoje'}
-            </button>
+            <section className="checkin-telegram-guide" aria-label="Tutorial de check-in no Telegram">
+              <h3>Como fazer seu check-in</h3>
+              <ol>
+                <li>Clique no botão abaixo para abrir o grupo oficial.</li>
+                <li>No grupo, envie o comando <strong>/checkin</strong>.</li>
+                <li>Volte para esta página e clique em <strong>Atualizar status</strong>.</li>
+              </ol>
+
+              <div className="checkin-telegram-actions">
+                <a
+                  className="checkin-telegram-btn primary"
+                  href="https://t.me/pglm001"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Ir para o grupo no Telegram
+                </a>
+                <button
+                  type="button"
+                  className="checkin-telegram-btn secondary"
+                  onClick={handleRefreshStatus}
+                  disabled={updating}
+                >
+                  {updating ? 'Atualizando...' : 'Já fiz no Telegram, atualizar status'}
+                </button>
+              </div>
+
+              <p className="checkin-telegram-note">
+                Grupo: <a href="https://t.me/pglm001" target="_blank" rel="noreferrer">https://t.me/pglm001</a> · Comando: <strong>/checkin</strong>
+              </p>
+            </section>
           </>
         )}
       </section>

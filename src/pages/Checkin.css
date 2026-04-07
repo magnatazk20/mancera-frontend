@@ -213,28 +213,77 @@
   font-size: 0.76rem;
 }
 
-.checkin-claim-btn {
-  width: 100%;
-  min-height: 48px;
-  border: 0;
-  border-radius: 12px;
-  background: linear-gradient(90deg, #06b6d4, #2563eb);
-  color: #fff;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
-  transition: transform 0.15s ease, filter 0.15s ease;
+.checkin-telegram-guide {
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.72));
+  padding: 12px;
 }
 
-.checkin-claim-btn:hover:not(:disabled) {
+.checkin-telegram-guide h3 {
+  margin: 0 0 8px;
+  font-size: 0.98rem;
+  color: #e2e8f0;
+}
+
+.checkin-telegram-guide ol {
+  margin: 0 0 12px 18px;
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  color: #cbd5e1;
+  font-size: 0.86rem;
+}
+
+.checkin-telegram-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.checkin-telegram-btn {
+  min-height: 44px;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease, border-color 0.15s ease;
+}
+
+.checkin-telegram-btn.primary {
+  background: linear-gradient(90deg, #06b6d4, #2563eb);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+}
+
+.checkin-telegram-btn.secondary {
+  background: rgba(15, 23, 42, 0.7);
+  color: #dbeafe;
+  border-color: rgba(148, 163, 184, 0.36);
+}
+
+.checkin-telegram-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   filter: brightness(1.04);
 }
 
-.checkin-claim-btn:disabled {
+.checkin-telegram-btn:disabled {
   opacity: 0.58;
   cursor: not-allowed;
-  box-shadow: none;
+}
+
+.checkin-telegram-note {
+  margin-top: 10px !important;
+  font-size: 0.8rem !important;
+  color: #93c5fd !important;
+}
+
+.checkin-telegram-note a {
+  color: #7dd3fc;
 }
 
 @media (min-width: 700px) {
