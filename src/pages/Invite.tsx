@@ -27,6 +27,7 @@ export default function Invite() {
   const [refCode, setRefCode] = useState('')
   const [copied, setCopied] = useState(false)
   const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
+  const [commissionError, setCommissionError] = useState('')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -47,11 +48,7 @@ export default function Invite() {
       }
 
       try {
-        const [referralResponse, commissionResponse] = await Promise.all([
-          fetch(`${API_URL}/api/referral/${user.id}`),
-          fetch(`${API_URL}/api/referral/commission-levels`),
-        ])
-
+        const referralResponse = await fetch(`${API_URL}/api/referral/${user.id}`)
         const referralData = await referralResponse.json()
 
         if (!referralResponse.ok || !referralData?.ok) {
@@ -62,9 +59,21 @@ export default function Invite() {
 
         setRefCode(String(referralData.referralCode ?? ''))
 
-        if (commissionResponse.ok) {
-          const commissionData = await commissionResponse.json()
-          if (commissionData?.ok && Array.isArray(commissionData.levels)) {
+        const commissionUrls = [
+          `${API_URL}/api/referral/commission-levels`,
+          `${window.location.origin}/api/referral/commission-levels`,
+        ]
+
+        let commissionLoaded = false
+
+        for (const url of commissionUrls) {
+          try {
+            const response = await fetch(url)
+            if (!response.ok) continue
+
+            const commissionData = await response.json()
+            if (!commissionData?.ok || !Array.isArray(commissionData.levels)) continue
+
             const mappedLevels = commissionData.levels
               .map((item: any) => ({
                 id: Number(item?.id ?? 0),
@@ -82,7 +91,17 @@ export default function Invite() {
               .sort((a: CommissionLevel, b: CommissionLevel) => a.level - b.level)
 
             setCommissionLevels(mappedLevels)
+            setCommissionError('')
+            commissionLoaded = true
+            break
+          } catch {
+            // tenta próxima URL
           }
+        }
+
+        if (!commissionLoaded) {
+          setCommissionLevels([])
+          setCommissionError('Não foi possível carregar comissões do banco de dados (API indisponível).')
         }
       } catch {
         setError('Erro de conexão ao carregar convite.')
@@ -234,8 +253,8 @@ export default function Invite() {
             </div>
           ) : displayedCommissionLevels.length === 0 ? (
             <div className="invite-level-row" style={{ background: '#f9fafb' }}>
-              <span className="invite-level-label">Sem configuração</span>
-              <strong style={{ color: '#6b7280' }}>0%</strong>
+              <span className="invite-level-label">{commissionError ? 'Erro ao buscar' : 'Sem configuração'}</span>
+              <strong style={{ color: '#6b7280' }}>{commissionError ? 'API' : '0%'}</strong>
             </div>
           ) : (
             displayedCommissionLevels.map((item, index) => (
