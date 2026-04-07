@@ -14,6 +14,8 @@ export default function AdminTelegramConfig() {
   const [privateChatOnlyMessage, setPrivateChatOnlyMessage] = useState('')
   const [privateLinkSuccessMessage, setPrivateLinkSuccessMessage] = useState('')
   const [alreadyLinkedMessage, setAlreadyLinkedMessage] = useState('')
+  const [checkinSuccessMessage, setCheckinSuccessMessage] = useState('')
+  const [checkinAlreadyClaimedMessage, setCheckinAlreadyClaimedMessage] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -57,6 +59,18 @@ export default function AdminTelegramConfig() {
             'Esta conta já foi conectada anteriormente e não pode ser vinculada novamente.'
         )
       )
+      setCheckinSuccessMessage(
+        String(
+          data?.config?.checkinSuccessMessage ??
+            'Check-in do dia {day} resgatado com sucesso!'
+        )
+      )
+      setCheckinAlreadyClaimedMessage(
+        String(
+          data?.config?.checkinAlreadyClaimedMessage ??
+            'Check-in de hoje já foi resgatado.'
+        )
+      )
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar configuração do Telegram.' })
     } finally {
@@ -84,6 +98,12 @@ export default function AdminTelegramConfig() {
     const normalizedAlreadyLinkedMessage =
       alreadyLinkedMessage.trim() ||
       'Esta conta já foi conectada anteriormente e não pode ser vinculada novamente.'
+    const normalizedCheckinSuccessMessage =
+      checkinSuccessMessage.trim() ||
+      'Check-in do dia {day} resgatado com sucesso!'
+    const normalizedCheckinAlreadyClaimedMessage =
+      checkinAlreadyClaimedMessage.trim() ||
+      'Check-in de hoje já foi resgatado.'
 
     if (!normalizedBotToken) {
       setToast({ type: 'error', message: 'Bot token é obrigatório.' })
@@ -110,6 +130,8 @@ export default function AdminTelegramConfig() {
           privateChatOnlyMessage: normalizedPrivateChatOnlyMessage,
           privateLinkSuccessMessage: normalizedPrivateLinkSuccessMessage,
           alreadyLinkedMessage: normalizedAlreadyLinkedMessage,
+          checkinSuccessMessage: normalizedCheckinSuccessMessage,
+          checkinAlreadyClaimedMessage: normalizedCheckinAlreadyClaimedMessage,
         }),
       })
 
@@ -220,6 +242,32 @@ export default function AdminTelegramConfig() {
                   placeholder="Ex.: Esta conta já foi conectada anteriormente e não pode ser vinculada novamente."
                   value={alreadyLinkedMessage}
                   onChange={(event) => setAlreadyLinkedMessage(event.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical', minHeight: 100 }}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-checkin-success-message">Mensagem de sucesso do /checkin</label>
+                <textarea
+                  id="telegram-checkin-success-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Check-in do dia {day} resgatado com sucesso!"
+                  value={checkinSuccessMessage}
+                  onChange={(event) => setCheckinSuccessMessage(event.target.value)}
+                  rows={4}
+                  style={{ resize: 'vertical', minHeight: 100 }}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-checkin-already-claimed-message">Mensagem quando /checkin já foi resgatado</label>
+                <textarea
+                  id="telegram-checkin-already-claimed-message"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: Check-in de hoje já foi resgatado."
+                  value={checkinAlreadyClaimedMessage}
+                  onChange={(event) => setCheckinAlreadyClaimedMessage(event.target.value)}
                   rows={4}
                   style={{ resize: 'vertical', minHeight: 100 }}
                 />
