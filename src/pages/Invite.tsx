@@ -70,8 +70,13 @@ export default function Invite() {
                 id: Number(item?.id ?? 0),
                 level: Number(item?.level ?? 0),
                 name: String(item?.name ?? ''),
-                commissionPercent: Number(item?.commissionPercent ?? 0),
-                isActive: Boolean(item?.isActive ?? true),
+                commissionPercent: Number(item?.commissionPercent ?? item?.commission_percent ?? 0),
+                isActive:
+                  item?.isActive !== undefined
+                    ? Number(item.isActive) === 1 || item.isActive === true
+                    : item?.is_active !== undefined
+                      ? Number(item.is_active) === 1 || item.is_active === true
+                      : true,
               }))
               .filter((item: CommissionLevel) => item.level > 0 && item.isActive)
               .sort((a: CommissionLevel, b: CommissionLevel) => a.level - b.level)
