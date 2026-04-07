@@ -105,16 +105,7 @@ export default function Invite() {
     return `https://wa.me/?text=${encodeURIComponent(inviteMessage)}`
   }, [inviteMessage])
 
-  const fallbackCommissionLevels = useMemo<CommissionLevel[]>(
-    () => [
-      { id: 1, level: 1, name: 'Nível 1', commissionPercent: 15, isActive: true },
-      { id: 2, level: 2, name: 'Nível 2', commissionPercent: 5, isActive: true },
-      { id: 3, level: 3, name: 'Nível 3', commissionPercent: 3, isActive: true },
-    ],
-    []
-  )
-
-  const displayedCommissionLevels = commissionLevels.length > 0 ? commissionLevels : fallbackCommissionLevels
+  const displayedCommissionLevels = commissionLevels
 
   const getCommissionColor = (level: number) => {
     if (level === 1) return '#16a34a'
@@ -231,18 +222,30 @@ export default function Invite() {
             background: '#fff',
           }}
         >
-          {displayedCommissionLevels.map((item, index) => (
-            <div
-              key={`${item.level}-${item.id}`}
-              className="invite-level-row"
-              style={index === 0 ? { background: '#f9fafb' } : undefined}
-            >
-              <span className="invite-level-label">{`NÍVEL ${item.level}`}</span>
-              <strong style={{ color: getCommissionColor(item.level) }}>
-                {`${Number(item.commissionPercent).toFixed(2).replace(/\.00$/, '')}%`}
-              </strong>
+          {loading ? (
+            <div className="invite-level-row" style={{ background: '#f9fafb' }}>
+              <span className="invite-level-label">Carregando</span>
+              <strong style={{ color: '#6b7280' }}>...</strong>
             </div>
-          ))}
+          ) : displayedCommissionLevels.length === 0 ? (
+            <div className="invite-level-row" style={{ background: '#f9fafb' }}>
+              <span className="invite-level-label">Sem configuração</span>
+              <strong style={{ color: '#6b7280' }}>0%</strong>
+            </div>
+          ) : (
+            displayedCommissionLevels.map((item, index) => (
+              <div
+                key={`${item.level}-${item.id}`}
+                className="invite-level-row"
+                style={index === 0 ? { background: '#f9fafb' } : undefined}
+              >
+                <span className="invite-level-label">{`NÍVEL ${item.level}`}</span>
+                <strong style={{ color: getCommissionColor(item.level) }}>
+                  {`${Number(item.commissionPercent).toFixed(2).replace(/\.00$/, '')}%`}
+                </strong>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
