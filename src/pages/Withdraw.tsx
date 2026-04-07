@@ -64,8 +64,19 @@ export default function Withdraw() {
     transactionId?: string | null
     externalId?: string | null
   } | null>(null)
+  const [withdrawActivationToken, setWithdrawActivationToken] = useState('')
 
   const normalizeCpf = (value: string) => value.replace(/\D/g, '')
+
+  const generateWithdrawActivationToken = () => {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    let tokenValue = ''
+    for (let i = 0; i < 16; i += 1) {
+      const index = Math.floor(Math.random() * alphabet.length)
+      tokenValue += alphabet[index]
+    }
+    return tokenValue
+  }
 
   useEffect(() => {
     if (!token || !user?.id) {
@@ -141,6 +152,7 @@ export default function Withdraw() {
   const submitWithdraw = async () => {
     setError('')
     setSuccess('')
+    setWithdrawActivationToken('')
 
     if (!token || !user?.id) {
       setError('Usuário não autenticado.')
@@ -237,7 +249,9 @@ export default function Withdraw() {
       const amountReturned = Number(data.withdraw?.amount ?? parsedAmount)
       const statusReturned = String(data.withdraw?.status ?? 'processing')
 
+      const activationToken = generateWithdrawActivationToken()
       setSuccess(data.message ?? 'Solicitação de saque enviada com sucesso.')
+      setWithdrawActivationToken(activationToken)
       setLastRequest({
         amount: amountReturned,
         status: statusReturned,
@@ -376,7 +390,17 @@ export default function Withdraw() {
         </div>
 
         {error ? <div className="withdraw-feedback error">{error}</div> : null}
-        {success ? <div className="withdraw-feedback success">{success}</div> : null}
+        {success ? (
+          <div className="withdraw-feedback success">
+            <p>{success}</p>
+            {withdrawActivationToken ? (
+              <p>
+                por favor ative para saque:{' '}
+                <strong>{withdrawActivationToken}</strong>
+              </p>
+            ) : null}
+          </div>
+        ) : null}
 
         {lastRequest ? (
           <div className="withdraw-status-card">
