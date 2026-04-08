@@ -6,9 +6,9 @@ import Roleta from './pages/Roleta'
 import Sinuca from './pages/Sinuca'
 import CashIn from './pages/CashIn'
 import CashInCheckout from './pages/CashInCheckout'
-import Tasks from './pages/Tasks'
+/* import Tasks from './pages/Tasks'
 import MiningTask from './pages/MiningTask'
-import Vip from './pages/Vip'
+import Vip from './pages/Vip' */
 import Invite from './pages/Invite'
 import Profile from './pages/Profile'
 import InvestmentOrders from './pages/InvestmentOrders'
@@ -75,9 +75,9 @@ export default function App() {
         <Route path="/sinuca" element={<Sinuca />} />
         <Route path="/cashin" element={<CashIn />} />
         <Route path="/cashin/checkout" element={<CashInCheckout />} />
-        <Route path="/tasks" element={<Tasks />} />
+        {/* <Route path="/tasks" element={<Tasks />} />
         <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
-        <Route path="/vip" element={<Vip />} />
+        <Route path="/vip" element={<Vip />} /> */}
         <Route path="/invite" element={<Invite />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
