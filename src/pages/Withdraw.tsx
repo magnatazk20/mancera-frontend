@@ -72,6 +72,46 @@ export default function Withdraw() {
 
   const normalizeCpf = (value: string) => value.replace(/\D/g, '')
 
+  const loadWithdrawActivationStatus = async () => {
+    if (!token || !user?.id) return { ok: false, isActivated: false as boolean }
+
+    try {
+      const res = await fetch(`${API_URL}/api/withdraw/activation-status/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = (await res.json()) as {
+        ok?: boolean
+        isActivated?: boolean
+        expiresAt?: string | null
+      }
+
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        sessionStorage.removeItem('token')
+        sessionStorage.removeItem('user')
+        navigate('/')
+        return { ok: false, isActivated: false as boolean }
+      }
+
+      if (!res.ok || !data?.ok) {
+        return { ok: false, isActivated: false as boolean }
+      }
+
+      const activated = Boolean(data.isActivated)
+      setIsWithdrawActivated(activated)
+      setWithdrawActivationExpiresAt(data.expiresAt ?? null)
+      return { ok: true, isActivated: activated }
+    } catch {
+      setIsWithdrawActivated(false)
+      setWithdrawActivationExpiresAt(null)
+      return { ok: false, isActivated: false as boolean }
+    }
+  }
+
   useEffect(() => {
     if (!token || !user?.id) {
       localStorage.removeItem('token')
@@ -125,39 +165,6 @@ export default function Withdraw() {
       }
     }
 
-    const loadWithdrawActivationStatus = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/withdraw/activation-status/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-
-        const data = (await res.json()) as {
-          ok?: boolean
-          isActivated?: boolean
-          expiresAt?: string | null
-        }
-
-        if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
-          sessionStorage.removeItem('token')
-          sessionStorage.removeItem('user')
-          navigate('/')
-          return
-        }
-
-        if (!res.ok || !data?.ok) return
-
-        setIsWithdrawActivated(Boolean(data.isActivated))
-        setWithdrawActivationExpiresAt(data.expiresAt ?? null)
-      } catch {
-        setIsWithdrawActivated(false)
-        setWithdrawActivationExpiresAt(null)
-      }
-    }
-
     const loadWithdrawConfig = async () => {
       try {
         const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
@@ -176,6 +183,23 @@ export default function Withdraw() {
     loadWithdrawActivationStatus()
     loadWithdrawConfig()
   }, [navigate, token, user?.id])
+
+  useEffect(() => {
+    if (!showActivationModal || !token || !user?.id) return
+
+    const interval = window.setInterval(async () => {
+      const status = await loadWithdrawActivationStatus()
+      if (status.ok && status.isActivated) {
+        setShowActivationModal(false)
+        setWithdrawActivationToken('')
+        setCopiedActivationMessage(false)
+        setError('')
+        setSuccess('Saque ativado com sucesso no Telegram. Você já pode solicitar novamente.')
+      }
+    }, 3000)
+
+    return () => window.clearInterval(interval)
+  }, [showActivationModal, token, user?.id])
 
   const submitWithdraw = async () => {
     setError('')
