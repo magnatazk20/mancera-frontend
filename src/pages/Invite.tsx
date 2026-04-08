@@ -50,19 +50,38 @@ export default function Invite() {
       try {
         const apiBase = String(API_URL ?? '').trim().replace(/\/+$/, '') || 'http://localhost:3333'
 
-        const storedRefCode = String(user?.referralCode ?? user?.referral_code ?? '').trim()
-        const storedReferralLink = String(user?.referralLink ?? user?.referral_link ?? '').trim()
+        const parsedUserId = Number(user?.id ?? 0)
+        if (!Number.isFinite(parsedUserId) || parsedUserId <= 0) {
+          setError('Usuário não autenticado.')
+        } else {
+          let referralLoaded = false
+          try {
+            const referralResponse = await fetch(`${apiBase}/api/referral/${parsedUserId}`)
+            if (referralResponse.ok) {
+              const referralData = await referralResponse.json()
+              if (referralData?.ok) {
+                setRefCode(String(referralData.referralCode ?? ''))
+                setReferralLinkState(String(referralData.referralLink ?? ''))
+                setError('')
+                referralLoaded = true
+              }
+            } else {
+              const body = await referralResponse.json().catch(() => ({}))
+              const apiError = String(body?.error ?? '')
+              if (apiError.toLowerCase().includes("doesn't exist")) {
+                setError('Banco local sem tabela users. Importe o SQL da plataforma no MySQL.')
+              } else {
+                setError('Não foi possível carregar seu link de convite.')
+              }
+            }
+          } catch (err) {
+            console.error('[invite] erro ao buscar referral', err)
+            setError('Erro de conexão ao carregar convite.')
+          }
 
-        if (storedRefCode) {
-          setRefCode(storedRefCode)
-        }
-
-        if (storedReferralLink) {
-          setReferralLinkState(storedReferralLink)
-        }
-
-        if (!storedRefCode && !storedReferralLink) {
-          setError('Não foi possível carregar seu link de convite.')
+          if (!referralLoaded) {
+            setError('Não foi possível carregar seu link de convite.')
+          }
         }
 
         let commissionLoaded = false
@@ -90,7 +109,7 @@ export default function Invite() {
 
               setCommissionLevels(mappedLevels)
               setCommissionError('')
-              setCommissionSource(commissionUrl)
+              setCommissionSource('')
               commissionLoaded = true
             }
           }
@@ -131,6 +150,16 @@ export default function Invite() {
   }, [inviteMessage])
 
   const displayedCommissionLevels = commissionLevels
+
+  const level1Percent = useMemo(() => {
+    const level1 = displayedCommissionLevels.find((item) => item.level === 1)
+    return Number(level1?.commissionPercent ?? 0)
+  }, [displayedCommissionLevels])
+
+  const exampleDeposit = 50
+  const exampleCommission = useMemo(() => {
+    return Number(((exampleDeposit * level1Percent) / 100).toFixed(2))
+  }, [level1Percent])
 
   const getCommissionColor = (level: number) => {
     if (level === 1) return '#16a34a'
@@ -283,7 +312,17 @@ export default function Invite() {
           <li>Seu link já inclui seu código automaticamente (`?ref=`).</li>
           <li>Não altere o link para não perder o rastreamento da indicação.</li>
           <li>Se a página mostrar erro, verifique se você está logado e tente novamente.</li>
-          <li>Seu código fica salvo no banco na tabela <strong>users.referral_code</strong>.</li>
+          <li>
+            Você ganha comissão sempre que um usuário convidado por você fizer depósito usando seu link de indicação.
+          </li>
+          <li>
+            Exemplo: se o indicado depositar R$ {exampleDeposit.toFixed(2).replace('.', ',')}, você recebe R$ {' '}
+            {exampleCommission.toFixed(2).replace('.', ',')} de comissão no nível 1 ({level1Percent
+              .toFixed(2)
+              .replace(/\.00$/, '')
+              .replace('.', ',')}
+            %).
+          </li>
         </ul>
       </section>
     </main>
