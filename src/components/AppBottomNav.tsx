@@ -5,7 +5,7 @@ function NavIcon({
   name,
   className = 'icon-sm',
 }: {
-  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user'
+  name: 'home' | 'deposit' | 'products' | 'invite' | 'user'
   className?: string
 }) {
   switch (name) {
@@ -16,21 +16,18 @@ function NavIcon({
           <path d="M6 9.5V20h12V9.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       )
-    case 'tasks':
+    case 'deposit':
       return (
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 7h11M8 12h11M8 17h11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <circle cx="5" cy="7" r="1.2" fill="currentColor" />
-          <circle cx="5" cy="12" r="1.2" fill="currentColor" />
-          <circle cx="5" cy="17" r="1.2" fill="currentColor" />
+          <path d="M12 4v16M6 10h12M6 15h12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
         </svg>
       )
-    case 'vjp':
+    case 'products':
       return (
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <circle cx="12" cy="12" r="2" fill="currentColor" />
-          <path d="M12 4v4M20 12h-4M12 20v-4M4 12h4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M8 10h8M8 14h5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       )
     case 'invite':
@@ -65,13 +62,13 @@ export default function AppBottomNav() {
         <NavIcon name="home" />
         <small>Início</small>
       </button>
-      <button className={isActive('/tasks') ? 'active' : ''} onClick={() => navigate('/tasks')}>
-        <NavIcon name="tasks" />
-        <small>Tarefas</small>
+      <button className={isActive('/cashin') ? 'active' : ''} onClick={() => navigate('/cashin')}>
+        <NavIcon name="deposit" />
+        <small>Depositar</small>
       </button>
-      <button className={isActive('/vip') ? 'active' : ''} onClick={() => navigate('/vip')}>
-        <NavIcon name="vjp" />
-        <small>VIP</small>
+      <button className={isActive('/gift-vouchers') ? 'active' : ''} onClick={() => navigate('/gift-vouchers')}>
+        <NavIcon name="products" />
+        <small>Produtos</small>
       </button>
       <button className={isActive('/invite') ? 'active' : ''} onClick={() => navigate('/invite')}>
         <NavIcon name="invite" />
