@@ -37,7 +37,7 @@ function SideIcon({
   name,
   className = 'icon-sm',
 }: {
-  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit'
+  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit' | 'products'
   className?: string
 }) {
   switch (name) {
@@ -112,6 +112,13 @@ function SideIcon({
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 20V8M16.5 12.5 12 8l-4.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
           <rect x="4.5" y="3.5" width="15" height="2.5" rx="1" fill="currentColor" />
+        </svg>
+      )
+    case 'products':
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M8 10h8M8 14h5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       )
     default:
@@ -336,13 +343,13 @@ export default function AppSidebar() {
           <SideIcon name="home" className="icon-sm" />
           <small>Início</small>
         </button>
-        <button className={isActive('/tasks') ? 'active' : ''} onClick={() => go('/tasks')}>
-          <SideIcon name="tasks" className="icon-sm" />
-          <small>Tarefas</small>
+        <button className={isActive('/cashin') ? 'active' : ''} onClick={() => go('/cashin')}>
+          <SideIcon name="deposit" className="icon-sm" />
+          <small>Depositar</small>
         </button>
-        <button className={isActive('/vip') ? 'active' : ''} onClick={() => go('/vip')}>
-          <SideIcon name="vjp" className="icon-sm" />
-          <small>VIP</small>
+        <button className={isActive('/gift-vouchers') ? 'active' : ''} onClick={() => go('/gift-vouchers')}>
+          <SideIcon name="products" className="icon-sm" />
+          <small>Produtos</small>
         </button>
         <button className={isActive('/invite') ? 'active' : ''} onClick={() => go('/invite')}>
           <SideIcon name="invite" className="icon-sm" />
