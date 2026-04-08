@@ -24,6 +24,7 @@ import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
 import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
+import CycleProducts from './pages/CycleProducts'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -93,6 +94,14 @@ export default function App() {
           element={(
             <RequireAuth>
               <GiftVouchers />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/cycle-products"
+          element={(
+            <RequireAuth>
+              <CycleProducts />
             </RequireAuth>
           )}
         />

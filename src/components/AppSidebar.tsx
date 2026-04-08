@@ -347,7 +347,7 @@ export default function AppSidebar() {
           <SideIcon name="deposit" className="icon-sm" />
           <small>Depositar</small>
         </button>
-        <button className={isActive('/gift-vouchers') ? 'active' : ''} onClick={() => go('/gift-vouchers')}>
+        <button className={isActive('/cycle-products') ? 'active' : ''} onClick={() => go('/cycle-products')}>
           <SideIcon name="products" className="icon-sm" />
           <small>Produtos</small>
         </button>
