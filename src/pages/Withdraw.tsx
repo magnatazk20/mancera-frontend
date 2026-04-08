@@ -522,16 +522,50 @@ export default function Withdraw() {
         ) : null}
 
         {lastRequest ? (
-          <div className="withdraw-receipt-card">
-            <h3>Comprovante de Solicitação de Saque</h3>
-            <p><strong>Situação:</strong> Solicitação recebida com sucesso</p>
-            <p><strong>Valor solicitado:</strong> {formatBRL(lastRequest.amount)}</p>
-            <p>
-              <strong>Data e hora:</strong>{' '}
-              {new Date(lastRequest.requestedAt).toLocaleString('pt-BR')}
-            </p>
-            <p><strong>Comprovante:</strong> {lastRequest.receiptCode ?? lastRequest.externalId ?? '-'}</p>
-          </div>
+          <section className="withdraw-paper-receipt" aria-label="Comprovante de solicitação de saque">
+            <header className="withdraw-paper-header">
+              <div>
+                <h3>PGLM</h3>
+                <p>Comprovante de Solicitação de Saque</p>
+              </div>
+              <span className="withdraw-paper-badge">VIA DO CLIENTE</span>
+            </header>
+
+            <div className="withdraw-paper-cut" />
+
+            <div className="withdraw-paper-body">
+              <p className="withdraw-paper-success">Solicitação de saque enviada com sucesso.</p>
+
+              <div className="withdraw-paper-row">
+                <span>Situação</span>
+                <strong>Solicitação recebida com sucesso</strong>
+              </div>
+
+              <div className="withdraw-paper-row">
+                <span>Valor solicitado</span>
+                <strong>{formatBRL(lastRequest.amount)}</strong>
+              </div>
+
+              <div className="withdraw-paper-row">
+                <span>Data e hora</span>
+                <strong>{new Date(lastRequest.requestedAt).toLocaleString('pt-BR')}</strong>
+              </div>
+
+              <div className="withdraw-paper-row">
+                <span>Comprovante</span>
+                <strong>{lastRequest.receiptCode ?? lastRequest.externalId ?? '-'}</strong>
+              </div>
+
+              <div className="withdraw-paper-row">
+                <span>CNPJ PGLM</span>
+                <strong>12.345.678/0001-99</strong>
+              </div>
+            </div>
+
+            <footer className="withdraw-paper-footer">
+              <small>Documento gerado automaticamente pelo sistema PGLM.</small>
+            </footer>
+          </section>
         ) : null}
       </section>
     </main>
