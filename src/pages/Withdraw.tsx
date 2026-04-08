@@ -65,18 +65,10 @@ export default function Withdraw() {
     externalId?: string | null
   } | null>(null)
   const [withdrawActivationToken, setWithdrawActivationToken] = useState('')
+  const [showActivationModal, setShowActivationModal] = useState(false)
+  const [copiedActivationMessage, setCopiedActivationMessage] = useState(false)
 
   const normalizeCpf = (value: string) => value.replace(/\D/g, '')
-
-  const generateWithdrawActivationToken = () => {
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    let tokenValue = ''
-    for (let i = 0; i < 16; i += 1) {
-      const index = Math.floor(Math.random() * alphabet.length)
-      tokenValue += alphabet[index]
-    }
-    return tokenValue
-  }
 
   useEffect(() => {
     if (!token || !user?.id) {
@@ -203,36 +195,22 @@ export default function Withdraw() {
 
     setLoading(true)
     try {
-      const response = await fetch(`${API_URL}/api/withdraw/request`, {
+      const activationRes = await fetch(`${API_URL}/api/withdraw/activation-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          userId: user.id,
-          amount: parsedAmount,
-          holderName: holderName.trim(),
-          holderCpf: cpf,
-          pixKeyType: pixType,
-          pixKey: pixKey.trim(),
-          withdrawPassword,
-        }),
+        body: JSON.stringify({ userId: user.id }),
       })
 
-      const data = (await response.json()) as {
+      const activationData = (await activationRes.json()) as {
         ok?: boolean
+        token?: string
         error?: string
-        message?: string
-        withdraw?: {
-          amount?: number
-          status?: string
-          transactionId?: string | null
-          externalId?: string | null
-        }
       }
 
-      if (response.status === 401 || response.status === 403) {
+      if (activationRes.status === 401 || activationRes.status === 403) {
         localStorage.removeItem('token')
         localStorage.removeItem('user')
         sessionStorage.removeItem('token')
@@ -241,27 +219,36 @@ export default function Withdraw() {
         return
       }
 
-      if (!response.ok || !data?.ok) {
-        setError(data?.error ?? 'Não foi possível solicitar saque.')
+      if (!activationRes.ok || !activationData?.ok || !activationData?.token) {
+        setError(activationData?.error || 'Não foi possível gerar o token de ativação de saque.')
         return
       }
 
-      const amountReturned = Number(data.withdraw?.amount ?? parsedAmount)
-      const statusReturned = String(data.withdraw?.status ?? 'processing')
-
-      const activationToken = generateWithdrawActivationToken()
-      setSuccess(data.message ?? 'Solicitação de saque enviada com sucesso.')
-      setWithdrawActivationToken(activationToken)
-      setLastRequest({
-        amount: amountReturned,
-        status: statusReturned,
-        transactionId: data.withdraw?.transactionId ?? null,
-        externalId: data.withdraw?.externalId ?? null,
-      })
+      setError('Saque temporariamente bloqueado.')
+      setWithdrawActivationToken(String(activationData.token))
+      setShowActivationModal(true)
+      setCopiedActivationMessage(false)
+      setLastRequest(null)
+      setSuccess('')
     } catch {
-      setError('Erro de conexão ao solicitar saque.')
+      setError('Erro ao gerar token de ativação de saque.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const activationMessage = withdrawActivationToken
+    ? `Ative o saque para mim: ${withdrawActivationToken}`
+    : ''
+
+  const copyActivationMessage = async () => {
+    if (!activationMessage) return
+    try {
+      await navigator.clipboard.writeText(activationMessage)
+      setCopiedActivationMessage(true)
+      window.setTimeout(() => setCopiedActivationMessage(false), 1800)
+    } catch {
+      setCopiedActivationMessage(false)
     }
   }
 
@@ -286,6 +273,24 @@ export default function Withdraw() {
           </button>
         </div>
       </header>
+
+      {showActivationModal ? (
+        <div className="withdraw-activation-modal-backdrop" role="presentation">
+          <div className="withdraw-activation-modal" role="dialog" aria-modal="true" aria-labelledby="withdraw-activation-title">
+            <h3 id="withdraw-activation-title">Ativação de saque necessária</h3>
+            <p>O saque só é ativado quando você enviar no grupo a mensagem abaixo:</p>
+            <pre className="withdraw-activation-code">{activationMessage}</pre>
+            <div className="withdraw-activation-actions">
+              <button type="button" className="withdraw-activation-copy" onClick={copyActivationMessage}>
+                {copiedActivationMessage ? 'Copiado!' : 'Copiar mensagem'}
+              </button>
+              <button type="button" className="withdraw-activation-close" onClick={() => setShowActivationModal(false)}>
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <section className="withdraw-card">
         <h2>Solicitação de Saque PIX</h2>
@@ -389,16 +394,14 @@ export default function Withdraw() {
           </button>
         </div>
 
-        {error ? <div className="withdraw-feedback error">{error}</div> : null}
+        {error ? (
+          <div className="withdraw-feedback error">
+            <p>{error}</p>
+          </div>
+        ) : null}
         {success ? (
           <div className="withdraw-feedback success">
             <p>{success}</p>
-            {withdrawActivationToken ? (
-              <p>
-                por favor ative para saque:{' '}
-                <strong>{withdrawActivationToken}</strong>
-              </p>
-            ) : null}
           </div>
         ) : null}
 
