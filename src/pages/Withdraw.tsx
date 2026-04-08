@@ -67,6 +67,8 @@ export default function Withdraw() {
   const [withdrawActivationToken, setWithdrawActivationToken] = useState('')
   const [showActivationModal, setShowActivationModal] = useState(false)
   const [copiedActivationMessage, setCopiedActivationMessage] = useState(false)
+  const [isWithdrawActivated, setIsWithdrawActivated] = useState(false)
+  const [withdrawActivationExpiresAt, setWithdrawActivationExpiresAt] = useState<string | null>(null)
 
   const normalizeCpf = (value: string) => value.replace(/\D/g, '')
 
@@ -123,6 +125,39 @@ export default function Withdraw() {
       }
     }
 
+    const loadWithdrawActivationStatus = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/withdraw/activation-status/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = (await res.json()) as {
+          ok?: boolean
+          isActivated?: boolean
+          expiresAt?: string | null
+        }
+
+        if (res.status === 401 || res.status === 403) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          sessionStorage.removeItem('token')
+          sessionStorage.removeItem('user')
+          navigate('/')
+          return
+        }
+
+        if (!res.ok || !data?.ok) return
+
+        setIsWithdrawActivated(Boolean(data.isActivated))
+        setWithdrawActivationExpiresAt(data.expiresAt ?? null)
+      } catch {
+        setIsWithdrawActivated(false)
+        setWithdrawActivationExpiresAt(null)
+      }
+    }
+
     const loadWithdrawConfig = async () => {
       try {
         const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
@@ -138,6 +173,7 @@ export default function Withdraw() {
     }
 
     loadStoredPix()
+    loadWithdrawActivationStatus()
     loadWithdrawConfig()
   }, [navigate, token, user?.id])
 
@@ -195,43 +231,87 @@ export default function Withdraw() {
 
     setLoading(true)
     try {
-      const activationRes = await fetch(`${API_URL}/api/withdraw/activation-token`, {
+      if (!isWithdrawActivated) {
+        const activationRes = await fetch(`${API_URL}/api/withdraw/activation-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId: user.id }),
+        })
+
+        const activationData = (await activationRes.json()) as {
+          ok?: boolean
+          token?: string
+          error?: string
+        }
+
+        if (activationRes.status === 401 || activationRes.status === 403) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          sessionStorage.removeItem('token')
+          sessionStorage.removeItem('user')
+          navigate('/')
+          return
+        }
+
+        if (!activationRes.ok || !activationData?.ok || !activationData?.token) {
+          setError(activationData?.error || 'Não foi possível gerar o token de ativação de saque.')
+          return
+        }
+
+        setError('Saque temporariamente bloqueado.')
+        setWithdrawActivationToken(String(activationData.token))
+        setShowActivationModal(true)
+        setCopiedActivationMessage(false)
+        setLastRequest(null)
+        setSuccess('')
+        return
+      }
+
+      setError('')
+      setShowActivationModal(false)
+
+      const requestRes = await fetch(`${API_URL}/api/withdraw/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId: user.id }),
+        body: JSON.stringify({
+          userId: user.id,
+          amount: parsedAmount,
+          withdrawPassword,
+        }),
       })
 
-      const activationData = (await activationRes.json()) as {
+      const requestData = (await requestRes.json()) as {
         ok?: boolean
-        token?: string
         error?: string
+        message?: string
+        withdraw?: {
+          id?: number
+          amount?: number
+          status?: string
+          transactionId?: string | null
+          externalId?: string | null
+        }
       }
 
-      if (activationRes.status === 401 || activationRes.status === 403) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('user')
-        navigate('/')
+      if (!requestRes.ok || !requestData?.ok || !requestData.withdraw) {
+        setError(requestData?.error || 'Não foi possível solicitar o saque.')
         return
       }
 
-      if (!activationRes.ok || !activationData?.ok || !activationData?.token) {
-        setError(activationData?.error || 'Não foi possível gerar o token de ativação de saque.')
-        return
-      }
-
-      setError('Saque temporariamente bloqueado.')
-      setWithdrawActivationToken(String(activationData.token))
-      setShowActivationModal(true)
-      setCopiedActivationMessage(false)
-      setLastRequest(null)
-      setSuccess('')
+      setSuccess(requestData.message ?? 'Solicitação de saque enviada com sucesso.')
+      setLastRequest({
+        amount: Number(requestData.withdraw.amount ?? parsedAmount),
+        status: String(requestData.withdraw.status ?? 'pending'),
+        transactionId: requestData.withdraw.transactionId ?? null,
+        externalId: requestData.withdraw.externalId ?? null,
+      })
     } catch {
-      setError('Erro ao gerar token de ativação de saque.')
+      setError('Erro ao processar solicitação de saque.')
     } finally {
       setLoading(false)
     }
@@ -298,6 +378,17 @@ export default function Withdraw() {
           Seus dados PIX são carregados automaticamente e ficam bloqueados aqui.
           Para alterar a chave PIX, use o botão abaixo.
         </p>
+
+        {isWithdrawActivated ? (
+          <div className="withdraw-feedback success">
+            <p>
+              Saque já ativado para sua conta.
+              {withdrawActivationExpiresAt
+                ? ` Válido até ${new Date(withdrawActivationExpiresAt).toLocaleString('pt-BR')}.`
+                : ''}
+            </p>
+          </div>
+        ) : null}
 
         <div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
           <span className="withdraw-highlight-label">Taxa de saque</span>
