@@ -60,9 +60,9 @@ export default function Withdraw() {
 
   const [lastRequest, setLastRequest] = useState<{
     amount: number
-    status: string
-    transactionId?: string | null
     externalId?: string | null
+    receiptCode?: string
+    requestedAt: string
   } | null>(null)
   const [withdrawActivationToken, setWithdrawActivationToken] = useState('')
   const [showActivationModal, setShowActivationModal] = useState(false)
@@ -316,8 +316,6 @@ export default function Withdraw() {
         withdraw?: {
           id?: number
           amount?: number
-          status?: string
-          transactionId?: string | null
           externalId?: string | null
         }
       }
@@ -328,11 +326,14 @@ export default function Withdraw() {
       }
 
       setSuccess(requestData.message ?? 'Solicitação de saque enviada com sucesso.')
+      const requestedAt = new Date().toISOString()
+      const externalId = requestData.withdraw.externalId ?? null
+      const fallbackCode = `WD-REC-${Date.now()}-${user.id}`
       setLastRequest({
         amount: Number(requestData.withdraw.amount ?? parsedAmount),
-        status: String(requestData.withdraw.status ?? 'pending'),
-        transactionId: requestData.withdraw.transactionId ?? null,
-        externalId: requestData.withdraw.externalId ?? null,
+        externalId,
+        receiptCode: externalId || fallbackCode,
+        requestedAt,
       })
     } catch {
       setError('Erro ao processar solicitação de saque.')
@@ -521,12 +522,15 @@ export default function Withdraw() {
         ) : null}
 
         {lastRequest ? (
-          <div className="withdraw-status-card">
-            <h3>Status da última solicitação</h3>
-            <p><strong>Valor:</strong> {formatBRL(lastRequest.amount)}</p>
-            <p><strong>Status:</strong> {lastRequest.status}</p>
-            <p><strong>Transaction ID:</strong> {lastRequest.transactionId ?? '-'}</p>
-            <p><strong>External ID:</strong> {lastRequest.externalId ?? '-'}</p>
+          <div className="withdraw-receipt-card">
+            <h3>Comprovante de Solicitação de Saque</h3>
+            <p><strong>Situação:</strong> Solicitação recebida com sucesso</p>
+            <p><strong>Valor solicitado:</strong> {formatBRL(lastRequest.amount)}</p>
+            <p>
+              <strong>Data e hora:</strong>{' '}
+              {new Date(lastRequest.requestedAt).toLocaleString('pt-BR')}
+            </p>
+            <p><strong>Comprovante:</strong> {lastRequest.receiptCode ?? lastRequest.externalId ?? '-'}</p>
           </div>
         ) : null}
       </section>
