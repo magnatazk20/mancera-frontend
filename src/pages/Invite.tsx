@@ -5,9 +5,13 @@ import './Tasks.css'
 import './Invite.css'
 
 type StoredUser = {
-  id: number | string
-  name: string
-  phone: string
+  id?: number | string
+  name?: string
+  phone?: string
+  referralCode?: string
+  referral_code?: string
+  referralLink?: string
+  referral_link?: string
 }
 
 type CommissionLevel = {
@@ -25,6 +29,7 @@ export default function Invite() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [refCode, setRefCode] = useState('')
+  const [referralLinkState, setReferralLinkState] = useState('')
   const [copied, setCopied] = useState(false)
   const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
   const [commissionError, setCommissionError] = useState('')
@@ -40,38 +45,24 @@ export default function Invite() {
     }
   }, [])
 
-  const parsedUserId = useMemo(() => {
-    const idValue = user?.id
-    const parsed = Number(idValue)
-    if (!Number.isFinite(parsed) || parsed <= 0) return null
-    return parsed
-  }, [user?.id])
-
   useEffect(() => {
     const loadReferral = async () => {
       try {
         const apiBase = String(API_URL ?? '').trim().replace(/\/+$/, '') || 'http://localhost:3333'
 
-        if (!parsedUserId) {
-          setError('Usuário não autenticado.')
-        } else {
-          let referralLoaded = false
-          try {
-            const referralResponse = await fetch(`${apiBase}/api/referral/${parsedUserId}`)
-            if (referralResponse.ok) {
-              const referralData = await referralResponse.json()
-              if (referralData?.ok) {
-                setRefCode(String(referralData.referralCode ?? ''))
-                referralLoaded = true
-              }
-            }
-          } catch (err) {
-            console.error('[invite] erro ao buscar referral', err)
-          }
+        const storedRefCode = String(user?.referralCode ?? user?.referral_code ?? '').trim()
+        const storedReferralLink = String(user?.referralLink ?? user?.referral_link ?? '').trim()
 
-          if (!referralLoaded) {
-            setError('Não foi possível carregar seu link de convite.')
-          }
+        if (storedRefCode) {
+          setRefCode(storedRefCode)
+        }
+
+        if (storedReferralLink) {
+          setReferralLinkState(storedReferralLink)
+        }
+
+        if (!storedRefCode && !storedReferralLink) {
+          setError('Não foi possível carregar seu link de convite.')
         }
 
         let commissionLoaded = false
@@ -120,13 +111,14 @@ export default function Invite() {
     }
 
     loadReferral()
-  }, [parsedUserId])
+  }, [user])
 
   const referralLink = useMemo(() => {
+    if (referralLinkState) return referralLinkState
     const origin = window.location.origin
     if (!refCode) return ''
     return `${origin}/cadastro?ref=${encodeURIComponent(refCode)}`
-  }, [refCode])
+  }, [refCode, referralLinkState])
 
   const inviteMessage = useMemo(() => {
     if (!referralLink) return ''
