@@ -1,3 +1,5 @@
-- [x] Ajustar `GiftVouchers.tsx` para mostrar mensagem quando não houver produtos.
-- [x] Validar build/lint após alteração.
+- [x] Criar página admin `AdminCycleProducts.tsx` com CRUD completo da tabela `cycle_products`.
+- [x] Adicionar rota protegida `/adf/cycle-products` no `App.tsx`.
+- [x] Adicionar botão de menu no `AdminSidebar.tsx` para acessar produtos.
+- [ ] Executar build para validar alterações.
 - [ ] Commit e push das mudanças.

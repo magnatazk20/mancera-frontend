@@ -423,6 +423,127 @@
   display: none;
 }
 
+.admin-cycle-form-panel {
+  margin-bottom: 16px;
+}
+
+.admin-cycle-form-title {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.admin-cycle-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.admin-cycle-field {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-cycle-field.full {
+  grid-column: 1 / -1;
+}
+
+.admin-cycle-field label {
+  font-size: 0.82rem;
+  color: #9cb0df;
+  font-weight: 700;
+}
+
+.admin-cycle-field input,
+.admin-cycle-field textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #334a7a;
+  background: #101a30;
+  color: #e6eeff;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 0.92rem;
+  box-sizing: border-box;
+}
+
+.admin-cycle-field input::placeholder,
+.admin-cycle-field textarea::placeholder {
+  color: #7f95c2;
+}
+
+.admin-cycle-field input:focus,
+.admin-cycle-field textarea:focus {
+  border-color: #4a6fb8;
+  box-shadow: 0 0 0 2px rgba(74, 111, 184, 0.28);
+}
+
+.admin-cycle-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.admin-cycle-checkbox input {
+  width: auto;
+}
+
+.admin-cycle-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-cycle-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-cycle-item {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.admin-cycle-item-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-cycle-item-title {
+  color: #f8fafc;
+}
+
+.admin-cycle-item-description {
+  margin: 6px 0;
+  color: #94a3b8;
+}
+
+.admin-cycle-item-meta {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.admin-cycle-item-meta.secondary {
+  margin-top: 6px;
+  color: #94a3b8;
+}
+
+.admin-cycle-item-actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.admin-cycle-delete-btn {
+  background: #7f1d1d;
+  color: #fff;
+}
+
 @media (max-width: 640px) {
   .admin-kpis {
     grid-template-columns: 1fr;
@@ -455,6 +576,15 @@
   .admin-withdraw-cards {
     display: grid;
     gap: 8px;
+  }
+
+  .admin-cycle-item-actions {
+    width: 100%;
+  }
+
+  .admin-cycle-item-actions .btn {
+    flex: 1;
+    text-align: center;
   }
 
   .admin-withdraw-card {

@@ -80,6 +80,7 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Promoções</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-products'); setMenuOpen(false) }}>Produtos (Cycle)</button>
 
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
