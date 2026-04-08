@@ -65,6 +65,12 @@ export default function Invite() {
           setError('Não foi possível carregar seu link de convite.')
         }
 
+        const defaultCommissionLevels: CommissionLevel[] = [
+          { id: 1, level: 1, name: 'Nível 1', commissionPercent: 10, isActive: true },
+          { id: 2, level: 2, name: 'Nível 2', commissionPercent: 3, isActive: true },
+          { id: 3, level: 3, name: 'Nível 3', commissionPercent: 1, isActive: true },
+        ]
+
         let commissionLoaded = false
         const commissionUrl = `${apiBase}/api/referral/commission-levels`
         try {
@@ -99,9 +105,10 @@ export default function Invite() {
         }
 
         if (!commissionLoaded) {
-          setCommissionLevels([])
+          setCommissionLevels(defaultCommissionLevels)
           setCommissionSource('')
-          setCommissionError('Não foi possível carregar comissões do banco de dados (API indisponível).')
+          setCommissionError('')
+          console.warn('[invite] usando comissões padrão (fallback) por falha da API de commission-levels')
         }
       } catch {
         setError('Erro de conexão ao carregar convite.')
