@@ -1,0 +1,94 @@
+.withdraw-receipt-page {
+  padding-bottom: 28px;
+}
+
+.withdraw-receipt-empty {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.withdraw-paper-receipt {
+  margin-top: 16px;
+  background: #fffefb;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.withdraw-paper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.withdraw-paper-header h3 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #0f172a;
+}
+
+.withdraw-paper-header p {
+  margin: 2px 0 0;
+  color: #334155;
+  font-weight: 600;
+}
+
+.withdraw-paper-badge {
+  border: 1px solid #16a34a;
+  color: #166534;
+  background: #dcfce7;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.4px;
+}
+
+.withdraw-paper-cut {
+  border-top: 2px dashed #cbd5e1;
+}
+
+.withdraw-paper-body {
+  padding: 14px 16px 10px;
+}
+
+.withdraw-paper-success {
+  margin: 0 0 12px;
+  color: #166534;
+  font-weight: 800;
+}
+
+.withdraw-paper-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.withdraw-paper-row span {
+  color: #475569;
+  font-weight: 600;
+}
+
+.withdraw-paper-row strong {
+  color: #0f172a;
+  text-align: right;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.withdraw-paper-footer {
+  padding: 10px 16px 14px;
+  color: #64748b;
+  background: #f8fafc;
+}

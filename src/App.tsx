@@ -22,6 +22,7 @@ import TaxDeclaration from './pages/TaxDeclaration'
 import WithdrawPassword from './pages/WithdrawPassword'
 import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
+import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
@@ -100,6 +101,14 @@ export default function App() {
           element={(
             <RequireAuth>
               <Withdraw />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/saque/comprovante"
+          element={(
+            <RequireAuth>
+              <WithdrawReceipt />
             </RequireAuth>
           )}
         />

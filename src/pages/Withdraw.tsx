@@ -329,12 +329,15 @@ export default function Withdraw() {
       const requestedAt = new Date().toISOString()
       const externalId = requestData.withdraw.externalId ?? null
       const fallbackCode = `WD-REC-${Date.now()}-${user.id}`
-      setLastRequest({
+      const receiptPayload = {
         amount: Number(requestData.withdraw.amount ?? parsedAmount),
         externalId,
         receiptCode: externalId || fallbackCode,
         requestedAt,
-      })
+      }
+
+      setLastRequest(receiptPayload)
+      navigate('/saque/comprovante', { state: receiptPayload })
     } catch {
       setError('Erro ao processar solicitação de saque.')
     } finally {
