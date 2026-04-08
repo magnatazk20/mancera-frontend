@@ -229,6 +229,8 @@ export default function GiftVouchers() {
 
       {loading ? (
         <div className="vip-inline-message">Carregando vales presentes...</div>
+      ) : vouchers.length === 0 ? (
+        <div className="vip-inline-message">Não tem produto no momento.</div>
       ) : (
         <section className="gift-vouchers-list">
           {vouchers.map((voucher) => (
