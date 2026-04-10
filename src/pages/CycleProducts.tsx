@@ -165,12 +165,15 @@ export default function CycleProducts() {
                 onClick={() => setActiveCategory('normal')}
                 style={{
                   border: activeCategory === 'normal' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'normal' ? '#e8f0ff' : '#fff',
+                  background: activeCategory === 'normal' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
                   color: '#0f172a',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   padding: '10px 8px',
                   fontWeight: 700,
                   cursor: 'pointer',
+                  transition: 'all 180ms ease',
+                  transform: activeCategory === 'normal' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
+                  boxShadow: activeCategory === 'normal' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
                 }}
               >
                 Plano normal
@@ -180,12 +183,15 @@ export default function CycleProducts() {
                 onClick={() => setActiveCategory('vip')}
                 style={{
                   border: activeCategory === 'vip' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'vip' ? '#e8f0ff' : '#fff',
+                  background: activeCategory === 'vip' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
                   color: '#0f172a',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   padding: '10px 8px',
                   fontWeight: 700,
                   cursor: 'pointer',
+                  transition: 'all 180ms ease',
+                  transform: activeCategory === 'vip' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
+                  boxShadow: activeCategory === 'vip' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
                 }}
               >
                 Plano VIP
@@ -195,12 +201,15 @@ export default function CycleProducts() {
                 onClick={() => setActiveCategory('vip_day')}
                 style={{
                   border: activeCategory === 'vip_day' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'vip_day' ? '#e8f0ff' : '#fff',
+                  background: activeCategory === 'vip_day' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
                   color: '#0f172a',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   padding: '10px 8px',
                   fontWeight: 700,
                   cursor: 'pointer',
+                  transition: 'all 180ms ease',
+                  transform: activeCategory === 'vip_day' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
+                  boxShadow: activeCategory === 'vip_day' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
                 }}
               >
                 VIP do dia
