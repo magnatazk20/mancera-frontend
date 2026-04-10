@@ -18,6 +18,9 @@ type WithdrawConfigResponse = {
     withdrawFeePercent?: number
     minWithdrawAmount?: number
     maxWithdrawAmount?: number
+    withdrawStartTime?: string
+    withdrawEndTime?: string
+    withdrawAllowedDays?: string
   }
 }
 
@@ -57,6 +60,9 @@ export default function Withdraw() {
   const [withdrawFeePercent, setWithdrawFeePercent] = useState(0)
   const [minWithdrawAmount, setMinWithdrawAmount] = useState(0)
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState(0)
+  const [withdrawStartTime, setWithdrawStartTime] = useState('00:00')
+  const [withdrawEndTime, setWithdrawEndTime] = useState('23:59')
+  const [withdrawAllowedDays, setWithdrawAllowedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6])
 
   const [lastRequest, setLastRequest] = useState<{
     amount: number
@@ -174,6 +180,13 @@ export default function Withdraw() {
         setWithdrawFeePercent(Number(data.config.withdrawFeePercent ?? 0))
         setMinWithdrawAmount(Number(data.config.minWithdrawAmount ?? 0))
         setMaxWithdrawAmount(Number(data.config.maxWithdrawAmount ?? 0))
+        setWithdrawStartTime(String(data.config.withdrawStartTime ?? '00:00'))
+        setWithdrawEndTime(String(data.config.withdrawEndTime ?? '23:59'))
+        const parsedDays = String(data.config.withdrawAllowedDays ?? '0,1,2,3,4,5,6')
+          .split(',')
+          .map((item) => Number(item.trim()))
+          .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6)
+        setWithdrawAllowedDays(parsedDays.length > 0 ? [...new Set(parsedDays)] : [0, 1, 2, 3, 4, 5, 6])
       } catch {
         // fallback silencioso
       }
@@ -229,6 +242,11 @@ export default function Withdraw() {
 
     if (maxWithdrawAmount > 0 && parsedAmount > maxWithdrawAmount) {
       setError(`O valor máximo de saque é ${formatBRL(maxWithdrawAmount)}.`)
+      return
+    }
+
+    if (!isWithdrawWindowOpen) {
+      setError(withdrawWindowMessage)
       return
     }
 
@@ -365,6 +383,45 @@ export default function Withdraw() {
   const feeValuePreview = hasValidPreviewAmount ? (parsedAmountPreview * withdrawFeePercent) / 100 : 0
   const netValuePreview = hasValidPreviewAmount ? parsedAmountPreview - feeValuePreview : 0
 
+  const weekdayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+
+  const parseTimeToMinutes = (timeValue: string) => {
+    const [hh, mm] = String(timeValue ?? '').split(':').map((v) => Number(v))
+    if (!Number.isInteger(hh) || !Number.isInteger(mm)) return null
+    if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return null
+    return hh * 60 + mm
+  }
+
+  const startMinutes = parseTimeToMinutes(withdrawStartTime)
+  const endMinutes = parseTimeToMinutes(withdrawEndTime)
+  const nowInSaoPaulo = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }))
+  const currentWeekDay = nowInSaoPaulo.getDay()
+  const currentMinutes = nowInSaoPaulo.getHours() * 60 + nowInSaoPaulo.getMinutes()
+
+  const isDayAllowed = withdrawAllowedDays.includes(currentWeekDay)
+  const isTimeAllowed =
+    startMinutes != null && endMinutes != null
+      ? startMinutes <= endMinutes
+        ? currentMinutes >= startMinutes && currentMinutes <= endMinutes
+        : currentMinutes >= startMinutes || currentMinutes <= endMinutes
+      : false
+
+  const isWithdrawWindowOpen = isDayAllowed && isTimeAllowed
+  const allowedDaysLabel =
+    withdrawAllowedDays.length > 0
+      ? withdrawAllowedDays
+          .slice()
+          .sort((a, b) => a - b)
+          .map((day) => weekdayNames[day] ?? String(day))
+          .join(', ')
+      : 'Nenhum'
+
+  const withdrawWindowMessage = !isDayAllowed
+    ? `Saque indisponível hoje. Dias permitidos: ${allowedDaysLabel}.`
+    : !isTimeAllowed
+      ? `Saque indisponível neste horário. Permitido entre ${withdrawStartTime} e ${withdrawEndTime} (horário de São Paulo).`
+      : 'Saque disponível agora.'
+
   return (
     <main className="tasks-page withdraw-page">
       <AppSidebar />
@@ -417,6 +474,13 @@ export default function Withdraw() {
             </p>
           </div>
         ) : null}
+
+        <div className={`withdraw-feedback withdraw-window-status ${isWithdrawWindowOpen ? 'success' : 'error'}`}>
+          <p>{withdrawWindowMessage}</p>
+          <small>
+            Janela configurada: {withdrawStartTime} até {withdrawEndTime} • Dias: {allowedDaysLabel}
+          </small>
+        </div>
 
         <div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
           <span className="withdraw-highlight-label">Taxa de saque</span>
@@ -508,7 +572,7 @@ export default function Withdraw() {
         </div>
 
         <div className="withdraw-actions">
-          <button type="button" className="withdraw-submit" disabled={loading} onClick={submitWithdraw}>
+          <button type="button" className="withdraw-submit" disabled={loading || !isWithdrawWindowOpen} onClick={submitWithdraw}>
             {loading ? 'Enviando...' : 'Solicitar saque'}
           </button>
         </div>
