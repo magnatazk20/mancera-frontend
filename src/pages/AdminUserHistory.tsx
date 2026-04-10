@@ -14,6 +14,16 @@ type UserLogItem = {
   created_at: string | null
 }
 
+const formatLogActionLabel = (actionRaw: string) => {
+  const action = String(actionRaw ?? '').toLowerCase().trim()
+
+  if (action === 'withdraw_request_created' || action === 'withdraw_request_auto_processed') {
+    return 'Solicitação de saque'
+  }
+
+  return actionRaw
+}
+
 type PurchaseItem = {
   id: number
   planName: string
@@ -238,7 +248,7 @@ export default function AdminUserHistory() {
                     {(user.accountLogs ?? []).map((log) => (
                       <article key={`log-${log.id}`} className="admin-user-log-item">
                         <div>
-                          <strong>{log.action}</strong>
+                          <strong>{formatLogActionLabel(log.action)}</strong>
                           <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
                           <small>
                             anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo:{' '}
