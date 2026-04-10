@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
@@ -21,6 +21,15 @@ type CycleProduct = {
   sortOrder: number
 }
 
+type PlanCategory = 'normal' | 'vip' | 'vip_day'
+
+const getPlanCategory = (plan: CycleProduct): PlanCategory => {
+  const name = String(plan.name ?? '').toLowerCase().trim()
+  if (name.includes('vip do dia')) return 'vip_day'
+  if (name.includes('vip')) return 'vip'
+  return 'normal'
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function CycleProducts() {
@@ -30,6 +39,7 @@ export default function CycleProducts() {
   const [loading, setLoading] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
+  const [activeCategory, setActiveCategory] = useState<PlanCategory>('normal')
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -125,6 +135,11 @@ export default function CycleProducts() {
     }
   }
 
+  const filteredCyclePlans = useMemo(
+    () => cyclePlans.filter((plan) => getPlanCategory(plan) === activeCategory),
+    [cyclePlans, activeCategory]
+  )
+
   if (!user) return null
 
   return (
@@ -137,13 +152,68 @@ export default function CycleProducts() {
             <h1 style={{ fontSize: 20, marginBottom: 10 }}>Produtos de ciclos</h1>
             <p style={{ marginBottom: 12 }}>Os mesmos produtos exibidos no Dashboard.</p>
 
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                gap: 8,
+                marginBottom: 14,
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setActiveCategory('normal')}
+                style={{
+                  border: activeCategory === 'normal' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
+                  background: activeCategory === 'normal' ? '#e8f0ff' : '#fff',
+                  color: '#0f172a',
+                  borderRadius: 10,
+                  padding: '10px 8px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Plano normal
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory('vip')}
+                style={{
+                  border: activeCategory === 'vip' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
+                  background: activeCategory === 'vip' ? '#e8f0ff' : '#fff',
+                  color: '#0f172a',
+                  borderRadius: 10,
+                  padding: '10px 8px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Plano VIP
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory('vip_day')}
+                style={{
+                  border: activeCategory === 'vip_day' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
+                  background: activeCategory === 'vip_day' ? '#e8f0ff' : '#fff',
+                  color: '#0f172a',
+                  borderRadius: 10,
+                  padding: '10px 8px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                VIP do dia
+              </button>
+            </div>
+
             {loading ? (
               <p style={{ color: '#6b7280' }}>Carregando produtos...</p>
-            ) : cyclePlans.length === 0 ? (
-              <p style={{ color: '#6b7280' }}>Nenhum plano disponível no momento.</p>
+            ) : filteredCyclePlans.length === 0 ? (
+              <p style={{ color: '#6b7280' }}>Nenhum plano disponível nesta categoria.</p>
             ) : (
               <div style={{ display: 'grid', gap: 10 }}>
-                {cyclePlans.map((plan, index) => {
+                {filteredCyclePlans.map((plan, index) => {
                   const compras = Math.max(1, Math.floor((index + 1) * 2))
                   const estoque = Math.max(120, 1000 - index * 37)
                   const progresso = Math.min(95, 25 + index * 10)
