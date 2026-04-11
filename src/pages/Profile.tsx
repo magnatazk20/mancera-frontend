@@ -423,6 +423,15 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Pedidos de Investimento</span>
             </button>
+            <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/monthly-salary')}>
+              <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19h16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M7 16V9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M12 16V6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M17 16v-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <span className="profile-shortcut-label">Salário Mensal</span>
+            </button>
             <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/earnings')}>
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 20h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

@@ -26,6 +26,7 @@ import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
 import CycleProducts from './pages/CycleProducts'
 import MiniTasks from './pages/MiniTasks'
+import MonthlySalary from './pages/MonthlySalary'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -83,6 +84,14 @@ export default function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/mini-tasks" element={<MiniTasks />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
+        <Route
+          path="/monthly-salary"
+          element={(
+            <RequireAuth>
+              <MonthlySalary />
+            </RequireAuth>
+          )}
+        />
         <Route path="/bank-cards" element={<BankCards />} />
         <Route path="/team-report" element={<TeamReport />} />
         <Route path="/checkin" element={<Checkin />} />

@@ -1,0 +1,103 @@
+.monthly-salary-page {
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px 20px 120px;
+  box-sizing: border-box;
+  color: #fff;
+}
+
+.monthly-salary-header {
+  margin-left: 72px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.monthly-salary-kicker {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.monthly-salary-header h1 {
+  margin: 4px 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.monthly-salary-subtitle {
+  font-size: 14px;
+  opacity: 0.82;
+}
+
+.monthly-salary-content {
+  margin-left: 72px;
+}
+
+.monthly-salary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 14px;
+}
+
+.monthly-salary-card {
+  background: rgba(24, 26, 39, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  backdrop-filter: blur(6px);
+}
+
+.monthly-salary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.monthly-salary-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.monthly-salary-card-header span {
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(57, 214, 179, 0.18);
+  border: 1px solid rgba(57, 214, 179, 0.5);
+  color: #7df8d5;
+  white-space: nowrap;
+}
+
+.monthly-salary-card-body p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: rgba(245, 247, 255, 0.93);
+  line-height: 1.35;
+}
+
+.monthly-salary-empty {
+  padding: 28px 16px;
+  border-radius: 12px;
+  text-align: center;
+  background: rgba(24, 26, 39, 0.7);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 900px) {
+  .monthly-salary-header,
+  .monthly-salary-content {
+    margin-left: 0;
+  }
+
+  .monthly-salary-page {
+    padding: 16px 14px 110px;
+  }
+}
