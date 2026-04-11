@@ -133,6 +133,18 @@ export default function MonthlySalary() {
                     {plan.requiredLevel3Deposited}
                   </p>
                 </div>
+
+                <div className="monthly-salary-card-actions">
+                  <button
+                    type="button"
+                    className="monthly-salary-get-btn"
+                    onClick={() => {
+                      // Botão solicitado para aparecer na tela.
+                    }}
+                  >
+                    Obter
+                  </button>
+                </div>
               </article>
             ))}
           </div>

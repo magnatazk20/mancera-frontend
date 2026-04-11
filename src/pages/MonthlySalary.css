@@ -82,6 +82,27 @@
   line-height: 1.35;
 }
 
+.monthly-salary-card-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.monthly-salary-get-btn {
+  border: 1px solid rgba(57, 214, 179, 0.55);
+  background: linear-gradient(180deg, rgba(57, 214, 179, 0.25), rgba(57, 214, 179, 0.12));
+  color: #cffff3;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.monthly-salary-get-btn:hover {
+  filter: brightness(1.08);
+}
+
 .monthly-salary-empty {
   padding: 28px 16px;
   border-radius: 12px;
