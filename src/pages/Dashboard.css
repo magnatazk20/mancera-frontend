@@ -319,7 +319,42 @@
 }
 
 .landscape-btn.deposit {
-  background-image: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1400&q=70');
+  background-image:
+    radial-gradient(circle at 72% 50%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 34%),
+    radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 42%),
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%),
+    url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1400&q=70');
+}
+
+.deposit-visual {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.deposit-coin {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  font-size: 32px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.35));
+  animation: deposit-coin-float 1.8s ease-in-out infinite;
+}
+
+@keyframes deposit-coin-float {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(0) rotate(-6deg);
+  }
+  50% {
+    transform: translateY(-62%) translateX(-6px) rotate(6deg);
+  }
 }
 
 .landscape-btn.withdraw {

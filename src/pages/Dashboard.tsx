@@ -233,6 +233,9 @@ export default function Dashboard() {
           <section className="landscape-actions">
             <button className="landscape-btn deposit" type="button" onClick={() => navigate('/cashin')}>
               <span>Depositar</span>
+              <div className="deposit-visual" aria-hidden="true">
+                <div className="deposit-coin">💵</div>
+              </div>
             </button>
             <button className="landscape-btn withdraw" type="button" onClick={() => navigate('/saque')}>
               <span>Sacar</span>
