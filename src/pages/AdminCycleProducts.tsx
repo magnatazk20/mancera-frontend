@@ -9,6 +9,7 @@ type CycleProduct = {
   imageUrl: string
   price: number
   redeemRewardValue: number
+  cycleDays: number
   isActive: boolean
   createdAt: string | null
 }
@@ -19,6 +20,7 @@ type FormState = {
   imageUrl: string
   price: string
   redeemRewardValue: string
+  cycleDays: string
   isActive: boolean
 }
 
@@ -33,6 +35,7 @@ const emptyForm: FormState = {
   imageUrl: '',
   price: '',
   redeemRewardValue: '',
+  cycleDays: '0',
   isActive: true,
 }
 
@@ -78,6 +81,7 @@ export default function AdminCycleProducts() {
           imageUrl?: string
           price?: number
           redeemRewardValue?: number
+          cycleDays?: number
           isActive?: boolean
           createdAt?: string | null
         }>
@@ -97,6 +101,7 @@ export default function AdminCycleProducts() {
             imageUrl: String(item.imageUrl ?? ''),
             price: Number(item.price ?? 0),
             redeemRewardValue: Number(item.redeemRewardValue ?? 0),
+            cycleDays: Number(item.cycleDays ?? 0),
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
           }))
@@ -123,6 +128,7 @@ export default function AdminCycleProducts() {
       imageUrl: product.imageUrl,
       price: String(product.price),
       redeemRewardValue: String(product.redeemRewardValue),
+      cycleDays: String(product.cycleDays ?? 0),
       isActive: product.isActive,
     })
     setFeedback(null)
@@ -134,6 +140,7 @@ export default function AdminCycleProducts() {
     const normalizedImageUrl = form.imageUrl.trim()
     const numericPrice = Number(form.price.replace(',', '.'))
     const numericReward = Number(form.redeemRewardValue.replace(',', '.'))
+    const numericCycleDays = Number(form.cycleDays.replace(',', '.'))
 
     if (!token) {
       setFeedback({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
@@ -160,6 +167,11 @@ export default function AdminCycleProducts() {
       return
     }
 
+    if (!Number.isInteger(numericCycleDays) || numericCycleDays < 0) {
+      setFeedback({ type: 'error', text: 'Informe os dias do ciclo (inteiro maior ou igual a 0).' })
+      return
+    }
+
     setSaving(true)
     setFeedback(null)
 
@@ -182,6 +194,7 @@ export default function AdminCycleProducts() {
           imageUrl: normalizedImageUrl,
           price: Number(numericPrice.toFixed(2)),
           redeemRewardValue: Number(numericReward.toFixed(2)),
+          cycleDays: numericCycleDays,
           isActive: form.isActive,
         }),
       })
@@ -285,6 +298,18 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
+              <label>Dias do ciclo</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.cycleDays}
+                onChange={(e) => setForm((prev) => ({ ...prev, cycleDays: e.target.value }))}
+                placeholder="Ex.: 30"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
               <label>Imagem (URL)</label>
               <input
                 type="url"
@@ -348,7 +373,7 @@ export default function AdminCycleProducts() {
                       <strong className="admin-cycle-item-title">{product.name}</strong>
                       <p className="admin-cycle-item-description">{product.description}</p>
                       <p className="admin-cycle-item-meta">
-                        Preço: {formatBRL(product.price)} • Resgate: {formatBRL(product.redeemRewardValue)}
+                        Preço: {formatBRL(product.price)} • Resgate: {formatBRL(product.redeemRewardValue)} • Ciclo: {product.cycleDays} dias
                       </p>
                       <p className="admin-cycle-item-meta secondary">
                         Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}
