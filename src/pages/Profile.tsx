@@ -24,6 +24,7 @@ type VipResponse = {
 type SummaryResponse = {
   balance?: number
   totalDeposits?: number
+  monthlySalaryContract?: string | null
 }
 
 type ProfileMetricsResponse = {
@@ -66,6 +67,7 @@ export default function Profile() {
   const [todayIncome, setTodayIncome] = useState(0)
   const [copyFeedback, setCopyFeedback] = useState('')
   const [inviteCode, setInviteCode] = useState('')
+  const [monthlySalaryContract, setMonthlySalaryContract] = useState('')
   const [giftCodeInput, setGiftCodeInput] = useState('')
   const [redeemLoading, setRedeemLoading] = useState(false)
   const [redeemFeedback, setRedeemFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -102,6 +104,7 @@ export default function Profile() {
           const summaryData = (await summaryRes.json()) as SummaryResponse
           setBalance(Number(summaryData.balance ?? 0))
           setTotalDeposits(Number(summaryData.totalDeposits ?? 0))
+          setMonthlySalaryContract(String(summaryData.monthlySalaryContract ?? '').trim())
         }
 
         if (vipRes.ok) {
@@ -330,6 +333,11 @@ export default function Profile() {
                     </svg>
                   </button>
                   {copyFeedback ? <span className="profile-copy-feedback">{copyFeedback}</span> : null}
+                </div>
+
+                <div className="profile-invite-row">
+                  <span>Contrato Atual:</span>
+                  <span className="profile-invite-code">{monthlySalaryContract || 'Sem contrato ativo'}</span>
                 </div>
               </div>
             </div>
