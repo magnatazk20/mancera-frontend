@@ -26,6 +26,23 @@ type MonthlySalaryResponse = {
   error?: string
 }
 
+type ClaimResponse = {
+  ok?: boolean
+  message?: string
+  error?: string
+  contract?: string
+  requirements?: {
+    requiredLevel1Deposited: number
+    requiredLevel2Deposited: number
+    requiredLevel3Deposited: number
+  }
+  current?: {
+    level1Deposited: number
+    level2Deposited: number
+    level3Deposited: number
+  }
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -36,6 +53,8 @@ export default function MonthlySalary() {
   const [loading, setLoading] = useState(true)
   const [plans, setPlans] = useState<MonthlySalaryPlan[]>([])
   const [error, setError] = useState('')
+  const [claimLoadingPlanId, setClaimLoadingPlanId] = useState<number | null>(null)
+  const [activeContract, setActiveContract] = useState('')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -46,6 +65,45 @@ export default function MonthlySalary() {
       return null
     }
   }, [])
+
+  const handleClaim = async (planId: number) => {
+    if (!user?.id || claimLoadingPlanId) return
+
+    setClaimLoadingPlanId(planId)
+    setError('')
+
+    try {
+      const res = await fetch(`${API_URL}/api/monthly-salary-plans/claim`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          planId,
+        }),
+      })
+
+      const data = (await res.json()) as ClaimResponse
+
+      if (!res.ok || !data?.ok) {
+        if (data?.requirements && data?.current) {
+          setError(
+            `Requisitos não atendidos. N1: ${data.current.level1Deposited}/${data.requirements.requiredLevel1Deposited}, ` +
+              `N2: ${data.current.level2Deposited}/${data.requirements.requiredLevel2Deposited}, ` +
+              `N3: ${data.current.level3Deposited}/${data.requirements.requiredLevel3Deposited}.`
+          )
+        } else {
+          setError(data?.error ?? 'Não foi possível obter o contrato.')
+        }
+        return
+      }
+
+      setActiveContract(String(data?.contract ?? 'Contrato: Start V1'))
+    } catch {
+      setError('Erro de conexão ao obter contrato.')
+    } finally {
+      setClaimLoadingPlanId(null)
+    }
+  }
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -98,6 +156,7 @@ export default function MonthlySalary() {
       </header>
 
       <section className="monthly-salary-content">
+        {activeContract ? <div className="monthly-salary-empty">Sucesso: {activeContract}</div> : null}
         {loading ? (
           <div className="monthly-salary-empty">Carregando planos...</div>
         ) : error ? (
@@ -138,11 +197,10 @@ export default function MonthlySalary() {
                   <button
                     type="button"
                     className="monthly-salary-get-btn"
-                    onClick={() => {
-                      // Botão solicitado para aparecer na tela.
-                    }}
+                    onClick={() => handleClaim(plan.id)}
+                    disabled={claimLoadingPlanId === plan.id}
                   >
-                    Obter
+                    {claimLoadingPlanId === plan.id ? 'Obtendo...' : 'Obter'}
                   </button>
                 </div>
               </article>
