@@ -25,6 +25,7 @@ import Withdraw from './pages/Withdraw'
 import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
 import CycleProducts from './pages/CycleProducts'
+import MiniTasks from './pages/MiniTasks'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="/vip" element={<Vip />} /> */}
         <Route path="/invite" element={<Invite />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/mini-tasks" element={<MiniTasks />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
         <Route path="/bank-cards" element={<BankCards />} />
         <Route path="/team-report" element={<TeamReport />} />
