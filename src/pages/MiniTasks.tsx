@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
@@ -16,10 +16,34 @@ type RedeemState = Record<number, 'idle' | 'loading' | 'done'>
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
+type StoredUser = {
+  id: number
+  name: string
+  phone: string
+}
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+
 export default function MiniTasks() {
   const navigate = useNavigate()
   const [redeemState, setRedeemState] = useState<RedeemState>({})
   const [notice, setNotice] = useState<string>('')
+
+  const user = useMemo(() => {
+    const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
+    if (!raw) return null
+    try {
+      return JSON.parse(raw) as StoredUser
+    } catch {
+      return null
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!user?.id) {
+      navigate('/')
+    }
+  }, [navigate, user?.id])
 
   const tasks = useMemo<MiniTask[]>(
     () => [
@@ -42,12 +66,12 @@ export default function MiniTasks() {
     setRedeemState((prev) => ({ ...prev, [task.id]: 'loading' }))
 
     try {
-      const userId = Number(localStorage.getItem('userId') ?? 0)
+      const userId = Number(user?.id ?? 0)
       if (!userId || Number.isNaN(userId)) {
-        throw new Error('Faça login novamente para resgatar.')
+        throw new Error('Usuário não autenticado.')
       }
 
-      const response = await fetch(`/api/mini-tasks/${userId}/redeem`, {
+      const response = await fetch(`${API_URL}/api/mini-tasks/${userId}/redeem`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ taskId: task.id }),
