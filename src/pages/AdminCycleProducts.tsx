@@ -10,6 +10,7 @@ type CycleProduct = {
   price: number
   redeemRewardValue: number
   cycleDays: number
+  planType: 'normal' | 'vip' | 'vip_day'
   isActive: boolean
   createdAt: string | null
 }
@@ -21,6 +22,7 @@ type FormState = {
   price: string
   redeemRewardValue: string
   cycleDays: string
+  planType: 'normal' | 'vip' | 'vip_day'
   isActive: boolean
 }
 
@@ -36,6 +38,7 @@ const emptyForm: FormState = {
   price: '',
   redeemRewardValue: '',
   cycleDays: '0',
+  planType: 'normal',
   isActive: true,
 }
 
@@ -82,6 +85,7 @@ export default function AdminCycleProducts() {
           price?: number
           redeemRewardValue?: number
           cycleDays?: number
+          planType?: string
           isActive?: boolean
           createdAt?: string | null
         }>
@@ -93,6 +97,9 @@ export default function AdminCycleProducts() {
         return
       }
 
+      const normalizePlanType = (value: string): 'normal' | 'vip' | 'vip_day' =>
+        value === 'vip' || value === 'vip_day' ? value : 'normal'
+
       const mapped: CycleProduct[] = Array.isArray(data.products)
         ? data.products.map((item) => ({
             id: Number(item.id ?? 0),
@@ -102,6 +109,7 @@ export default function AdminCycleProducts() {
             price: Number(item.price ?? 0),
             redeemRewardValue: Number(item.redeemRewardValue ?? 0),
             cycleDays: Number(item.cycleDays ?? 0),
+            planType: normalizePlanType(String(item.planType ?? 'normal')),
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
           }))
@@ -129,6 +137,7 @@ export default function AdminCycleProducts() {
       price: String(product.price),
       redeemRewardValue: String(product.redeemRewardValue),
       cycleDays: String(product.cycleDays ?? 0),
+      planType: product.planType ?? 'normal',
       isActive: product.isActive,
     })
     setFeedback(null)
@@ -195,6 +204,7 @@ export default function AdminCycleProducts() {
           price: Number(numericPrice.toFixed(2)),
           redeemRewardValue: Number(numericReward.toFixed(2)),
           cycleDays: numericCycleDays,
+          planType: form.planType,
           isActive: form.isActive,
         }),
       })
@@ -310,6 +320,23 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
+              <label>Tipo do plano</label>
+              <select
+                value={form.planType}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    planType: e.target.value as 'normal' | 'vip' | 'vip_day',
+                  }))
+                }
+              >
+                <option value="normal">Plano normal</option>
+                <option value="vip">Plano VIP</option>
+                <option value="vip_day">VIP do dia</option>
+              </select>
+            </div>
+
+            <div className="admin-cycle-field">
               <label>Imagem (URL)</label>
               <input
                 type="url"
@@ -376,7 +403,7 @@ export default function AdminCycleProducts() {
                         Preço: {formatBRL(product.price)} • Resgate: {formatBRL(product.redeemRewardValue)} • Ciclo: {product.cycleDays} dias
                       </p>
                       <p className="admin-cycle-item-meta secondary">
-                        Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}
+                        Tipo: {product.planType === 'vip' ? 'Plano VIP' : product.planType === 'vip_day' ? 'VIP do dia' : 'Plano normal'} • Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}
                       </p>
                     </div>
                     <div className="admin-cycle-item-actions">
