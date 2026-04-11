@@ -8,14 +8,6 @@ type StoredUser = {
   phone: string
 }
 
-type VipResponse = {
-  ok?: boolean
-  hasVip?: boolean
-  vip?: {
-    levelName?: string
-  } | null
-}
-
 type PaidTransactionResponse = {
   ok?: boolean
   total?: number
@@ -31,6 +23,12 @@ type CommunityLinksResponse = {
     whatsappGroupUrl?: string
     vipGroupUrl?: string
   }
+}
+
+type SummaryResponse = {
+  balance?: number
+  totalDeposits?: number
+  monthlySalaryContract?: string | null
 }
 
 function SideIcon({
@@ -132,7 +130,7 @@ export default function AppSidebar() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [vipLabel, setVipLabel] = useState('Sem VIP')
+  const [monthlySalaryContract, setMonthlySalaryContract] = useState('Sem contrato ativo')
   const [canClickVip, setCanClickVip] = useState(false)
   const [vipGroupUrl, setVipGroupUrl] = useState('')
 
@@ -145,34 +143,6 @@ export default function AppSidebar() {
       user = null
     }
   }
-
-  useEffect(() => {
-    const loadVip = async () => {
-      if (!user?.id) {
-        setVipLabel('Sem VIP')
-        return
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/vip/user/${user.id}`)
-        if (!res.ok) {
-          setVipLabel('Sem VIP')
-          return
-        }
-
-        const data = await res.json() as VipResponse
-        if (data?.ok && data?.hasVip && data.vip?.levelName) {
-          setVipLabel(String(data.vip.levelName))
-        } else {
-          setVipLabel('Sem VIP')
-        }
-      } catch {
-        setVipLabel('Sem VIP')
-      }
-    }
-
-    loadVip()
-  }, [user?.id])
 
   useEffect(() => {
     const loadPaidDepositStatus = async () => {
@@ -199,6 +169,31 @@ export default function AppSidebar() {
     }
 
     loadPaidDepositStatus()
+  }, [user?.id])
+
+  useEffect(() => {
+    const loadMonthlySalaryContract = async () => {
+      if (!user?.id) {
+        setMonthlySalaryContract('Sem contrato ativo')
+        return
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/user/summary/${user.id}`)
+        if (!res.ok) {
+          setMonthlySalaryContract('Sem contrato ativo')
+          return
+        }
+
+        const data = (await res.json()) as SummaryResponse
+        const contract = String(data?.monthlySalaryContract ?? '').trim()
+        setMonthlySalaryContract(contract || 'Sem contrato ativo')
+      } catch {
+        setMonthlySalaryContract('Sem contrato ativo')
+      }
+    }
+
+    loadMonthlySalaryContract()
   }, [user?.id])
 
   useEffect(() => {
@@ -259,7 +254,7 @@ export default function AppSidebar() {
             <div className="avatar">{(user?.name?.[0] ?? 'U').toUpperCase()}</div>
             <div>
               <strong>{user?.name ?? 'Usuário'}</strong>
-              <p>{user?.phone ?? '-'} • VIP: {vipLabel}</p>
+              <p>{user?.phone ?? '-'} • Contrato: {monthlySalaryContract}</p>
             </div>
           </div>
 
@@ -290,7 +285,7 @@ export default function AppSidebar() {
           <span className="brand-logo">N</span>
           <div>
             <strong>{user?.name ?? 'Usuário'}</strong>
-            <small>{user?.phone ?? '-'} • VIP: {vipLabel}</small>
+            <small>{user?.phone ?? '-'} • Contrato: {monthlySalaryContract}</small>
           </div>
         </div>
 
