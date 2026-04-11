@@ -394,22 +394,28 @@ export default function AdminPendingWithdrawals() {
               <div
                 style={{
                   width: '100%',
-                  maxWidth: 420,
-                  background: '#fff',
-                  borderRadius: 12,
-                  border: '1px solid #e2e8f0',
-                  padding: 16,
+                  maxWidth: 440,
+                  background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+                  borderRadius: 14,
+                  border: '1px solid #dbe4f0',
+                  boxShadow: '0 20px 40px rgba(2, 6, 23, 0.18)',
+                  padding: 18,
                 }}
               >
-                <h3 style={{ margin: 0, color: '#0f172a' }}>Cancelar saque</h3>
-                <p style={{ marginTop: 10, color: '#334155' }}>
+                <h3 style={{ margin: 0, color: '#0f172a', fontSize: 18 }}>Cancelar saque</h3>
+                <p style={{ marginTop: 10, color: '#475569', lineHeight: 1.45 }}>
                   Deseja estornar o valor para o saldo do usuário?
                 </p>
 
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 14 }}>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 14, flexWrap: 'wrap' }}>
                   <button
                     type="button"
                     className="btn ghost"
+                    style={{
+                      background: '#e2e8f0',
+                      color: '#0f172a',
+                      borderColor: '#cbd5e1',
+                    }}
                     onClick={() => setCancelModal({ open: false, withdrawalId: null })}
                   >
                     Fechar
@@ -417,6 +423,11 @@ export default function AdminPendingWithdrawals() {
                   <button
                     type="button"
                     className="btn ghost"
+                    style={{
+                      background: '#fef3c7',
+                      color: '#7c2d12',
+                      borderColor: '#fcd34d',
+                    }}
                     onClick={async () => {
                       if (!cancelModal.withdrawalId) return
                       await processAction(cancelModal.withdrawalId, 'cancel', false)
@@ -428,6 +439,11 @@ export default function AdminPendingWithdrawals() {
                   <button
                     type="button"
                     className="btn primary"
+                    style={{
+                      background: '#dc2626',
+                      color: '#ffffff',
+                      borderColor: '#b91c1c',
+                    }}
                     onClick={async () => {
                       if (!cancelModal.withdrawalId) return
                       await processAction(cancelModal.withdrawalId, 'cancel', true)
