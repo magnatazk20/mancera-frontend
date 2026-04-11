@@ -320,10 +320,60 @@
 
 .landscape-btn.deposit {
   background-image:
-    radial-gradient(circle at 72% 50%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 34%),
-    radial-gradient(circle at 80% 50%, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 42%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%),
-    url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=1400&q=70');
+    linear-gradient(120deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.15)),
+    url('https://images.unsplash.com/photo-1624958723474-6be8ff24dc1a?auto=format&fit=crop&w=1400&q=80');
+}
+
+.deposit-bg-dollars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.deposit-bg-dollars span {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.24);
+  font-weight: 900;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  animation: deposit-bg-float 5s ease-in-out infinite;
+}
+
+.deposit-bg-dollars span:nth-child(1) {
+  top: 8px;
+  left: 44%;
+  font-size: 18px;
+  animation-delay: 0s;
+}
+.deposit-bg-dollars span:nth-child(2) {
+  top: 30px;
+  left: 58%;
+  font-size: 24px;
+  animation-delay: 0.5s;
+}
+.deposit-bg-dollars span:nth-child(3) {
+  top: 52px;
+  left: 40%;
+  font-size: 20px;
+  animation-delay: 1s;
+}
+.deposit-bg-dollars span:nth-child(4) {
+  top: 14px;
+  left: 70%;
+  font-size: 16px;
+  animation-delay: 1.5s;
+}
+.deposit-bg-dollars span:nth-child(5) {
+  top: 48px;
+  left: 74%;
+  font-size: 18px;
+  animation-delay: 2s;
+}
+.deposit-bg-dollars span:nth-child(6) {
+  top: 28px;
+  left: 84%;
+  font-size: 22px;
+  animation-delay: 2.5s;
 }
 
 .deposit-visual {
@@ -354,6 +404,18 @@
   }
   50% {
     transform: translateY(-62%) translateX(-6px) rotate(6deg);
+  }
+}
+
+@keyframes deposit-bg-float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-4px) scale(1.06);
+    opacity: 0.34;
   }
 }
 
