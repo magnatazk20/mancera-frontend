@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
@@ -11,11 +11,15 @@ type MiniTask = {
   reward: number
 }
 
+type RedeemState = Record<number, 'idle' | 'loading' | 'done'>
+
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export default function MiniTasks() {
   const navigate = useNavigate()
+  const [redeemState, setRedeemState] = useState<RedeemState>({})
+  const [notice, setNotice] = useState<string>('')
 
   const tasks = useMemo<MiniTask[]>(
     () => [
@@ -32,6 +36,41 @@ export default function MiniTasks() {
     ],
     []
   )
+
+  const handleRedeem = async (task: MiniTask) => {
+    setNotice('')
+    setRedeemState((prev) => ({ ...prev, [task.id]: 'loading' }))
+
+    try {
+      const userId = Number(localStorage.getItem('userId') ?? 0)
+      if (!userId || Number.isNaN(userId)) {
+        throw new Error('Faça login novamente para resgatar.')
+      }
+
+      const response = await fetch(`/api/mini-tasks/${userId}/redeem`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: task.id }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || data?.ok === false) {
+        throw new Error(
+          data?.error ??
+            'Resgate não disponível. Somente convidados nível 1 (direto do seu link) com depósito contam.'
+        )
+      }
+
+      setRedeemState((prev) => ({ ...prev, [task.id]: 'done' }))
+      setNotice(data?.message ?? 'Resgate realizado com sucesso.')
+    } catch (err: any) {
+      setRedeemState((prev) => ({ ...prev, [task.id]: 'idle' }))
+      setNotice(
+        err?.message ??
+          'Não foi possível resgatar. Apenas convidados nível 1 depositantes são válidos.'
+      )
+    }
+  }
 
   return (
     <main className="tasks-page mini-tasks-page">
@@ -52,24 +91,40 @@ export default function MiniTasks() {
       <section className="mini-tasks-hero">
         <h2>Desafios de convite</h2>
         <p>Conclua metas de convites para receber bônus em saldo.</p>
+        <small className="mini-tasks-rule">
+          Regra: só conta convidado nível 1 (direto do seu link) que fez depósito.
+        </small>
       </section>
 
+      {notice ? <div className="mini-tasks-notice">{notice}</div> : null}
+
       <section className="mini-tasks-grid">
-        {tasks.map((task) => (
-          <article key={task.id} className="mini-task-card" role="article" aria-label={task.title}>
-            <div className="mini-task-left">
-              <span className="mini-task-index">#{task.id}</span>
-              <div>
-                <h3 className="mini-task-title">{task.title}</h3>
-                <p className="mini-task-sub">Meta: {task.inviteGoal} convidados</p>
+        {tasks.map((task) => {
+          const state = redeemState[task.id] ?? 'idle'
+          return (
+            <article key={task.id} className="mini-task-card" role="article" aria-label={task.title}>
+              <div className="mini-task-left">
+                <span className="mini-task-index">#{task.id}</span>
+                <div>
+                  <h3 className="mini-task-title">{task.title}</h3>
+                  <p className="mini-task-sub">Meta: {task.inviteGoal} convidados</p>
+                </div>
               </div>
-            </div>
-            <div className="mini-task-reward">
-              <span>Recompensa</span>
-              <strong>{formatBRL(task.reward)}</strong>
-            </div>
-          </article>
-        ))}
+              <div className="mini-task-reward">
+                <span>Recompensa</span>
+                <strong>{formatBRL(task.reward)}</strong>
+                <button
+                  type="button"
+                  className="mini-task-redeem-btn"
+                  disabled={state === 'loading' || state === 'done'}
+                  onClick={() => handleRedeem(task)}
+                >
+                  {state === 'loading' ? 'Resgatando...' : state === 'done' ? 'Resgatado' : 'Resgatar'}
+                </button>
+              </div>
+            </article>
+          )
+        })}
       </section>
     </main>
   )
