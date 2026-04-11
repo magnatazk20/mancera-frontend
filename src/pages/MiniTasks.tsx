@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
+import './MiniTasks.css'
 
 type MiniTask = {
   id: number
@@ -33,7 +34,7 @@ export default function MiniTasks() {
   )
 
   return (
-    <main className="tasks-page">
+    <main className="tasks-page mini-tasks-page">
       <AppSidebar />
       <header className="tasks-header">
         <div>
@@ -48,14 +49,23 @@ export default function MiniTasks() {
         </div>
       </header>
 
-      <section className="tasks-list">
+      <section className="mini-tasks-hero">
+        <h2>Desafios de convite</h2>
+        <p>Conclua metas de convites para receber bônus em saldo.</p>
+      </section>
+
+      <section className="mini-tasks-grid">
         {tasks.map((task) => (
-          <article key={task.id} className="task-card" role="article" aria-label={task.title}>
-            <div>
-              <h3>{task.title}</h3>
-              <p>Meta: {task.inviteGoal} convidados</p>
+          <article key={task.id} className="mini-task-card" role="article" aria-label={task.title}>
+            <div className="mini-task-left">
+              <span className="mini-task-index">#{task.id}</span>
+              <div>
+                <h3 className="mini-task-title">{task.title}</h3>
+                <p className="mini-task-sub">Meta: {task.inviteGoal} convidados</p>
+              </div>
             </div>
-            <div>
+            <div className="mini-task-reward">
+              <span>Recompensa</span>
               <strong>{formatBRL(task.reward)}</strong>
             </div>
           </article>
