@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
@@ -7,29 +7,26 @@ import './AdminSiteBranding.css'
 type BrandingConfig = {
   title: string
   logoUrl: string
+  description: string
 }
 
-const STORAGE_KEY = 'site_branding_config'
 const DEFAULT_TITLE = 'PGLM Plataforma'
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
-const readBrandingConfig = (): BrandingConfig => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return { title: DEFAULT_TITLE, logoUrl: '' }
-    const parsed = JSON.parse(raw) as Partial<BrandingConfig>
-    return {
-      title: String(parsed.title ?? DEFAULT_TITLE).trim() || DEFAULT_TITLE,
-      logoUrl: String(parsed.logoUrl ?? '').trim(),
-    }
-  } catch {
-    return { title: DEFAULT_TITLE, logoUrl: '' }
-  }
+const readToken = () => {
+  const fromLocal = String(localStorage.getItem('token') ?? '').trim()
+  if (fromLocal) return fromLocal
+  const fromSession = String(sessionStorage.getItem('token') ?? '').trim()
+  return fromSession
 }
 
 export default function AdminSiteBranding() {
-  const current = useMemo(() => readBrandingConfig(), [])
+  const current = useMemo<BrandingConfig>(() => ({ title: DEFAULT_TITLE, logoUrl: '', description: '' }), [])
   const [title, setTitle] = useState(current.title)
   const [logoUrl, setLogoUrl] = useState(current.logoUrl)
+  const [description, setDescription] = useState(current.description)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ open: boolean; type: 'success' | 'error'; message: string }>({
     open: false,
     type: 'success',
@@ -54,18 +51,89 @@ export default function AdminSiteBranding() {
     }
   }
 
-  const save = () => {
+  useEffect(() => {
+    let active = true
+
+    const load = async () => {
+      try {
+        const token = readToken()
+        if (!token) {
+          throw new Error('Token de admin não encontrado.')
+        }
+
+        const response = await fetch(`${API_BASE}/api/admin/site-settings`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok || !data?.ok) {
+          throw new Error(String(data?.error ?? 'Não foi possível carregar configurações.'))
+        }
+
+        const remoteTitle = String(data?.settings?.siteTitle ?? '').trim() || DEFAULT_TITLE
+        const remoteLogoUrl = String(data?.settings?.siteLogoUrl ?? '').trim()
+        const remoteDescription = String(data?.settings?.siteDescription ?? '').trim()
+
+        if (!active) return
+        setTitle(remoteTitle)
+        setLogoUrl(remoteLogoUrl)
+        setDescription(remoteDescription)
+        applyBranding({ title: remoteTitle, logoUrl: remoteLogoUrl, description: remoteDescription })
+      } catch (error) {
+        if (!active) return
+        showToast('error', error instanceof Error ? error.message : 'Falha ao carregar configurações.')
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    load()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const save = async () => {
     const normalized: BrandingConfig = {
       title: title.trim() || DEFAULT_TITLE,
       logoUrl: logoUrl.trim(),
+      description: description.trim(),
     }
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized))
+      setSaving(true)
+      const token = readToken()
+      if (!token) {
+        throw new Error('Token de admin não encontrado.')
+      }
+
+      const response = await fetch(`${API_BASE}/api/admin/site-settings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          siteTitle: normalized.title,
+          siteDescription: normalized.description,
+          siteLogoUrl: normalized.logoUrl,
+        }),
+      })
+
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok || !data?.ok) {
+        throw new Error(String(data?.error ?? 'Não foi possível salvar as configurações.'))
+      }
+
       applyBranding(normalized)
-      showToast('success', 'Configuração de título e foto do site salva com sucesso.')
-    } catch {
-      showToast('error', 'Não foi possível salvar as configurações de branding.')
+      showToast('success', 'Configuração de título e foto do site salva no banco com sucesso.')
+    } catch (error) {
+      showToast('error', error instanceof Error ? error.message : 'Não foi possível salvar as configurações de branding.')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -99,6 +167,16 @@ export default function AdminSiteBranding() {
                 placeholder="https://exemplo.com/logo.png"
               />
             </label>
+
+            <label className="admin-branding-field full">
+              <span>Descrição do site (banco: site_settings.site_description)</span>
+              <input
+                type="text"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Descrição opcional do site"
+              />
+            </label>
           </div>
 
           <section className="admin-branding-preview">
@@ -119,7 +197,9 @@ export default function AdminSiteBranding() {
           </section>
 
           <div className="admin-branding-actions">
-            <button type="button" onClick={save}>Salvar alterações</button>
+            <button type="button" onClick={save} disabled={loading || saving}>
+              {saving ? 'Salvando...' : 'Salvar alterações'}
+            </button>
           </div>
         </article>
       </section>
