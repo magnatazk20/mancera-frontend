@@ -76,6 +76,7 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Configuração de Depósitos</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Configuração de Comissão</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/monthly-salary'); setMenuOpen(false) }}>Salário Mensal</button>
 
           <p className="dash-nav-group-title">Promoções</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
