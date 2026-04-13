@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminSiteBranding.css'
+import { applySiteBranding } from '../utils/siteBranding'
 
 type BrandingConfig = {
   title: string
@@ -37,19 +38,6 @@ export default function AdminSiteBranding() {
     setToast({ open: true, type, message })
   }
 
-  const applyBranding = (cfg: BrandingConfig) => {
-    document.title = cfg.title || DEFAULT_TITLE
-
-    if (cfg.logoUrl) {
-      let favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement | null
-      if (!favicon) {
-        favicon = document.createElement('link')
-        favicon.setAttribute('rel', 'icon')
-        document.head.appendChild(favicon)
-      }
-      favicon.setAttribute('href', cfg.logoUrl)
-    }
-  }
 
   useEffect(() => {
     let active = true
@@ -80,7 +68,7 @@ export default function AdminSiteBranding() {
         setTitle(remoteTitle)
         setLogoUrl(remoteLogoUrl)
         setDescription(remoteDescription)
-        applyBranding({ title: remoteTitle, logoUrl: remoteLogoUrl, description: remoteDescription })
+        applySiteBranding({ siteTitle: remoteTitle, siteLogoUrl: remoteLogoUrl })
       } catch (error) {
         if (!active) return
         showToast('error', error instanceof Error ? error.message : 'Falha ao carregar configurações.')
@@ -128,7 +116,7 @@ export default function AdminSiteBranding() {
         throw new Error(String(data?.error ?? 'Não foi possível salvar as configurações.'))
       }
 
-      applyBranding(normalized)
+      applySiteBranding({ siteTitle: normalized.title, siteLogoUrl: normalized.logoUrl })
       showToast('success', 'Configuração de título e foto do site salva no banco com sucesso.')
     } catch (error) {
       showToast('error', error instanceof Error ? error.message : 'Não foi possível salvar as configurações de branding.')
