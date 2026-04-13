@@ -5,6 +5,7 @@ import './Admin.css'
 type MonthlySalaryPlan = {
   id: number
   title: string
+  imageUrl: string
   monthlySalary: number
   requiredLevel1Deposited: number
   requiredLevel2Deposited: number
@@ -15,6 +16,7 @@ type MonthlySalaryPlan = {
 
 type FormState = {
   title: string
+  imageUrl: string
   monthlySalary: string
   requiredLevel1Deposited: string
   requiredLevel2Deposited: string
@@ -27,6 +29,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const emptyForm: FormState = {
   title: '',
+  imageUrl: '',
   monthlySalary: '',
   requiredLevel1Deposited: '0',
   requiredLevel2Deposited: '0',
@@ -74,6 +77,7 @@ export default function AdminMonthlySalary() {
         plans?: Array<{
           id?: number
           title?: string
+          imageUrl?: string
           monthlySalary?: number
           requiredLevel1Deposited?: number
           requiredLevel2Deposited?: number
@@ -93,6 +97,7 @@ export default function AdminMonthlySalary() {
         ? data.plans.map((item) => ({
             id: Number(item.id ?? 0),
             title: String(item.title ?? ''),
+            imageUrl: String(item.imageUrl ?? ''),
             monthlySalary: Number(item.monthlySalary ?? 0),
             requiredLevel1Deposited: Number(item.requiredLevel1Deposited ?? 0),
             requiredLevel2Deposited: Number(item.requiredLevel2Deposited ?? 0),
@@ -119,6 +124,7 @@ export default function AdminMonthlySalary() {
     setEditingId(plan.id)
     setForm({
       title: plan.title,
+      imageUrl: plan.imageUrl,
       monthlySalary: String(plan.monthlySalary),
       requiredLevel1Deposited: String(plan.requiredLevel1Deposited),
       requiredLevel2Deposited: String(plan.requiredLevel2Deposited),
@@ -136,6 +142,7 @@ export default function AdminMonthlySalary() {
     }
 
     const title = form.title.trim()
+    const imageUrl = form.imageUrl.trim()
     const monthlySalary = Number(form.monthlySalary.replace(',', '.'))
     const level1 = Number(form.requiredLevel1Deposited.replace(',', '.'))
     const level2 = Number(form.requiredLevel2Deposited.replace(',', '.'))
@@ -180,6 +187,7 @@ export default function AdminMonthlySalary() {
         },
         body: JSON.stringify({
           title,
+          imageUrl,
           monthlySalary: Number(monthlySalary.toFixed(2)),
           requiredLevel1Deposited: level1,
           requiredLevel2Deposited: level2,
@@ -270,6 +278,16 @@ export default function AdminMonthlySalary() {
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
                 placeholder="Ex.: Start V1"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Foto do plano (URL)</label>
+              <input
+                type="url"
+                value={form.imageUrl}
+                onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="https://..."
               />
             </div>
 
@@ -371,6 +389,11 @@ export default function AdminMonthlySalary() {
                       <p className="admin-cycle-item-meta">
                         Salário: {formatBRL(plan.monthlySalary)} • N1: {plan.requiredLevel1Deposited} • N2: {plan.requiredLevel2Deposited} • N3: {plan.requiredLevel3Deposited}
                       </p>
+                      {plan.imageUrl ? (
+                        <p className="admin-cycle-item-meta secondary">
+                          Foto: <a href={plan.imageUrl} target="_blank" rel="noreferrer">{plan.imageUrl}</a>
+                        </p>
+                      ) : null}
                       <p className="admin-cycle-item-meta secondary">
                         Status: {plan.isActive ? 'Ativo' : 'Inativo'} • Ordem: {plan.sortOrder}
                       </p>

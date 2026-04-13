@@ -12,6 +12,7 @@ type StoredUser = {
 type MonthlySalaryPlan = {
   id: number
   title: string
+  imageUrl: string
   monthlySalary: number
   requiredLevel1Deposited: number
   requiredLevel2Deposited: number
@@ -167,6 +168,19 @@ export default function MonthlySalary() {
           <div className="monthly-salary-grid">
             {plans.map((plan) => (
               <article key={plan.id} className="monthly-salary-card">
+                <div className="monthly-salary-card-image-wrap">
+                  {plan.imageUrl ? (
+                    <img
+                      src={plan.imageUrl}
+                      alt={plan.title}
+                      className="monthly-salary-card-image"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="monthly-salary-card-image-placeholder">Sem foto</div>
+                  )}
+                </div>
+
                 <header className="monthly-salary-card-header">
                   <h3>{plan.title}</h3>
                   <span>{formatBRL(plan.monthlySalary)}/mês</span>

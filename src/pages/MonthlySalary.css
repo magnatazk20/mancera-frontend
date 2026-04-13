@@ -52,6 +52,32 @@
   backdrop-filter: blur(6px);
 }
 
+.monthly-salary-card-image-wrap {
+  width: 100%;
+  height: 170px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.monthly-salary-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.monthly-salary-card-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
 .monthly-salary-card-header {
   display: flex;
   align-items: center;
