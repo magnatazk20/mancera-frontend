@@ -43,6 +43,7 @@ import AdminDepositConfig from './pages/AdminDepositConfig'
 import AdminCommissionConfig from './pages/AdminCommissionConfig'
 import AdminTelegramConfig from './pages/AdminTelegramConfig'
 import AdminCycleProducts from './pages/AdminCycleProducts'
+import AdminMonthlySalary from './pages/AdminMonthlySalary'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -257,6 +258,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCycleProducts />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/monthly-salary"
+          element={(
+            <RequireMaxAdmin>
+              <AdminMonthlySalary />
             </RequireMaxAdmin>
           )}
         />
