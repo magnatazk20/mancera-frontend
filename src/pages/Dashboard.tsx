@@ -259,127 +259,59 @@ export default function Dashboard() {
             </button>
           </section>
 
-          <section className="welcome-card" style={{ marginTop: 14 }}>
-            <h1 style={{ fontSize: 20, marginBottom: 10 }}>Planos de ciclo</h1>
-            <p style={{ marginBottom: 12 }}>Produtos de ciclos</p>
+          <section className="welcome-card cycle-section">
+            <h1 className="cycle-section-title">Planos de ciclo</h1>
+            <p className="cycle-section-subtitle">Produtos de ciclos</p>
 
             {cyclePlans.length === 0 ? (
               <p style={{ color: '#6b7280' }}>Nenhum plano disponível no momento.</p>
             ) : (
-              <div style={{ display: 'grid', gap: 10 }}>
+              <div className="cycle-plans-grid">
                 {cyclePlans.map((plan, index) => {
                   const compras = Math.max(1, Math.floor((index + 1) * 2))
                   const estoque = Math.max(120, 1000 - index * 37)
                   const progresso = Math.min(95, 25 + index * 10)
 
                   return (
-                    <article
-                      key={plan.id}
-                      style={{
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 12,
-                        overflow: 'hidden',
-                        background: '#fff',
-                      }}
-                    >
-                      <img
-                        src={plan.imageUrl}
-                        alt={plan.name}
-                        style={{
-                          width: '100%',
-                          height: 120,
-                          objectFit: 'cover',
-                          display: 'block',
-                        }}
-                      />
-                      <div style={{ padding: 10 }}>
-                        <div style={{ color: '#334155', fontSize: 18, fontWeight: 500 }}>{plan.name}</div>
+                    <article key={plan.id} className="cycle-card">
+                      <img src={plan.imageUrl} alt={plan.name} className="cycle-card-image" />
+                      <div className="cycle-card-body">
+                        <div className="cycle-card-name">{plan.name}</div>
 
-                        <div
-                          style={{
-                            marginTop: 8,
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            gap: 8,
-                            textAlign: 'center',
-                          }}
-                        >
+                        <div className="cycle-metrics-grid">
                           <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              {Math.round(plan.amount)}
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Montante</div>
+                            <div className="cycle-metric-value">{Math.round(plan.amount)}</div>
+                            <div className="cycle-metric-label">Montante</div>
                           </div>
                           <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              {plan.cycleDays} dias
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Ciclo</div>
+                            <div className="cycle-metric-value">{plan.cycleDays} dias</div>
+                            <div className="cycle-metric-label">Ciclo</div>
                           </div>
                           <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              R${Math.round(plan.profit)}
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Lucro</div>
+                            <div className="cycle-metric-value">R${Math.round(plan.profit)}</div>
+                            <div className="cycle-metric-label">Lucro</div>
                           </div>
                         </div>
 
-                        <div
-                          style={{
-                            marginTop: 12,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 10,
-                          }}
-                        >
-                          <div style={{ color: '#64748b', fontSize: 16, lineHeight: 1.5 }}>
+                        <div className="cycle-footer">
+                          <div className="cycle-stock-info">
                             <div>
-                              Quantidade de Compras: <span style={{ color: '#0f172a', fontWeight: 700 }}>{compras}</span>
+                              Quantidade de Compras: <span className="cycle-stock-highlight">{compras}</span>
                             </div>
                             <div>
-                              Quantidade de Estoque: <span style={{ color: '#0f172a', fontWeight: 700 }}>{estoque}</span>
+                              Quantidade de Estoque: <span className="cycle-stock-highlight">{estoque}</span>
                             </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => handleBuyCycle(plan)}
-                            style={{
-                              border: 'none',
-                              borderRadius: 14,
-                              background: '#0b63ff',
-                              color: '#fff',
-                              fontWeight: 800,
-                              fontSize: 20,
-                              padding: '10px 16px',
-                              cursor: 'pointer',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
+                          <button type="button" onClick={() => handleBuyCycle(plan)} className="cycle-invest-btn">
                             Investir
                           </button>
                         </div>
 
-                        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div
-                            style={{
-                              flex: 1,
-                              height: 10,
-                              borderRadius: 999,
-                              background: '#eceff3',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: `${progresso}%`,
-                                height: '100%',
-                                background: '#ff9100',
-                                borderRadius: 999,
-                              }}
-                            />
+                        <div className="cycle-progress-row">
+                          <div className="cycle-progress-track">
+                            <div className="cycle-progress-fill" style={{ width: `${progresso}%` }} />
                           </div>
-                          <div style={{ color: '#334155', fontSize: 15 }}>progresso {progresso}%</div>
+                          <div className="cycle-progress-label">progresso {progresso}%</div>
                         </div>
                       </div>
                     </article>
@@ -392,34 +324,12 @@ export default function Dashboard() {
       </section>
 
       {selectedPlan ? (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 16,
-            zIndex: 9999,
-          }}
-          onClick={closePurchaseModal}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 420,
-              background: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 style={{ margin: 0, color: '#0f172a' }}>Confirmar investimento</h3>
-            <p style={{ marginTop: 6, color: '#64748b' }}>{selectedPlan.name}</p>
+        <div className="cycle-modal-backdrop" onClick={closePurchaseModal}>
+          <div className="cycle-modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3 className="cycle-modal-title">Confirmar investimento</h3>
+            <p className="cycle-modal-subtitle">{selectedPlan.name}</p>
 
-            <div style={{ marginTop: 12, display: 'grid', gap: 8, color: '#1e293b', fontSize: 14 }}>
+            <div className="cycle-modal-details">
               <div><strong>Montante:</strong> {formatBRL(selectedPlan.amount)}</div>
               <div><strong>Lucro final:</strong> {formatBRL(selectedPlan.profit)}</div>
               <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
@@ -430,19 +340,12 @@ export default function Dashboard() {
               <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
             </div>
 
-            <div style={{ marginTop: 14, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <div className="cycle-modal-actions">
               <button
                 type="button"
                 onClick={closePurchaseModal}
                 disabled={isBuying}
-                style={{
-                  border: '1px solid #cbd5e1',
-                  background: '#fff',
-                  color: '#334155',
-                  borderRadius: 8,
-                  padding: '10px 14px',
-                  cursor: isBuying ? 'not-allowed' : 'pointer',
-                }}
+                className="cycle-modal-btn cycle-modal-btn-cancel"
               >
                 Cancelar
               </button>
@@ -450,15 +353,7 @@ export default function Dashboard() {
                 type="button"
                 onClick={confirmBuyCycle}
                 disabled={isBuying}
-                style={{
-                  border: 'none',
-                  background: '#0b63ff',
-                  color: '#fff',
-                  borderRadius: 8,
-                  padding: '10px 14px',
-                  fontWeight: 700,
-                  cursor: isBuying ? 'not-allowed' : 'pointer',
-                }}
+                className="cycle-modal-btn cycle-modal-btn-confirm"
               >
                 {isBuying ? 'Processando...' : 'Confirmar compra'}
               </button>
