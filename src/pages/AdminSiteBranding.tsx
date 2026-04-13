@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
+import './AdminSiteBranding.css'
 
 type BrandingConfig = {
   title: string
@@ -69,17 +70,17 @@ export default function AdminSiteBranding() {
   }
 
   return (
-    <main className="admin-page">
+    <main className="admin-page admin-branding-page">
       <AdminSidebar />
-      <section className="admin-content admin-users-page">
-        <div className="admin-card">
-          <div className="admin-card-head">
+      <section className="admin-content admin-branding-content">
+        <article className="admin-branding-card">
+          <header className="admin-branding-head">
             <h1>Personalização do Site</h1>
-            <p>Altere o título e a foto (logo/favicon) do site inteiro.</p>
-          </div>
+            <p>Altere o título e a foto (logo/favicon) exibidos no site inteiro.</p>
+          </header>
 
-          <div className="admin-form-grid">
-            <label className="admin-input-group">
+          <div className="admin-branding-grid">
+            <label className="admin-branding-field">
               <span>Título do site</span>
               <input
                 type="text"
@@ -89,8 +90,8 @@ export default function AdminSiteBranding() {
               />
             </label>
 
-            <label className="admin-input-group">
-              <span>URL da foto/logo do site</span>
+            <label className="admin-branding-field">
+              <span>URL da foto/logo</span>
               <input
                 type="url"
                 value={logoUrl}
@@ -100,10 +101,27 @@ export default function AdminSiteBranding() {
             </label>
           </div>
 
-          <div className="admin-form-actions">
+          <section className="admin-branding-preview">
+            <h2>Pré-visualização</h2>
+            <div className="admin-branding-preview-box">
+              <div className="admin-branding-logo">
+                {logoUrl.trim() ? (
+                  <img src={logoUrl.trim()} alt="Preview do logo" />
+                ) : (
+                  <div className="admin-branding-logo-fallback">Sem logo</div>
+                )}
+              </div>
+              <div className="admin-branding-meta">
+                <strong>{title.trim() || DEFAULT_TITLE}</strong>
+                <small>Esse título aparecerá na aba do navegador.</small>
+              </div>
+            </div>
+          </section>
+
+          <div className="admin-branding-actions">
             <button type="button" onClick={save}>Salvar alterações</button>
           </div>
-        </div>
+        </article>
       </section>
 
       <FloatingToast
