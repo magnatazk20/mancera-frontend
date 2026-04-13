@@ -3,6 +3,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Roleta from './pages/Roleta'
+import RoletaTestAutoSpin from './pages/RoletaTestAutoSpin'
 import Sinuca from './pages/Sinuca'
 import CashIn from './pages/CashIn'
 import CashInCheckout from './pages/CashInCheckout'
@@ -75,6 +76,7 @@ export default function App() {
         <Route path="/cadastro" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/roleta" element={<Roleta />} />
+        <Route path="/roleta-test" element={<RoletaTestAutoSpin />} />
         <Route path="/sinuca" element={<Sinuca />} />
         <Route path="/cashin" element={<CashIn />} />
         <Route path="/cashin/checkout" element={<CashInCheckout />} />
