@@ -157,58 +157,73 @@ export default function Register() {
 
           <form className="auth-form" onSubmit={onSubmit}>
             <label htmlFor="name">Nome completo</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Seu nome"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">👤</span>
+              <input
+                id="name"
+                type="text"
+                placeholder="Seu nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                required
+              />
+            </div>
 
             <label htmlFor="phone">Telefone</label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="(11) 99999-9999"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">📱</span>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+                required
+              />
+            </div>
 
             <label htmlFor="password">Senha</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Mínimo 6 caracteres"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">🔒</span>
+              <input
+                id="password"
+                type="password"
+                placeholder="Mínimo 6 caracteres"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
 
             <label htmlFor="confirm">Confirmar senha</label>
-            <input
-              id="confirm"
-              type="password"
-              placeholder="Repita a senha"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              autoComplete="new-password"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">✅</span>
+              <input
+                id="confirm"
+                type="password"
+                placeholder="Repita a senha"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                autoComplete="new-password"
+                required
+              />
+            </div>
 
             <label htmlFor="referralCode">Código de convite (opcional)</label>
-            <input
-              id="referralCode"
-              type="text"
-              placeholder="Ex.: 342A6L31M"
-              value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-              autoComplete="off"
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">🎟️</span>
+              <input
+                id="referralCode"
+                type="text"
+                placeholder="Ex.: 342A6L31M"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                autoComplete="off"
+              />
+            </div>
 
             <button type="submit" disabled={loading}>
               {loading ? 'Criando conta...' : 'Criar conta'}

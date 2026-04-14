@@ -138,26 +138,32 @@ export default function Login() {
 
           <form className="auth-form" onSubmit={onSubmit}>
             <label htmlFor="phone">Telefone</label>
-            <input
-              id="phone"
-              type="tel"
-              placeholder="(11) 99999-9999"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              autoComplete="tel"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">📱</span>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="(11) 99999-9999"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+                required
+              />
+            </div>
 
             <label htmlFor="password">Senha</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Digite sua senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
+            <div className="input-with-icon">
+              <span className="input-icon" aria-hidden="true">🔒</span>
+              <input
+                id="password"
+                type="password"
+                placeholder="Digite sua senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
+            </div>
 
             <div className="row">
               <label className="remember-me" htmlFor="remember">
