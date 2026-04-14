@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import ceoBanner from '../assets/ceo.jpg'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -13,12 +14,45 @@ interface AuthResponse {
 
 export default function Login() {
   const navigate = useNavigate()
+  const [activeSlide, setActiveSlide] = useState(0)
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const bannerSlides = [
+    {
+      id: 'premium',
+      title: 'PGLM',
+      subtitle: 'Acesso seguro, experiência premium.',
+      kicker: 'PLATAFORMA OFICIAL',
+      image: '',
+    },
+    {
+      id: 'ceo',
+      title: 'Liderança PGLM',
+      subtitle: 'Conheça a visão por trás da plataforma.',
+      kicker: 'DESTAQUE',
+      image: ceoBanner,
+    },
+    {
+      id: 'community',
+      title: 'Comunidade Forte',
+      subtitle: 'Conecte-se e cresça com a PGLM.',
+      kicker: 'EVOLUÇÃO',
+      image: '',
+    },
+  ]
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % bannerSlides.length)
+    }, 3800)
+
+    return () => window.clearInterval(interval)
+  }, [bannerSlides.length])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -60,11 +94,20 @@ export default function Login() {
     <main className="auth-page">
       <section className="auth-shell">
         <aside className="hero-panel login-banner-panel" aria-hidden="true">
-          <div className="pglm-banner-bg-glow" />
-          <div className="pglm-banner-content">
-            <p className="pglm-banner-kicker">PLATAFORMA OFICIAL</p>
-            <h2 className="pglm-banner-title">PGLM</h2>
-            <p className="pglm-banner-subtitle">Acesso seguro, experiência premium.</p>
+          <div className="pglm-banner-slider-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+            {bannerSlides.map((slide) => (
+              <div key={slide.id} className="pglm-banner-slide">
+                {slide.image ? (
+                  <img src={slide.image} alt="" className="pglm-banner-slide-image" />
+                ) : null}
+                <div className="pglm-banner-bg-glow" />
+                <div className="pglm-banner-content">
+                  <p className="pglm-banner-kicker">{slide.kicker}</p>
+                  <h2 className="pglm-banner-title">{slide.title}</h2>
+                  <p className="pglm-banner-subtitle">{slide.subtitle}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
           <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
@@ -74,6 +117,15 @@ export default function Login() {
           <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
             <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
           </svg>
+
+          <div className="pglm-banner-dots" aria-hidden="true">
+            {bannerSlides.map((slide, index) => (
+              <span
+                key={slide.id}
+                className={`pglm-banner-dot${index === activeSlide ? ' active' : ''}`}
+              />
+            ))}
+          </div>
         </aside>
 
         <section className="form-panel" aria-labelledby="login-title">

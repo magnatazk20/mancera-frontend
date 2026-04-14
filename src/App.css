@@ -234,12 +234,44 @@ body {
   position: relative;
   min-height: 280px;
   overflow: hidden;
-  display: grid;
-  place-items: center;
   background:
     radial-gradient(circle at 22% 20%, rgba(56, 189, 248, 0.24), transparent 42%),
     radial-gradient(circle at 78% 76%, rgba(37, 99, 235, 0.24), transparent 46%),
     linear-gradient(155deg, #020617 0%, #0b1633 48%, #10224a 100%);
+}
+
+.pglm-banner-slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  transition: transform 0.7s ease-in-out;
+}
+
+.pglm-banner-slide {
+  position: relative;
+  flex: 0 0 100%;
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.pglm-banner-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(2, 6, 23, 0.18), rgba(2, 6, 23, 0.58));
+  z-index: 1;
+}
+
+.pglm-banner-slide-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(1.05) brightness(0.8);
 }
 
 .pglm-banner-bg-glow {
@@ -252,7 +284,7 @@ body {
 
 .pglm-banner-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   text-align: center;
   padding: 16px;
 }
@@ -280,6 +312,29 @@ body {
   margin: 10px 0 0;
   color: rgba(226, 232, 240, 0.9);
   font-size: 0.92rem;
+}
+
+.pglm-banner-dots {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+}
+
+.pglm-banner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.45);
+  transition: all 0.2s ease;
+}
+
+.pglm-banner-dot.active {
+  width: 20px;
+  background: #38bdf8;
 }
 
 .pglm-banner-lightning {
