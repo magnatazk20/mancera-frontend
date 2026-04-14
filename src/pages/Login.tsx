@@ -139,7 +139,12 @@ export default function Login() {
           <form className="auth-form" onSubmit={onSubmit}>
             <label htmlFor="phone">Telefone</label>
             <div className="input-with-icon">
-              <span className="input-icon" aria-hidden="true">📱</span>
+              <span className="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" className="input-icon-svg">
+                  <rect x="7" y="2.8" width="10" height="18.4" rx="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                  <circle cx="12" cy="17.8" r="1.1" fill="currentColor" />
+                </svg>
+              </span>
               <input
                 id="phone"
                 type="tel"
@@ -153,7 +158,12 @@ export default function Login() {
 
             <label htmlFor="password">Senha</label>
             <div className="input-with-icon">
-              <span className="input-icon" aria-hidden="true">🔒</span>
+              <span className="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" className="input-icon-svg">
+                  <rect x="5" y="10" width="14" height="10" rx="2.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                  <path d="M8 10V7.7a4 4 0 0 1 8 0V10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </span>
               <input
                 id="password"
                 type="password"
