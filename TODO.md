@@ -1,6 +1,8 @@
-- [x] Atualizar AdminMonthlySalary para aceitar `imageUrl` no formulário e payload.
-- [x] Exibir preview da foto no AdminMonthlySalary.
-- [x] Atualizar MonthlySalary para renderizar foto dos planos.
-- [x] Ajustar estilos em MonthlySalary.css para imagem.
-- [x] Rodar build do frontend.
-- [ ] Commitar e enviar (push) alterações.
+# TODO - Botões de redes sociais na página inicial
+
+- [x] Identificar rota/página exibida em `http://localhost:5173/` (Login).
+- [x] Adicionar seção de redes sociais (Instagram e YouTube) abaixo do formulário em `src/pages/Login.tsx`.
+- [x] Estilizar seção e botões em `src/App.css`.
+- [ ] Validar build do frontend.
+- [x] Atualizar TODO com progresso final.
+- [ ] Commit e push das alterações.

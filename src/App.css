@@ -513,6 +513,60 @@ body {
   font-size: 0.92rem;
 }
 
+/* Social links */
+.social-links-section {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.social-links-title {
+  margin: 0 0 10px;
+  text-align: center;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.social-links-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.social-link-button {
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.social-link-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.social-link-button:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
+
+.social-link-button.instagram {
+  background: linear-gradient(135deg, #fd1d1d 0%, #c13584 45%, #833ab4 100%);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(193, 53, 132, 0.25);
+}
+
+.social-link-button.youtube {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.25);
+}
+
 /* ═══════════════════════════════════════
    DESKTOP LAYOUT
 ═══════════════════════════════════════ */
@@ -536,5 +590,11 @@ body {
     flex-direction: column;
     justify-content: center;
     padding: 40px 36px;
+  }
+}
+
+@media (max-width: 420px) {
+  .social-links-grid {
+    grid-template-columns: 1fr;
   }
 }

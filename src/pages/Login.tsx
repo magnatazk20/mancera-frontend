@@ -126,6 +126,28 @@ export default function Login() {
           {message ? <p className="feedback success">{message}</p> : null}
           {error ? <p className="feedback error">{error}</p> : null}
 
+          <div className="social-links-section" aria-label="Redes sociais oficiais">
+            <p className="social-links-title">Siga nossas redes sociais</p>
+            <div className="social-links-grid">
+              <a
+                href="https://www.instagram.com/pglmbr/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-link-button instagram"
+              >
+                Instagram
+              </a>
+              <a
+                href="https://www.youtube.com/@PGLMBrasil"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="social-link-button youtube"
+              >
+                YouTube
+              </a>
+            </div>
+          </div>
+
           <p className="switch-page">
             Não tem conta?{' '}
             <Link to="/cadastro" className="text-link bold">
