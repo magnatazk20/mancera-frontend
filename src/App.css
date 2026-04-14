@@ -238,6 +238,9 @@ body {
     radial-gradient(circle at 22% 20%, rgba(56, 189, 248, 0.24), transparent 42%),
     radial-gradient(circle at 78% 76%, rgba(37, 99, 235, 0.24), transparent 46%),
     linear-gradient(155deg, #020617 0%, #0b1633 48%, #10224a 100%);
+  margin-right: 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .pglm-banner-slider-track {
@@ -644,6 +647,10 @@ body {
 
   .hero-panel {
     min-height: 100%;
+  }
+
+  .login-banner-panel {
+    margin-right: 16px;
   }
 
   .form-panel {
