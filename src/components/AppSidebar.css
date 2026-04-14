@@ -16,6 +16,8 @@
   display: flex;
   flex-direction: column;
   padding: 18px 14px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .dash-sidebar.open {
@@ -55,6 +57,7 @@
   margin-top: 14px;
   display: grid;
   gap: 8px;
+  padding-bottom: 12px;
 }
 
 .dash-nav-group-title {
