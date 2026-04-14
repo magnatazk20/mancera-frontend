@@ -311,6 +311,54 @@ export default function AppSidebar() {
             <SideIcon name="user" className="icon-sm" />
             <span>Perfil</span>
           </button>
+          <button className={`dash-nav-item ${isActive('/investment-orders') ? 'active' : ''}`} onClick={() => go('/investment-orders')}>
+            <SideIcon name="tasks" className="icon-sm" />
+            <span>Pedidos de Investimento</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/monthly-salary') ? 'active' : ''}`} onClick={() => go('/monthly-salary')}>
+            <SideIcon name="vjp" className="icon-sm" />
+            <span>Salário Mensal</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/earnings') ? 'active' : ''}`} onClick={() => go('/earnings')}>
+            <SideIcon name="extract" className="icon-sm" />
+            <span>Ganhos</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/bank-cards') ? 'active' : ''}`} onClick={() => go('/bank-cards')}>
+            <SideIcon name="deposit" className="icon-sm" />
+            <span>Cartões Bancários</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/team-report') ? 'active' : ''}`} onClick={() => go('/team-report')}>
+            <SideIcon name="tasks" className="icon-sm" />
+            <span>Relatório da Equipe</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/mini-tasks') ? 'active' : ''}`} onClick={() => go('/mini-tasks')}>
+            <SideIcon name="tasks" className="icon-sm" />
+            <span>Mini tarefas</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/community') ? 'active' : ''}`} onClick={() => go('/community')}>
+            <SideIcon name="invite" className="icon-sm" />
+            <span>Comunidade</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/checkin') ? 'active' : ''}`} onClick={() => go('/checkin')}>
+            <SideIcon name="products" className="icon-sm" />
+            <span>Check-in</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/withdraw-password') ? 'active' : ''}`} onClick={() => go('/withdraw-password')}>
+            <SideIcon name="withdraw" className="icon-sm" />
+            <span>Senha do Fundo</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/tax-declaration') ? 'active' : ''}`} onClick={() => go('/tax-declaration')}>
+            <SideIcon name="extract" className="icon-sm" />
+            <span>Imposto de Renda</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/change-password') ? 'active' : ''}`} onClick={() => go('/change-password')}>
+            <SideIcon name="user" className="icon-sm" />
+            <span>Alterar Senha</span>
+          </button>
+          <button className={`dash-nav-item ${isActive('/gift-vouchers') ? 'active' : ''}`} onClick={() => go('/gift-vouchers')}>
+            <SideIcon name="products" className="icon-sm" />
+            <span>Comprar vale-presentes</span>
+          </button>
         </nav>
 
         <button className="dash-logout side" onClick={logout}>
