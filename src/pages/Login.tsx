@@ -110,13 +110,17 @@ export default function Login() {
             ))}
           </div>
 
-          <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
-            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-          </svg>
+          {activeSlide === 0 ? (
+            <>
+              <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
+                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+              </svg>
 
-          <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
-            <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-          </svg>
+              <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
+                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
+              </svg>
+            </>
+          ) : null}
 
           <div className="pglm-banner-dots" aria-hidden="true">
             {bannerSlides.map((slide, index) => (
