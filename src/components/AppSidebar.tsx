@@ -290,18 +290,18 @@ export default function AppSidebar() {
         </div>
 
         <nav className="dash-nav">
-          <p className="dash-nav-group-title">Principal</p>
+          <p className="dash-nav-group-title">Menu</p>
           <button className={`dash-nav-item ${isActive('/dashboard') ? 'active' : ''}`} onClick={() => go('/dashboard')}>
             <SideIcon name="home" className="icon-sm" />
             <span>Início</span>
           </button>
-          <button className={`dash-nav-item ${isActive('/tasks') ? 'active' : ''}`} onClick={() => go('/tasks')}>
-            <SideIcon name="tasks" className="icon-sm" />
-            <span>Tarefas</span>
+          <button className={`dash-nav-item ${isActive('/cashin') ? 'active' : ''}`} onClick={() => go('/cashin')}>
+            <SideIcon name="deposit" className="icon-sm" />
+            <span>Depositar</span>
           </button>
-          <button className={`dash-nav-item ${isActive('/vip') ? 'active' : ''}`} onClick={() => go('/vip')}>
-            <SideIcon name="vjp" className="icon-sm" />
-            <span>VJP</span>
+          <button className={`dash-nav-item ${isActive('/cycle-products') ? 'active' : ''}`} onClick={() => go('/cycle-products')}>
+            <SideIcon name="products" className="icon-sm" />
+            <span>Produtos</span>
           </button>
           <button className={`dash-nav-item ${isActive('/invite') ? 'active' : ''}`} onClick={() => go('/invite')}>
             <SideIcon name="invite" className="icon-sm" />
@@ -310,20 +310,6 @@ export default function AppSidebar() {
           <button className={`dash-nav-item ${isActive('/profile') ? 'active' : ''}`} onClick={() => go('/profile')}>
             <SideIcon name="user" className="icon-sm" />
             <span>Perfil</span>
-          </button>
-
-          <p className="dash-nav-group-title">Financeiro</p>
-          <button className={`dash-nav-item ${isActive('/extrato') ? 'active' : ''}`} onClick={() => go('/extrato')}>
-            <SideIcon name="extract" className="icon-sm" />
-            <span>Extrato</span>
-          </button>
-          <button className={`dash-nav-item ${isActive('/saque') ? 'active' : ''}`} onClick={() => go('/saque')}>
-            <SideIcon name="withdraw" className="icon-sm" />
-            <span>Saque</span>
-          </button>
-          <button className={`dash-nav-item ${isActive('/cashin') ? 'active' : ''}`} onClick={() => go('/cashin')}>
-            <SideIcon name="deposit" className="icon-sm" />
-            <span>Depositar</span>
           </button>
         </nav>
 
