@@ -530,7 +530,7 @@ body {
 
 .social-links-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -567,6 +567,12 @@ body {
   box-shadow: 0 6px 14px rgba(220, 38, 38, 0.25);
 }
 
+.social-link-button.telegram {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(2, 132, 199, 0.28);
+}
+
 /* ═══════════════════════════════════════
    DESKTOP LAYOUT
 ═══════════════════════════════════════ */
@@ -593,7 +599,7 @@ body {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 680px) {
   .social-links-grid {
     grid-template-columns: 1fr;
   }
