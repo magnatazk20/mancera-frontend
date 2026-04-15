@@ -46,6 +46,7 @@ import AdminTelegramConfig from './pages/AdminTelegramConfig'
 import AdminCycleProducts from './pages/AdminCycleProducts'
 import AdminMonthlySalary from './pages/AdminMonthlySalary'
 import AdminSiteBranding from './pages/AdminSiteBranding'
+import AdminCommunityLinks from './pages/AdminCommunityLinks'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -277,6 +278,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminSiteBranding />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/community-links"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCommunityLinks />
             </RequireMaxAdmin>
           )}
         />
