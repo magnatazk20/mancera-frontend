@@ -73,6 +73,20 @@
   color: #94a3b8;
 }
 
+.mini-task-badge {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .mini-task-reward {
   text-align: right;
 }
@@ -104,6 +118,26 @@
   background: #334155;
   color: #94a3b8;
   cursor: not-allowed;
+}
+
+.mini-task-earned-badge {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+  background: rgba(16, 185, 129, 0.18);
+  color: #bbf7d0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mini-task-card.is-done {
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.18) inset;
 }
 
 .mini-tasks-rule {
