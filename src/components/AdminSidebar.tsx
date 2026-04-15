@@ -1,9 +1,15 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type AdminUser = {
+  id?: number
   name?: string
   phone?: string
+}
+
+type AdminUsersResponse = {
+  ok?: boolean
+  users?: Array<{ id?: number; name?: string; phone?: string }>
 }
 
 export default function AdminSidebar() {
@@ -19,6 +25,33 @@ export default function AdminSidebar() {
       return null
     }
   }, [])
+
+  const [usersCount, setUsersCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+    const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+
+    const loadUsersCount = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/admin/users`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = (await res.json()) as AdminUsersResponse
+        if (!res.ok || !data?.ok || !Array.isArray(data?.users)) {
+          setUsersCount(null)
+          return
+        }
+        setUsersCount(data.users.length)
+      } catch {
+        setUsersCount(null)
+      }
+    }
+
+    loadUsersCount()
+  }, [])
+
+  const usersLabel = usersCount == null ? 'Usuários' : `Usuários (${usersCount})`
 
   return (
     <>
@@ -64,7 +97,7 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf'); setMenuOpen(false) }}>Dashboard Admin</button>
 
           <p className="dash-nav-group-title">Usuários e Rede</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/users'); setMenuOpen(false) }}>Usuários</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/users'); setMenuOpen(false) }}>{usersLabel}</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
 
           <p className="dash-nav-group-title">Saques</p>
