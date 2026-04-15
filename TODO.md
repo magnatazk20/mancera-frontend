@@ -1,9 +1,10 @@
-# TODO - Admin Community Links (/adf)
-
-- [x] Levantar contexto da navegação/admin atual.
-- [x] Criar página `src/pages/AdminCommunityLinks.tsx` com formulário de links.
-- [x] Adicionar botão no menu admin para `/adf/community-links`.
-- [x] Adicionar rota protegida no `src/App.tsx`.
-- [x] Integrar com API (`GET /api/community-links`, `POST /api/community-links`).
-- [ ] Rodar build frontend.
+# TODO - Cycle Products: Regras de nível de comissão
+lan
+- [x] Levantar contexto da página `src/pages/CycleProducts.tsx`.
+- [x] Atualizar tipo `CycleProduct` com campos de regras de comissão.
+- [x] Mapear `requireCommissionLevel1Count/2/3` no carregamento da API.
+- [x] Exibir regras no card somente se houver pelo menos um nível > 0.
+- [x] Rodar build frontend.
 - [ ] Commit e push frontend.
+- [x] Atualizar texto para "Regras de compra" em `src/pages/CycleProducts.tsx`.
+- [ ] Validar build do frontend.

@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
@@ -9,6 +10,8 @@ type StoredUser = {
   phone: string
 }
 
+type PlanCategory = 'normal' | 'vip' | 'vip_day'
+
 type CycleProduct = {
   id: number
   name: string
@@ -19,14 +22,16 @@ type CycleProduct = {
   imageUrl: string
   isActive: boolean
   sortOrder: number
+  planType: PlanCategory
+  requireCommissionLevel1Count: number
+  requireCommissionLevel2Count: number
+  requireCommissionLevel3Count: number
 }
 
-type PlanCategory = 'normal' | 'vip' | 'vip_day'
-
-const getPlanCategory = (plan: CycleProduct): PlanCategory => {
-  const name = String(plan.name ?? '').toLowerCase().trim()
-  if (name.includes('vip do dia')) return 'vip_day'
-  if (name.includes('vip')) return 'vip'
+const normalizePlanType = (value: unknown): PlanCategory => {
+  const raw = String(value ?? '').trim().toLowerCase()
+  if (raw === 'vip') return 'vip'
+  if (raw === 'vip_day') return 'vip_day'
   return 'normal'
 }
 
@@ -68,12 +73,29 @@ export default function CycleProducts() {
           setCyclePlans([])
           return
         }
-        const data = (await response.json()) as { ok?: boolean; products?: CycleProduct[] }
+        const data = (await response.json()) as { ok?: boolean; products?: Array<Record<string, unknown>> }
         if (!data?.ok || !Array.isArray(data.products)) {
           setCyclePlans([])
           return
         }
-        setCyclePlans(data.products)
+
+        const mappedPlans: CycleProduct[] = data.products.map((item) => ({
+          id: Number(item.id ?? 0),
+          name: String(item.name ?? ''),
+          description: String(item.description ?? ''),
+          amount: Number(item.amount ?? 0),
+          profit: Number(item.profit ?? 0),
+          cycleDays: Number(item.cycleDays ?? 0),
+          imageUrl: String(item.imageUrl ?? ''),
+          isActive: Boolean(item.isActive),
+          sortOrder: Number(item.sortOrder ?? 0),
+          planType: normalizePlanType(item.planType),
+          requireCommissionLevel1Count: Number(item.requireCommissionLevel1Count ?? 0),
+          requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
+          requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
+        }))
+
+        setCyclePlans(mappedPlans)
       } catch {
         setCyclePlans([])
       } finally {
@@ -136,7 +158,7 @@ export default function CycleProducts() {
   }
 
   const filteredCyclePlans = useMemo(
-    () => cyclePlans.filter((plan) => getPlanCategory(plan) === activeCategory),
+    () => cyclePlans.filter((plan) => plan.planType === activeCategory),
     [cyclePlans, activeCategory]
   )
 
@@ -226,6 +248,10 @@ export default function CycleProducts() {
                   const compras = Math.max(1, Math.floor((index + 1) * 2))
                   const estoque = Math.max(120, 1000 - index * 37)
                   const progresso = Math.min(95, 25 + index * 10)
+                  const shouldShowCommissionRules =
+                    plan.requireCommissionLevel1Count > 0 ||
+                    plan.requireCommissionLevel2Count > 0 ||
+                    plan.requireCommissionLevel3Count > 0
 
                   return (
                     <article
@@ -314,6 +340,24 @@ export default function CycleProducts() {
                             Investir
                           </button>
                         </div>
+
+                        {shouldShowCommissionRules ? (
+                          <div
+                            style={{
+                              marginTop: 10,
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                              background: '#f8fafc',
+                              border: '1px dashed #cbd5e1',
+                              color: '#334155',
+                              fontSize: 14,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            Regras de compra • Nível 1: {plan.requireCommissionLevel1Count} • Nível 2:{' '}
+                            {plan.requireCommissionLevel2Count} • Nível 3: {plan.requireCommissionLevel3Count}
+                          </div>
+                        ) : null}
 
                         <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div
