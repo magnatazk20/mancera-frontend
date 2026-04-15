@@ -209,6 +209,8 @@
   top: 0;
   transform: none !important;
   height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .admin-dash-user-chip {
@@ -284,6 +286,8 @@
     transform: translateX(-100%) !important;
     width: 272px;
     height: 100vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .admin-dash-sidebar.open {
