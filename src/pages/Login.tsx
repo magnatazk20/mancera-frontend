@@ -217,14 +217,6 @@ export default function Login() {
               >
                 YouTube
               </a>
-              <a
-                href="https://t.me/pglm001"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-link-button telegram"
-              >
-                Telegram
-              </a>
             </div>
           </div>
 
