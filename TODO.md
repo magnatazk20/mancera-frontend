@@ -7,4 +7,6 @@ lan
 - [x] Rodar build frontend.
 - [ ] Commit e push frontend.
 - [x] Atualizar texto para "Regras de compra" em `src/pages/CycleProducts.tsx`.
-- [ ] Validar build do frontend.
+- [x] Validar build do frontend.
+- [x] Adicionar efeito visual na barra de progresso em `src/pages/CycleProducts.tsx`.
+- [x] Validar build do frontend após efeito.

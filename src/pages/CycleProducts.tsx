@@ -373,8 +373,10 @@ export default function CycleProducts() {
                               style={{
                                 width: `${progresso}%`,
                                 height: '100%',
-                                background: '#ff9100',
+                                background: 'linear-gradient(90deg, #ffb703 0%, #ff9100 55%, #fb8500 100%)',
                                 borderRadius: 999,
+                                transition: 'width 500ms ease',
+                                boxShadow: 'inset 0 0 10px rgba(255,255,255,0.35), 0 0 8px rgba(255,145,0,0.35)',
                               }}
                             />
                           </div>
