@@ -11,8 +11,19 @@ type CycleProduct = {
   redeemRewardValue: number
   cycleDays: number
   planType: 'normal' | 'vip' | 'vip_day'
+  requireCommissionLevel1Count: number
+  requireCommissionLevel2Count: number
+  requireCommissionLevel3Count: number
   isActive: boolean
   createdAt: string | null
+}
+
+type CommissionLevel = {
+  id: number
+  level: number
+  name: string
+  commissionPercent: number
+  isActive: boolean
 }
 
 type FormState = {
@@ -23,6 +34,9 @@ type FormState = {
   redeemRewardValue: string
   cycleDays: string
   planType: 'normal' | 'vip' | 'vip_day'
+  requireCommissionLevel1Count: string
+  requireCommissionLevel2Count: string
+  requireCommissionLevel3Count: string
   isActive: boolean
 }
 
@@ -39,6 +53,9 @@ const emptyForm: FormState = {
   redeemRewardValue: '',
   cycleDays: '0',
   planType: 'normal',
+  requireCommissionLevel1Count: '0',
+  requireCommissionLevel2Count: '0',
+  requireCommissionLevel3Count: '0',
   isActive: true,
 }
 
@@ -50,6 +67,7 @@ export default function AdminCycleProducts() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState<FormState>(emptyForm)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
 
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
@@ -59,6 +77,39 @@ export default function AdminCycleProducts() {
   const resetForm = () => {
     setForm(emptyForm)
     setEditingId(null)
+  }
+
+  const loadCommissionLevels = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/referral/commission-levels`)
+      const data = await res.json() as {
+        ok?: boolean
+        levels?: Array<{
+          id?: number
+          level?: number
+          name?: string
+          commissionPercent?: number
+          isActive?: boolean
+        }>
+      }
+
+      if (!res.ok || !data?.ok || !Array.isArray(data?.levels)) {
+        setCommissionLevels([])
+        return
+      }
+
+      const mappedLevels: CommissionLevel[] = data.levels.map((item) => ({
+        id: Number(item.id ?? 0),
+        level: Number(item.level ?? 0),
+        name: String(item.name ?? ''),
+        commissionPercent: Number(item.commissionPercent ?? 0),
+        isActive: Boolean(item.isActive),
+      }))
+
+      setCommissionLevels(mappedLevels)
+    } catch {
+      setCommissionLevels([])
+    }
   }
 
   const loadProducts = async () => {
@@ -86,6 +137,9 @@ export default function AdminCycleProducts() {
           redeemRewardValue?: number
           cycleDays?: number
           planType?: string
+          requireCommissionLevel1Count?: number
+          requireCommissionLevel2Count?: number
+          requireCommissionLevel3Count?: number
           isActive?: boolean
           createdAt?: string | null
         }>
@@ -110,6 +164,9 @@ export default function AdminCycleProducts() {
             redeemRewardValue: Number(item.redeemRewardValue ?? 0),
             cycleDays: Number(item.cycleDays ?? 0),
             planType: normalizePlanType(String(item.planType ?? 'normal')),
+            requireCommissionLevel1Count: Number(item.requireCommissionLevel1Count ?? 0),
+            requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
+            requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
           }))
@@ -126,6 +183,7 @@ export default function AdminCycleProducts() {
 
   useEffect(() => {
     loadProducts()
+    loadCommissionLevels()
   }, [])
 
   const fillEditForm = (product: CycleProduct) => {
@@ -138,6 +196,9 @@ export default function AdminCycleProducts() {
       redeemRewardValue: String(product.redeemRewardValue),
       cycleDays: String(product.cycleDays ?? 0),
       planType: product.planType ?? 'normal',
+      requireCommissionLevel1Count: String(product.requireCommissionLevel1Count ?? 0),
+      requireCommissionLevel2Count: String(product.requireCommissionLevel2Count ?? 0),
+      requireCommissionLevel3Count: String(product.requireCommissionLevel3Count ?? 0),
       isActive: product.isActive,
     })
     setFeedback(null)
@@ -150,6 +211,9 @@ export default function AdminCycleProducts() {
     const numericPrice = Number(form.price.replace(',', '.'))
     const numericReward = Number(form.redeemRewardValue.replace(',', '.'))
     const numericCycleDays = Number(form.cycleDays.replace(',', '.'))
+    const numericRequireLevel1 = Number(form.requireCommissionLevel1Count.replace(',', '.'))
+    const numericRequireLevel2 = Number(form.requireCommissionLevel2Count.replace(',', '.'))
+    const numericRequireLevel3 = Number(form.requireCommissionLevel3Count.replace(',', '.'))
 
     if (!token) {
       setFeedback({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
@@ -181,6 +245,21 @@ export default function AdminCycleProducts() {
       return
     }
 
+    if (!Number.isInteger(numericRequireLevel1) || numericRequireLevel1 < 0) {
+      setFeedback({ type: 'error', text: 'Informe uma quantidade válida para exigência do nível 1.' })
+      return
+    }
+
+    if (!Number.isInteger(numericRequireLevel2) || numericRequireLevel2 < 0) {
+      setFeedback({ type: 'error', text: 'Informe uma quantidade válida para exigência do nível 2.' })
+      return
+    }
+
+    if (!Number.isInteger(numericRequireLevel3) || numericRequireLevel3 < 0) {
+      setFeedback({ type: 'error', text: 'Informe uma quantidade válida para exigência do nível 3.' })
+      return
+    }
+
     setSaving(true)
     setFeedback(null)
 
@@ -205,6 +284,9 @@ export default function AdminCycleProducts() {
           redeemRewardValue: Number(numericReward.toFixed(2)),
           cycleDays: numericCycleDays,
           planType: form.planType,
+          requireCommissionLevel1Count: numericRequireLevel1,
+          requireCommissionLevel2Count: numericRequireLevel2,
+          requireCommissionLevel3Count: numericRequireLevel3,
           isActive: form.isActive,
         }),
       })
@@ -337,6 +419,42 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
+              <label>Exigência Convite Nível 1 ({commissionLevels.find((lvl) => lvl.level === 1)?.name || 'Nível 1'})</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.requireCommissionLevel1Count}
+                onChange={(e) => setForm((prev) => ({ ...prev, requireCommissionLevel1Count: e.target.value }))}
+                placeholder="Ex.: 3"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Exigência Convite Nível 2 ({commissionLevels.find((lvl) => lvl.level === 2)?.name || 'Nível 2'})</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.requireCommissionLevel2Count}
+                onChange={(e) => setForm((prev) => ({ ...prev, requireCommissionLevel2Count: e.target.value }))}
+                placeholder="Ex.: 5"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Exigência Convite Nível 3 ({commissionLevels.find((lvl) => lvl.level === 3)?.name || 'Nível 3'})</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.requireCommissionLevel3Count}
+                onChange={(e) => setForm((prev) => ({ ...prev, requireCommissionLevel3Count: e.target.value }))}
+                placeholder="Ex.: 7"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
               <label>Imagem (URL)</label>
               <input
                 type="url"
@@ -404,6 +522,9 @@ export default function AdminCycleProducts() {
                       </p>
                       <p className="admin-cycle-item-meta secondary">
                         Tipo: {product.planType === 'vip' ? 'Plano VIP' : product.planType === 'vip_day' ? 'VIP do dia' : 'Plano normal'} • Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}
+                      </p>
+                      <p className="admin-cycle-item-meta secondary">
+                        Exigência de convite • Nível 1: {product.requireCommissionLevel1Count} • Nível 2: {product.requireCommissionLevel2Count} • Nível 3: {product.requireCommissionLevel3Count}
                       </p>
                     </div>
                     <div className="admin-cycle-item-actions">
