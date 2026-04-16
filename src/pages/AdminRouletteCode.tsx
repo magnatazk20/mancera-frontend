@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './AdminRouletteCode.css'
 
@@ -10,6 +10,66 @@ export default function AdminRouletteCode() {
   const [reward, setReward] = useState('')
   const [message, setMessage] = useState('')
   const [creating, setCreating] = useState(false)
+  const [loadingList, setLoadingList] = useState(false)
+  const [createdCodes, setCreatedCodes] = useState<
+    Array<{
+      id: number
+      code: string
+      reward: string
+      description: string
+      isActive: boolean
+      createdAt: string | null
+    }>
+  >([])
+
+  const totalCodes = useMemo(() => createdCodes.length, [createdCodes])
+
+  const loadCodes = async () => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (!token) return
+
+    setLoadingList(true)
+    try {
+      const response = await fetch(`${API_URL}/api/admin/roulette-codes`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json().catch(() => ({} as Record<string, unknown>))
+      if (!response.ok) {
+        const errorMessage =
+          typeof data?.error === 'string' && data.error.trim()
+            ? data.error.trim()
+            : 'Não foi possível carregar os códigos da roleta.'
+        setMessage(errorMessage)
+        return
+      }
+
+      const list = Array.isArray((data as { rouletteCodes?: unknown[] }).rouletteCodes)
+        ? ((data as { rouletteCodes: Array<Record<string, unknown>> }).rouletteCodes ?? [])
+        : []
+
+      const mapped = list.map((item) => ({
+        id: Number(item.id ?? 0),
+        code: String(item.code ?? ''),
+        reward: String(item.reward ?? ''),
+        description: String(item.description ?? ''),
+        isActive: Number(item.isActive ?? 1) === 1 || item.isActive === true,
+        createdAt: item.createdAt == null ? null : String(item.createdAt),
+      }))
+
+      setCreatedCodes(mapped)
+    } catch {
+      setMessage('Erro de conexão ao carregar códigos da roleta.')
+    } finally {
+      setLoadingList(false)
+    }
+  }
+
+  useEffect(() => {
+    loadCodes()
+  }, [])
 
   const handleCreate = async () => {
     if (creating) return
@@ -67,6 +127,7 @@ export default function AdminRouletteCode() {
       setReward('')
       setDescription('')
       window.alert(successMessage)
+      await loadCodes()
     } catch {
       const errorMessage = 'Erro de conexão ao criar código da roleta.'
       setMessage(errorMessage)
@@ -90,7 +151,7 @@ export default function AdminRouletteCode() {
         <section className="roulette-code-card">
           <div className="roulette-code-card-head">
             <h2>Novo Código</h2>
-            <p>Painel administrativo</p>
+            <p>Painel administrativo • Total cadastrados: {totalCodes}</p>
           </div>
 
           <div className="roulette-code-grid">
@@ -142,6 +203,38 @@ export default function AdminRouletteCode() {
           <p className="roulette-code-hint">
             Códigos criados ficam disponíveis imediatamente para uso nas ações da roleta.
           </p>
+
+          {loadingList ? <p className="roulette-code-hint">Carregando códigos...</p> : null}
+
+          {createdCodes.length > 0 ? (
+            <div style={{ marginTop: 16 }}>
+              <h3 style={{ marginBottom: 10, color: '#eaf2ff' }}>Códigos criados</h3>
+              <div style={{ display: 'grid', gap: 10 }}>
+                {createdCodes.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      border: '1px solid rgba(148,163,184,0.35)',
+                      borderRadius: 10,
+                      padding: 12,
+                      background: 'rgba(15,23,42,0.88)',
+                      color: '#eaf2ff',
+                    }}
+                  >
+                    <strong style={{ color: '#f8fbff' }}>{item.code}</strong>
+                    <p style={{ margin: '6px 0 0', color: '#dbeafe' }}>
+                      Recompensa: {item.reward || '-'} • Status: {item.isActive ? 'Ativo' : 'Inativo'}
+                    </p>
+                    <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>Descrição: {item.description || '-'}</p>
+                    <p style={{ margin: '6px 0 0', color: '#93c5fd' }}>
+                      Criado em:{' '}
+                      {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
       </section>
     </main>
