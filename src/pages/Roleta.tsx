@@ -35,6 +35,11 @@ export default function Roleta() {
 
   useEffect(() => {
     let ignore = false
+    const clearCodigoFromUrl = () => {
+      const nextParams = new URLSearchParams(searchParams.toString())
+      nextParams.delete('codigo')
+      setSearchParams(nextParams, { replace: true })
+    }
 
     const loadRoletaData = async () => {
       try {
@@ -70,9 +75,7 @@ export default function Roleta() {
               if (typeof redeemData.availableSpins === 'number') {
                 setRemainingSpins(Number(redeemData.availableSpins))
               }
-              const nextParams = new URLSearchParams(searchParams)
-              nextParams.delete('codigo')
-              setSearchParams(nextParams, { replace: true })
+              clearCodigoFromUrl()
             } else {
               setRedeemSuccessMessage(null)
               const backendError = String(redeemData?.error ?? '').trim()
@@ -89,9 +92,7 @@ export default function Roleta() {
                 setRedeemErrorMessage(backendError || 'Não foi possível resgatar o código da roleta.')
               }
               setRedeemErrorModalOpen(true)
-              const nextParams = new URLSearchParams(searchParams)
-              nextParams.delete('codigo')
-              setSearchParams(nextParams, { replace: true })
+              clearCodigoFromUrl()
             }
           }
         }
@@ -147,7 +148,7 @@ export default function Roleta() {
       ignore = true
       window.clearInterval(timer)
     }
-  }, [codeFromUrl, searchParams, setSearchParams])
+  }, [codeFromUrl, setSearchParams])
 
   const wheelStyle = useMemo(() => {
     const colors = ['#0ea5e9', '#0284c7', '#06b6d4', '#0891b2', '#2563eb', '#1d4ed8', '#0ea5e9', '#0284c7']
