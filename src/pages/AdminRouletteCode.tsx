@@ -22,9 +22,9 @@ export default function AdminRouletteCode() {
       return
     }
 
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (!token) {
-      const msg = 'Sessão expirada. Faça login novamente para criar códigos.'
+      const msg = 'Token não encontrado. Faça login novamente.'
       setMessage(msg)
       window.alert(msg)
       return
