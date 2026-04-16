@@ -26,6 +26,7 @@ export default function Roleta() {
   const [remainingSpins, setRemainingSpins] = useState(0)
   const [redeemSuccessMessage, setRedeemSuccessMessage] = useState<string | null>(null)
   const [redeemErrorMessage, setRedeemErrorMessage] = useState<string | null>(null)
+  const [redeemErrorModalOpen, setRedeemErrorModalOpen] = useState(false)
   const [celebration, setCelebration] = useState<{ amount: string } | null>(null)
   const redeemedCodeRef = useRef<string | null>(null)
 
@@ -55,6 +56,7 @@ export default function Roleta() {
           if (!ignore) {
             if (redeemResponse.ok && redeemData?.ok) {
               setRedeemErrorMessage(null)
+              setRedeemErrorModalOpen(false)
               setRedeemSuccessMessage(`🎉 Parabéns! Você resgatou o código ${codeFromUrl}.`)
               if (typeof redeemData.availableSpins === 'number') {
                 setRemainingSpins(Number(redeemData.availableSpins))
@@ -63,17 +65,18 @@ export default function Roleta() {
               setRedeemSuccessMessage(null)
               const backendError = String(redeemData?.error ?? '').trim()
               const normalizedError = backendError.toLowerCase()
-              if (
+              if (normalizedError.includes('já foi resgatado')) {
+                setRedeemErrorMessage('Este código já foi resgatado por você.')
+              } else if (
                 normalizedError.includes('não encontrado') ||
                 normalizedError.includes('invalido') ||
                 normalizedError.includes('inválido')
               ) {
-                setRedeemErrorMessage(`Código inválido: ${codeFromUrl}.`)
-              } else if (normalizedError.includes('já foi resgatado')) {
-                setRedeemErrorMessage(`Este código já foi utilizado por você: ${codeFromUrl}.`)
+                setRedeemErrorMessage('Código inválido.')
               } else {
                 setRedeemErrorMessage(backendError || 'Não foi possível resgatar o código da roleta.')
               }
+              setRedeemErrorModalOpen(true)
             }
           }
         }
@@ -210,6 +213,17 @@ export default function Roleta() {
 
   return (
     <main className="roleta-pro">
+      {redeemErrorModalOpen && redeemErrorMessage ? (
+        <div className="redeem-error-modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="redeem-error-title">
+          <div className="redeem-error-modal">
+            <h2 id="redeem-error-title">Erro ao resgatar código</h2>
+            <p>{redeemErrorMessage}</p>
+            <button type="button" onClick={() => setRedeemErrorModalOpen(false)}>
+              Fechar
+            </button>
+          </div>
+        </div>
+      ) : null}
       {celebration ? (
         <div className="roleta-celebration" role="status" aria-live="polite">
           <div className="roleta-celebration-card">
@@ -268,7 +282,7 @@ export default function Roleta() {
 
         <section className="spin-cta">
           {redeemSuccessMessage ? <p className="winner-text">{redeemSuccessMessage}</p> : null}
-          {redeemErrorMessage ? <p className="redeem-error-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
+          {redeemErrorMessage && !redeemErrorModalOpen ? <p className="redeem-error-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
           <button
             type="button"
             onClick={spin}
