@@ -203,6 +203,17 @@ export default function AdminRouletteCode() {
           <p className="roulette-code-hint">
             Códigos criados ficam disponíveis imediatamente para uso nas ações da roleta.
           </p>
+          <p className="roulette-code-hint">
+            Link direto para resgatar/usar na roleta:{' '}
+            <a
+              href={code.trim() ? `/roleta?codigo=${encodeURIComponent(code.trim().toUpperCase())}` : '/roleta'}
+              style={{ color: '#93c5fd', fontWeight: 700 }}
+            >
+              {code.trim()
+                ? `Abrir Roleta com código (${code.trim().toUpperCase()})`
+                : 'Abrir Roleta'}
+            </a>
+          </p>
 
           {loadingList ? <p className="roulette-code-hint">Carregando códigos...</p> : null}
 
