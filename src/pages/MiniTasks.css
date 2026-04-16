@@ -87,6 +87,18 @@
   font-weight: 700;
 }
 
+.mini-task-shield-icon {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  color: currentColor;
+}
+
+.mini-task-shield-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
 .mini-task-reward {
   text-align: right;
 }

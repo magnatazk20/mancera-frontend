@@ -51,16 +51,16 @@ export default function MiniTasks() {
 
   const fallbackTasks = useMemo<MiniTask[]>(
     () => [
-      { id: 1, title: 'Convidar 30 usuários', inviteGoal: 30, reward: 10, badge: '🥉 Bronze' },
-      { id: 2, title: 'Convidar 20 usuários', inviteGoal: 20, reward: 20, badge: '🥈 Prata' },
-      { id: 3, title: 'Convidar 40 usuários', inviteGoal: 40, reward: 25, badge: '🏅 Foco' },
-      { id: 4, title: 'Convidar 50 usuários', inviteGoal: 50, reward: 35, badge: '🎯 Meta' },
-      { id: 5, title: 'Convidar 60 usuários', inviteGoal: 60, reward: 45, badge: '🔥 Impulso' },
-      { id: 6, title: 'Convidar 70 usuários', inviteGoal: 70, reward: 55, badge: '⭐ Destaque' },
-      { id: 7, title: 'Convidar 80 usuários', inviteGoal: 80, reward: 70, badge: '💎 Elite' },
-      { id: 8, title: 'Convidar 90 usuários', inviteGoal: 90, reward: 85, badge: '🚀 Turbo' },
-      { id: 9, title: 'Convidar 100 usuários', inviteGoal: 100, reward: 100, badge: '👑 Mestre' },
-      { id: 10, title: 'Convidar 120 usuários', inviteGoal: 120, reward: 130, badge: '🏆 Lendário' },
+      { id: 1, title: 'Convidar 30 usuários', inviteGoal: 30, reward: 10, badge: 'Bronze' },
+      { id: 2, title: 'Convidar 20 usuários', inviteGoal: 20, reward: 20, badge: 'Prata' },
+      { id: 3, title: 'Convidar 40 usuários', inviteGoal: 40, reward: 25, badge: 'Foco' },
+      { id: 4, title: 'Convidar 50 usuários', inviteGoal: 50, reward: 35, badge: 'Meta' },
+      { id: 5, title: 'Convidar 60 usuários', inviteGoal: 60, reward: 45, badge: 'Impulso' },
+      { id: 6, title: 'Convidar 70 usuários', inviteGoal: 70, reward: 55, badge: 'Destaque' },
+      { id: 7, title: 'Convidar 80 usuários', inviteGoal: 80, reward: 70, badge: 'Elite' },
+      { id: 8, title: 'Convidar 90 usuários', inviteGoal: 90, reward: 85, badge: 'Turbo' },
+      { id: 9, title: 'Convidar 100 usuários', inviteGoal: 100, reward: 100, badge: 'Mestre' },
+      { id: 10, title: 'Convidar 120 usuários', inviteGoal: 120, reward: 130, badge: 'Lendário' },
     ],
     []
   )
@@ -182,7 +182,13 @@ export default function MiniTasks() {
           <div className="mini-tasks-earned-list">
             {badges.map((badge) => (
               <span key={badge} className="mini-task-earned-chip">
-                {badge}
+                <span className="mini-task-shield-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
+                    <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
+                  </svg>
+                </span>
+                <span>{badge}</span>
               </span>
             ))}
           </div>
@@ -205,7 +211,13 @@ export default function MiniTasks() {
                   <h3 className="mini-task-title">{task.title}</h3>
                   <p className="mini-task-sub">Meta: {task.inviteGoal} convidados</p>
                   <span className="mini-task-badge" aria-label={`Emblema da tarefa ${task.id}`}>
-                    {task.badge}
+                    <span className="mini-task-shield-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
+                        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
+                      </svg>
+                    </span>
+                    <span>{task.badge || 'Sem badge'}</span>
                   </span>
                 </div>
               </div>
@@ -214,7 +226,13 @@ export default function MiniTasks() {
                 <strong>{formatBRL(task.reward)}</strong>
                 {state === 'done' ? (
                   <div className="mini-task-earned-badge" aria-label="Tarefa resgatada">
-                    🏅 Emblema recebido
+                    <span className="mini-task-shield-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
+                        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
+                      </svg>
+                    </span>
+                    <span>{task.badge || 'Badge recebida'}</span>
                   </div>
                 ) : null}
                 <button
