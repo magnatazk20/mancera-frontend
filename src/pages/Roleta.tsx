@@ -26,6 +26,7 @@ export default function Roleta() {
   const [remainingSpins, setRemainingSpins] = useState(0)
   const [redeemSuccessMessage, setRedeemSuccessMessage] = useState<string | null>(null)
   const [redeemErrorMessage, setRedeemErrorMessage] = useState<string | null>(null)
+  const [celebration, setCelebration] = useState<{ amount: string } | null>(null)
   const redeemedCodeRef = useRef<string | null>(null)
 
   const segmentAngle = 360 / PRIZES.length
@@ -177,6 +178,8 @@ export default function Roleta() {
       setTimeout(() => {
         const result = '1 BRL'
         setWinner(result)
+        setCelebration({ amount: result })
+        window.setTimeout(() => setCelebration(null), 3200)
         setMyWins((prev) => [
           { amount: result, at: data.spin?.createdAt ? new Date(data.spin.createdAt).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR') },
           ...prev,
@@ -195,6 +198,15 @@ export default function Roleta() {
 
   return (
     <main className="roleta-pro">
+      {celebration ? (
+        <div className="roleta-celebration" role="status" aria-live="polite">
+          <div className="roleta-celebration-card">
+            <div className="roleta-confetti" />
+            <h2>🎉 Parabéns! 🎉</h2>
+            <p>Você ganhou <strong>{celebration.amount}</strong> na roleta!</p>
+          </div>
+        </div>
+      ) : null}
       <div className="roleta-wrap">
         <header className="roleta-head">
           <button className="roleta-back-btn" onClick={() => navigate('/dashboard')} type="button">
