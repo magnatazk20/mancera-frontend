@@ -119,6 +119,12 @@ export default function MiniTasks() {
         })
         return next
       })
+
+      const earnedBadges = normalizedTasks
+        .filter((task) => Boolean(task.isClaimed) && String(task.badge ?? '').trim().length > 0)
+        .map((task) => String(task.badge).trim())
+
+      setBadges(Array.from(new Set(earnedBadges)))
     } catch {
       setTasks(fallbackTasks)
     }
