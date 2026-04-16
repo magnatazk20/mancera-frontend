@@ -12,6 +12,7 @@ export default function AdminRouletteCode() {
   const [message, setMessage] = useState('')
   const [creating, setCreating] = useState(false)
   const [loadingList, setLoadingList] = useState(false)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const [createdCodes, setCreatedCodes] = useState<
     Array<{
       id: number
@@ -77,6 +78,58 @@ export default function AdminRouletteCode() {
   useEffect(() => {
     loadCodes()
   }, [])
+
+  const handleDelete = async (rouletteCodeId: number, rouletteCode: string) => {
+    if (deletingId === rouletteCodeId) return
+
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (!token) {
+      const msg = 'Token não encontrado. Faça login novamente.'
+      setMessage(msg)
+      window.alert(msg)
+      return
+    }
+
+    const confirmed = window.confirm(`Deseja realmente excluir o código "${rouletteCode}"?`)
+    if (!confirmed) return
+
+    try {
+      setDeletingId(rouletteCodeId)
+      setMessage('')
+
+      const response = await fetch(`${API_URL}/api/admin/roulette-codes/${rouletteCodeId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json().catch(() => ({} as Record<string, unknown>))
+      if (!response.ok) {
+        const errorMessage =
+          typeof data?.error === 'string' && data.error.trim()
+            ? data.error.trim()
+            : 'Não foi possível excluir o código da roleta.'
+        setMessage(errorMessage)
+        window.alert(errorMessage)
+        return
+      }
+
+      const successMessage =
+        typeof data?.message === 'string' && data.message.trim()
+          ? data.message.trim()
+          : `Código "${rouletteCode}" excluído com sucesso.`
+      setMessage(successMessage)
+      window.alert(successMessage)
+      await loadCodes()
+    } catch {
+      const errorMessage = 'Erro de conexão ao excluir código da roleta.'
+      setMessage(errorMessage)
+      window.alert(errorMessage)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const handleCreate = async () => {
     if (creating) return
@@ -279,6 +332,24 @@ export default function AdminRouletteCode() {
                       Criado em:{' '}
                       {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
                     </p>
+                    <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(item.id, item.code)}
+                        disabled={deletingId === item.id}
+                        style={{
+                          border: '1px solid #ef4444',
+                          background: deletingId === item.id ? '#7f1d1d' : '#991b1b',
+                          color: '#fee2e2',
+                          borderRadius: 8,
+                          padding: '8px 12px',
+                          cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {deletingId === item.id ? 'Excluindo...' : 'Excluir'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
