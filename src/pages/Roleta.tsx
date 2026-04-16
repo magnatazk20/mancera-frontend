@@ -16,7 +16,7 @@ const WINNERS_SEED = [
 
 export default function Roleta() {
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [winner, setWinner] = useState<string | null>(null)
@@ -61,6 +61,9 @@ export default function Roleta() {
               if (typeof redeemData.availableSpins === 'number') {
                 setRemainingSpins(Number(redeemData.availableSpins))
               }
+              const nextParams = new URLSearchParams(searchParams)
+              nextParams.delete('codigo')
+              setSearchParams(nextParams, { replace: true })
             } else {
               setRedeemSuccessMessage(null)
               const backendError = String(redeemData?.error ?? '').trim()
@@ -77,6 +80,9 @@ export default function Roleta() {
                 setRedeemErrorMessage(backendError || 'Não foi possível resgatar o código da roleta.')
               }
               setRedeemErrorModalOpen(true)
+              const nextParams = new URLSearchParams(searchParams)
+              nextParams.delete('codigo')
+              setSearchParams(nextParams, { replace: true })
             }
           }
         }
@@ -132,7 +138,7 @@ export default function Roleta() {
       ignore = true
       window.clearInterval(timer)
     }
-  }, [codeFromUrl])
+  }, [codeFromUrl, searchParams, setSearchParams])
 
   const wheelStyle = useMemo(() => {
     const colors = ['#0ea5e9', '#0284c7', '#06b6d4', '#0891b2', '#2563eb', '#1d4ed8', '#0ea5e9', '#0284c7']
