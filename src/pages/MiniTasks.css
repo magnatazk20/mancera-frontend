@@ -102,13 +102,34 @@
 
 .mini-task-shield-mark {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 8px;
-  font-weight: 900;
-  color: rgba(255, 255, 255, 0.92);
-  line-height: 1;
+  inset: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.mini-task-shield-mark-bronze {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+.mini-task-shield-mark-silver {
+  border-radius: 3px;
+}
+
+.mini-task-shield-mark-gold {
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 92%, 50% 70%, 21% 92%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.mini-task-shield-mark-diamond {
+  clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
+}
+
+.mini-task-shield-mark-vip {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.mini-task-shield-mark-regular {
+  border-radius: 50%;
 }
 
 .mini-task-shield-bronze {

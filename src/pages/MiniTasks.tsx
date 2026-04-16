@@ -44,9 +44,7 @@ function BadgeShield({ badge }: { badge: string }) {
         <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
         <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
       </svg>
-      <span className="mini-task-shield-mark">
-        {theme === 'diamond' ? '◆' : theme === 'gold' ? '●' : theme === 'silver' ? '◈' : theme === 'bronze' ? '◉' : theme === 'vip' ? '✦' : '•'}
-      </span>
+      <span className={`mini-task-shield-mark mini-task-shield-mark-${theme}`} />
     </span>
   )
 }
