@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
+import './AdminMiniTasks.css'
 
 type MiniTaskItem = {
   id: number
@@ -169,7 +170,7 @@ export default function AdminMiniTasks() {
   }
 
   return (
-    <main className="admin-page">
+    <main className="admin-page admin-mini-tasks-page">
       <AdminSidebar />
       <section className="admin-content admin-users-page">
         <header className="admin-users-header">
@@ -179,92 +180,101 @@ export default function AdminMiniTasks() {
           </div>
         </header>
 
-        <article className="admin-card" style={{ marginBottom: 16 }}>
-          <h2 style={{ marginTop: 0 }}>{editingId ? `Editar #${editingId}` : 'Nova mini task'}</h2>
-          <form className="admin-form-grid" onSubmit={handleSubmit}>
-            <label>
-              <span>Título</span>
-              <input
-                value={form.title}
-                onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                required
-              />
-            </label>
+        <div className="admin-mini-wrap">
+          <article className="admin-mini-card">
+            <h2 className="admin-mini-card-title">{editingId ? `Editar #${editingId}` : 'Nova mini task'}</h2>
+            <form className="admin-mini-form-grid" onSubmit={handleSubmit}>
+              <div className="admin-mini-field">
+                <label htmlFor="mini-task-title">Título</label>
+                <input
+                  id="mini-task-title"
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+                  required
+                />
+              </div>
 
-            <label>
-              <span>Meta de convites</span>
-              <input
-                type="number"
-                min={0}
-                value={form.inviteGoal}
-                onChange={(e) => setForm((prev) => ({ ...prev, inviteGoal: e.target.value }))}
-                required
-              />
-            </label>
+              <div className="admin-mini-field">
+                <label htmlFor="mini-task-goal">Meta de convites</label>
+                <input
+                  id="mini-task-goal"
+                  type="number"
+                  min={0}
+                  value={form.inviteGoal}
+                  onChange={(e) => setForm((prev) => ({ ...prev, inviteGoal: e.target.value }))}
+                  required
+                />
+              </div>
 
-            <label>
-              <span>Recompensa (R$)</span>
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={form.rewardAmount}
-                onChange={(e) => setForm((prev) => ({ ...prev, rewardAmount: e.target.value }))}
-                required
-              />
-            </label>
+              <div className="admin-mini-field">
+                <label htmlFor="mini-task-reward">Recompensa (R$)</label>
+                <input
+                  id="mini-task-reward"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={form.rewardAmount}
+                  onChange={(e) => setForm((prev) => ({ ...prev, rewardAmount: e.target.value }))}
+                  required
+                />
+              </div>
 
-            <label>
-              <span>Emblema</span>
-              <input
-                value={form.badgeLabel}
-                onChange={(e) => setForm((prev) => ({ ...prev, badgeLabel: e.target.value }))}
-                placeholder="Ex: 🥉 Bronze"
-                required
-              />
-            </label>
+              <div className="admin-mini-field">
+                <label htmlFor="mini-task-badge">Emblema</label>
+                <input
+                  id="mini-task-badge"
+                  type="text"
+                  value={form.badgeLabel}
+                  onChange={(e) => setForm((prev) => ({ ...prev, badgeLabel: e.target.value }))}
+                  placeholder="Ex: 🥉 Bronze"
+                  required
+                />
+              </div>
 
-            <label>
-              <span>Ordem</span>
-              <input
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) => setForm((prev) => ({ ...prev, sortOrder: e.target.value }))}
-                required
-              />
-            </label>
+              <div className="admin-mini-field">
+                <label htmlFor="mini-task-order">Ordem</label>
+                <input
+                  id="mini-task-order"
+                  type="number"
+                  value={form.sortOrder}
+                  onChange={(e) => setForm((prev) => ({ ...prev, sortOrder: e.target.value }))}
+                  required
+                />
+              </div>
 
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-              />
-              <span>Ativa</span>
-            </label>
+              <label className="admin-mini-field-checkbox" htmlFor="mini-task-active">
+                <input
+                  id="mini-task-active"
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => setForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                />
+                <span>Ativa</span>
+              </label>
 
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn primary" type="submit" disabled={saving}>
-                {saving ? 'Salvando...' : editingId ? 'Salvar alterações' : 'Criar mini task'}
-              </button>
-              {editingId ? (
-                <button className="btn ghost" type="button" onClick={resetForm}>
-                  Cancelar edição
+              <div className="admin-mini-actions">
+                <button className="btn primary" type="submit" disabled={saving}>
+                  {saving ? 'Salvando...' : editingId ? 'Salvar alterações' : 'Criar mini task'}
                 </button>
-              ) : null}
-            </div>
-          </form>
-        </article>
+                {editingId ? (
+                  <button className="btn ghost" type="button" onClick={resetForm}>
+                    Cancelar edição
+                  </button>
+                ) : null}
+              </div>
+            </form>
+          </article>
 
-        <article className="admin-card">
-          <h2 style={{ marginTop: 0 }}>Lista de mini tasks</h2>
-          {loading ? (
-            <p>Carregando...</p>
-          ) : tasks.length === 0 ? (
-            <p>Nenhuma mini task encontrada.</p>
-          ) : (
-            <div className="admin-table-wrap">
-              <table className="admin-table">
+          <article className="admin-mini-card">
+            <h2 className="admin-mini-card-title">Lista de mini tasks</h2>
+            {loading ? (
+              <p>Carregando...</p>
+            ) : tasks.length === 0 ? (
+              <p>Nenhuma mini task encontrada.</p>
+            ) : (
+              <div className="admin-mini-table-wrap">
+                <table className="admin-mini-table">
                 <thead>
                   <tr>
                     <th>ID</th>
@@ -284,24 +294,33 @@ export default function AdminMiniTasks() {
                       <td>{task.title}</td>
                       <td>{task.inviteGoal}</td>
                       <td>{Number(task.rewardAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                      <td>{task.badgeLabel}</td>
+                      <td>
+                        <span className="admin-mini-badge">{task.badgeLabel}</span>
+                      </td>
                       <td>{task.sortOrder}</td>
-                      <td>{task.isActive ? 'Ativa' : 'Inativa'}</td>
-                      <td style={{ display: 'flex', gap: 8 }}>
-                        <button className="btn ghost" type="button" onClick={() => startEdit(task)}>
-                          Editar
-                        </button>
-                        <button className="btn danger" type="button" onClick={() => handleDelete(task.id)}>
-                          Remover
-                        </button>
+                      <td>
+                        <span className={`admin-mini-status ${task.isActive ? 'active' : 'inactive'}`}>
+                          {task.isActive ? 'Ativa' : 'Inativa'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="admin-mini-row-actions">
+                          <button className="btn ghost" type="button" onClick={() => startEdit(task)}>
+                            Editar
+                          </button>
+                          <button className="btn danger" type="button" onClick={() => handleDelete(task.id)}>
+                            Remover
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
-          )}
-        </article>
+                </table>
+              </div>
+            )}
+          </article>
+        </div>
       </section>
 
       {toast ? (
