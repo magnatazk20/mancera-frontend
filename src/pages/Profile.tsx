@@ -75,6 +75,17 @@ export default function Profile() {
   const [showRedeemSuccessModal, setShowRedeemSuccessModal] = useState(false)
   const [redeemSuccessData, setRedeemSuccessData] = useState<{ message: string; rewardValue: number; code: string } | null>(null)
 
+  const normalizedBadge = useMemo(() => userBadge.toLowerCase(), [userBadge])
+
+  const badgeTheme = useMemo(() => {
+    if (normalizedBadge.includes('diam')) return 'diamond'
+    if (normalizedBadge.includes('ouro') || normalizedBadge.includes('gold')) return 'gold'
+    if (normalizedBadge.includes('prata') || normalizedBadge.includes('silver')) return 'silver'
+    if (normalizedBadge.includes('bronze')) return 'bronze'
+    if (normalizedBadge.includes('vip')) return 'vip'
+    return 'regular'
+  }, [normalizedBadge])
+
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
@@ -312,8 +323,14 @@ export default function Profile() {
               <div className="profile-header-info">
                 <div className="profile-header-topline">
                   <h2 className="profile-header-name">{user?.phone ?? user?.name ?? 'Usuário'}</h2>
-                  <span className="profile-user-badge" aria-label="Badge do usuário">
-                    🏅 Badge: {userBadge}
+                  <span className={`profile-user-badge profile-user-badge-${badgeTheme}`} aria-label="Badge do usuário">
+                    <span className="profile-user-badge-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
+                        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.45)" />
+                      </svg>
+                    </span>
+                    <span className="profile-user-badge-text">{userBadge}</span>
                   </span>
                   <button
                     type="button"

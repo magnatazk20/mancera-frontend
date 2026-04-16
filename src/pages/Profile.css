@@ -187,14 +187,66 @@
 .profile-page .profile-user-badge {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #f59e0b;
-  background: #fffbeb;
-  color: #92400e;
+  gap: 6px;
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
+  border: 1px solid #94a3b8;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.profile-page .profile-user-badge-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.profile-page .profile-user-badge-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.profile-page .profile-user-badge-text {
+  line-height: 1;
+}
+
+.profile-page .profile-user-badge-regular {
+  border-color: #94a3b8;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.profile-page .profile-user-badge-bronze {
+  border-color: #b45309;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.profile-page .profile-user-badge-silver {
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #475569;
+}
+
+.profile-page .profile-user-badge-gold {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.profile-page .profile-user-badge-diamond {
+  border-color: #06b6d4;
+  background: #ecfeff;
+  color: #0e7490;
+}
+
+.profile-page .profile-user-badge-vip {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+  color: #5b21b6;
 }
 
 .profile-page .profile-vip-pill {
