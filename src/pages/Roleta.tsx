@@ -24,7 +24,8 @@ export default function Roleta() {
   const [myWins, setMyWins] = useState<Array<{ amount: string; at: string }>>([])
   const [liveWinners, setLiveWinners] = useState(WINNERS_SEED)
   const [remainingSpins, setRemainingSpins] = useState(0)
-  const [redeemMessage, setRedeemMessage] = useState<string | null>(null)
+  const [redeemSuccessMessage, setRedeemSuccessMessage] = useState<string | null>(null)
+  const [redeemErrorMessage, setRedeemErrorMessage] = useState<string | null>(null)
   const redeemedCodeRef = useRef<string | null>(null)
 
   const segmentAngle = 360 / PRIZES.length
@@ -52,12 +53,14 @@ export default function Roleta() {
           const redeemData = await redeemResponse.json().catch(() => ({} as { ok?: boolean; message?: string; error?: string; availableSpins?: number }))
           if (!ignore) {
             if (redeemResponse.ok && redeemData?.ok) {
-              setRedeemMessage(String(redeemData.message ?? `Código "${codeFromUrl}" resgatado com sucesso.`))
+              setRedeemErrorMessage(null)
+              setRedeemSuccessMessage(`🎉 Parabéns! Você resgatou o código ${codeFromUrl}.`)
               if (typeof redeemData.availableSpins === 'number') {
                 setRemainingSpins(Number(redeemData.availableSpins))
               }
             } else {
-              setRedeemMessage(String(redeemData?.error ?? 'Não foi possível resgatar o código da roleta.'))
+              setRedeemSuccessMessage(null)
+              setRedeemErrorMessage(String(redeemData?.error ?? 'Não foi possível resgatar o código da roleta.'))
             }
           }
         }
@@ -240,7 +243,8 @@ export default function Roleta() {
         </section>
 
         <section className="spin-cta">
-          {redeemMessage ? <p className="winner-text">{redeemMessage}</p> : null}
+          {redeemSuccessMessage ? <p className="winner-text">{redeemSuccessMessage}</p> : null}
+          {redeemErrorMessage ? <p className="winner-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
           <button
             type="button"
             onClick={spin}
