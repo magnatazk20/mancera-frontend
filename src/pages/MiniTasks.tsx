@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
@@ -10,6 +10,7 @@ type MiniTask = {
   inviteGoal: number
   reward: number
   badge: string
+  isClaimed?: boolean
 }
 
 type RedeemState = Record<number, 'idle' | 'loading' | 'done'>
@@ -29,6 +30,8 @@ export default function MiniTasks() {
   const navigate = useNavigate()
   const [redeemState, setRedeemState] = useState<RedeemState>({})
   const [notice, setNotice] = useState<string>('')
+  const [tasks, setTasks] = useState<MiniTask[]>([])
+  const [badges, setBadges] = useState<string[]>([])
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -46,7 +49,7 @@ export default function MiniTasks() {
     }
   }, [navigate, user?.id])
 
-  const tasks = useMemo<MiniTask[]>(
+  const fallbackTasks = useMemo<MiniTask[]>(
     () => [
       { id: 1, title: 'Convidar 30 usuários', inviteGoal: 30, reward: 10, badge: '🥉 Bronze' },
       { id: 2, title: 'Convidar 20 usuários', inviteGoal: 20, reward: 20, badge: '🥈 Prata' },
@@ -61,6 +64,46 @@ export default function MiniTasks() {
     ],
     []
   )
+
+  const loadMiniTasks = useCallback(async () => {
+    const userId = Number(user?.id ?? 0)
+    if (!userId || Number.isNaN(userId)) return
+
+    try {
+      const response = await fetch(`${API_URL}/api/mini-tasks/${userId}`)
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok || data?.ok === false || !Array.isArray(data?.tasks)) {
+        setTasks(fallbackTasks)
+        return
+      }
+
+      const normalizedTasks: MiniTask[] = data.tasks.map((item: any) => ({
+        id: Number(item?.id ?? 0),
+        title: String(item?.title ?? ''),
+        inviteGoal: Number(item?.inviteGoal ?? 0),
+        reward: Number(item?.reward ?? 0),
+        badge: String(item?.badge ?? ''),
+        isClaimed: Boolean(item?.isClaimed),
+      }))
+
+      setTasks(normalizedTasks)
+
+      setRedeemState((prev) => {
+        const next: RedeemState = { ...prev }
+        normalizedTasks.forEach((task) => {
+          next[task.id] = task.isClaimed ? 'done' : (prev[task.id] === 'loading' ? 'loading' : 'idle')
+        })
+        return next
+      })
+    } catch {
+      setTasks(fallbackTasks)
+    }
+  }, [fallbackTasks, user?.id])
+
+  useEffect(() => {
+    loadMiniTasks()
+  }, [loadMiniTasks])
 
   const handleRedeem = async (task: MiniTask) => {
     setNotice('')
@@ -87,6 +130,16 @@ export default function MiniTasks() {
       }
 
       setRedeemState((prev) => ({ ...prev, [task.id]: 'done' }))
+      setTasks((prev) => prev.map((item) => (item.id === task.id ? { ...item, isClaimed: true } : item)))
+      if (Array.isArray(data?.badges)) {
+        setBadges(
+          data.badges
+            .map((item: unknown) => String(item ?? '').trim())
+            .filter((item: string) => item.length > 0)
+        )
+      } else if (task.badge) {
+        setBadges((prev) => (prev.includes(task.badge) ? prev : [...prev, task.badge]))
+      }
       setNotice(data?.message ?? 'Resgate realizado com sucesso.')
     } catch (err: any) {
       setRedeemState((prev) => ({ ...prev, [task.id]: 'idle' }))
@@ -123,9 +176,22 @@ export default function MiniTasks() {
 
       {notice ? <div className="mini-tasks-notice">{notice}</div> : null}
 
+      {badges.length > 0 ? (
+        <section className="mini-tasks-earned">
+          <h3>Meus emblemas</h3>
+          <div className="mini-tasks-earned-list">
+            {badges.map((badge) => (
+              <span key={badge} className="mini-task-earned-chip">
+                {badge}
+              </span>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="mini-tasks-grid">
         {tasks.map((task) => {
-          const state = redeemState[task.id] ?? 'idle'
+          const state = task.isClaimed ? 'done' : (redeemState[task.id] ?? 'idle')
           return (
             <article
               key={task.id}
