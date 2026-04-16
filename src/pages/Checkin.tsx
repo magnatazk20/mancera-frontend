@@ -37,6 +37,8 @@ export default function Checkin() {
   const [historyDays, setHistoryDays] = useState<number[]>([])
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+  const progressPercent = Math.min(100, Math.max(0, (historyDays.length / 10) * 100))
+
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
@@ -131,6 +133,17 @@ export default function Checkin() {
             <h2>Ciclo de 10 dias</h2>
             <p>O check-in diário agora é feito no bot do Telegram.</p>
           </div>
+        </div>
+
+        <div className="checkin-progress-overview" aria-label="Status do progresso">
+          <div className="checkin-progress-head">
+            <strong>Status do progresso</strong>
+            <span>{historyDays.length}/10 dias concluídos</span>
+          </div>
+          <div className="checkin-progress-track">
+            <div className="checkin-progress-fill" style={{ width: `${progressPercent}%` }} />
+          </div>
+          <small>{Math.round(progressPercent)}% completo</small>
         </div>
 
         <div className="checkin-meta">

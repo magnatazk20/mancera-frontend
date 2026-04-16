@@ -91,6 +91,54 @@
   font-size: 0.9rem;
 }
 
+.checkin-progress-overview {
+  border-radius: 12px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(14, 116, 144, 0.12);
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.checkin-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.checkin-progress-head strong {
+  font-size: 0.86rem;
+  color: #bae6fd;
+}
+
+.checkin-progress-head span {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.checkin-progress-track {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  overflow: hidden;
+}
+
+.checkin-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #06b6d4);
+  transition: width 0.28s ease;
+}
+
+.checkin-progress-overview small {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: #93c5fd;
+}
+
 .checkin-meta {
   display: flex;
   gap: 8px;
