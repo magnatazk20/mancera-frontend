@@ -52,6 +52,11 @@ type MiningTasksResponse = {
   }>
 }
 
+type MiniTasksBadgeResponse = {
+  ok?: boolean
+  badges?: string[]
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -105,11 +110,12 @@ export default function Profile() {
     const loadProfile = async () => {
       setLoading(true)
       try {
-        const [summaryRes, vipRes, metricsRes, miningRes] = await Promise.all([
+        const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes] = await Promise.all([
           fetch(`${API_URL}/api/user/summary/${user.id}`),
           fetch(`${API_URL}/api/vip/user/${user.id}`),
           fetch(`${API_URL}/api/profile/metrics/${user.id}`),
           fetch(`${API_URL}/api/mining/tasks/${user.id}`),
+          fetch(`${API_URL}/api/mini-tasks/${user.id}`),
         ])
 
         if (summaryRes.ok) {
@@ -123,12 +129,22 @@ export default function Profile() {
           const vipData = (await vipRes.json()) as VipResponse
           if (vipData?.ok && vipData?.hasVip && vipData.vip && typeof vipData.balance === 'number') {
             setBalance(Number(vipData.balance))
-            setUserBadge(String(vipData.vip?.levelName ?? 'VIP').trim() || 'VIP')
+          }
+        }
+
+        if (miniTasksRes.ok) {
+          const miniTasksData = (await miniTasksRes.json()) as MiniTasksBadgeResponse
+          if (miniTasksData?.ok && Array.isArray(miniTasksData.badges) && miniTasksData.badges.length > 0) {
+            const parsedBadges = miniTasksData.badges
+              .map((item) => String(item ?? '').trim())
+              .filter((item) => item.length > 0)
+            const latestBadge = parsedBadges[parsedBadges.length - 1]
+            setUserBadge(latestBadge || 'Sem badge')
           } else {
-            setUserBadge('Usuário regular')
+            setUserBadge('Sem badge')
           }
         } else {
-          setUserBadge('Usuário regular')
+          setUserBadge('Sem badge')
         }
 
         if (metricsRes.ok) {
