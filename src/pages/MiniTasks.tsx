@@ -26,6 +26,31 @@ type StoredUser = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
+const getBadgeTheme = (badgeText: string) => {
+  const normalized = String(badgeText ?? '').toLowerCase()
+  if (normalized.includes('diam')) return 'diamond'
+  if (normalized.includes('ouro') || normalized.includes('gold')) return 'gold'
+  if (normalized.includes('prata') || normalized.includes('silver')) return 'silver'
+  if (normalized.includes('bronze')) return 'bronze'
+  if (normalized.includes('vip')) return 'vip'
+  return 'regular'
+}
+
+function BadgeShield({ badge }: { badge: string }) {
+  const theme = getBadgeTheme(badge)
+  return (
+    <span className={`mini-task-shield-icon mini-task-shield-${theme}`} aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
+        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
+      </svg>
+      <span className="mini-task-shield-mark">
+        {theme === 'diamond' ? '◆' : theme === 'gold' ? '●' : theme === 'silver' ? '◈' : theme === 'bronze' ? '◉' : theme === 'vip' ? '✦' : '•'}
+      </span>
+    </span>
+  )
+}
+
 export default function MiniTasks() {
   const navigate = useNavigate()
   const [redeemState, setRedeemState] = useState<RedeemState>({})
@@ -182,12 +207,7 @@ export default function MiniTasks() {
           <div className="mini-tasks-earned-list">
             {badges.map((badge) => (
               <span key={badge} className="mini-task-earned-chip">
-                <span className="mini-task-shield-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
-                    <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
-                  </svg>
-                </span>
+                <BadgeShield badge={badge} />
                 <span>{badge}</span>
               </span>
             ))}
@@ -210,13 +230,8 @@ export default function MiniTasks() {
                 <div>
                   <h3 className="mini-task-title">{task.title}</h3>
                   <p className="mini-task-sub">Meta: {task.inviteGoal} convidados</p>
-                  <span className="mini-task-badge" aria-label={`Emblema da tarefa ${task.id}`}>
-                    <span className="mini-task-shield-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24">
-                        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
-                        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
-                      </svg>
-                    </span>
+                  <span className={`mini-task-badge mini-task-badge-${getBadgeTheme(task.badge)}`} aria-label={`Emblema da tarefa ${task.id}`}>
+                    <BadgeShield badge={task.badge} />
                     <span>{task.badge || 'Sem badge'}</span>
                   </span>
                 </div>
@@ -225,13 +240,8 @@ export default function MiniTasks() {
                 <span>Recompensa</span>
                 <strong>{formatBRL(task.reward)}</strong>
                 {state === 'done' ? (
-                  <div className="mini-task-earned-badge" aria-label="Tarefa resgatada">
-                    <span className="mini-task-shield-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24">
-                        <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
-                        <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.42)" />
-                      </svg>
-                    </span>
+                  <div className={`mini-task-earned-badge mini-task-badge-${getBadgeTheme(task.badge)}`} aria-label="Tarefa resgatada">
+                    <BadgeShield badge={task.badge} />
                     <span>{task.badge || 'Badge recebida'}</span>
                   </div>
                 ) : null}
