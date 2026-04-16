@@ -18,6 +18,8 @@ export default function AdminRouletteCode() {
       reward: string
       description: string
       isActive: boolean
+      redeemedCount: number
+      isRedeemed: boolean
       createdAt: string | null
     }>
   >([])
@@ -56,6 +58,8 @@ export default function AdminRouletteCode() {
         reward: String(item.reward ?? ''),
         description: String(item.description ?? ''),
         isActive: Number(item.isActive ?? 1) === 1 || item.isActive === true,
+        redeemedCount: Number(item.redeemedCount ?? 0),
+        isRedeemed: Number(item.redeemedCount ?? 0) > 0 || item.isRedeemed === true,
         createdAt: item.createdAt == null ? null : String(item.createdAt),
       }))
 
@@ -237,6 +241,9 @@ export default function AdminRouletteCode() {
                       Recompensa: {item.reward || '-'} • Status: {item.isActive ? 'Ativo' : 'Inativo'}
                     </p>
                     <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>Descrição: {item.description || '-'}</p>
+                    <p style={{ margin: '6px 0 0', color: '#bfdbfe' }}>
+                      Utilizado: {item.isRedeemed ? 'Sim' : 'Não'} • Pessoas que usaram: {item.redeemedCount}
+                    </p>
                     <p style={{ margin: '6px 0 0', color: '#93c5fd' }}>
                       Criado em:{' '}
                       {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
