@@ -47,6 +47,10 @@ export default function Roleta() {
         const parsed = rawUser ? (JSON.parse(rawUser) as { id?: number }) : null
         const userId = Number(parsed?.id)
 
+        if (!codeFromUrl) {
+          redeemedCodeRef.current = null
+        }
+
         if (codeFromUrl && (!userId || Number.isNaN(userId))) {
           if (!ignore) {
             setRedeemSuccessMessage(null)
@@ -58,8 +62,12 @@ export default function Roleta() {
 
         if (!userId || Number.isNaN(userId)) return
 
-        if (codeFromUrl && redeemedCodeRef.current !== codeFromUrl) {
-          redeemedCodeRef.current = codeFromUrl
+        const redeemAttemptKey = codeFromUrl && userId && !Number.isNaN(userId)
+          ? `${userId}:${codeFromUrl}`
+          : null
+
+        if (redeemAttemptKey && redeemedCodeRef.current !== redeemAttemptKey) {
+          redeemedCodeRef.current = redeemAttemptKey
           const redeemResponse = await fetch(`${API_URL}/api/roleta/redeem-code`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -77,6 +85,7 @@ export default function Roleta() {
               }
               clearCodigoFromUrl()
             } else {
+              redeemedCodeRef.current = null
               setRedeemSuccessMessage(null)
               const backendError = String(redeemData?.error ?? '').trim()
               const normalizedError = backendError.toLowerCase()
