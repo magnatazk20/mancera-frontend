@@ -65,6 +65,7 @@ export default function Profile() {
   const [totalDeposits, setTotalDeposits] = useState(0)
   const [withdrawableBalance, setWithdrawableBalance] = useState(0)
   const [todayIncome, setTodayIncome] = useState(0)
+  const [userBadge, setUserBadge] = useState('Usuário regular')
   const [copyFeedback, setCopyFeedback] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [monthlySalaryContract, setMonthlySalaryContract] = useState('')
@@ -111,7 +112,12 @@ export default function Profile() {
           const vipData = (await vipRes.json()) as VipResponse
           if (vipData?.ok && vipData?.hasVip && vipData.vip && typeof vipData.balance === 'number') {
             setBalance(Number(vipData.balance))
+            setUserBadge(String(vipData.vip?.levelName ?? 'VIP').trim() || 'VIP')
+          } else {
+            setUserBadge('Usuário regular')
           }
+        } else {
+          setUserBadge('Usuário regular')
         }
 
         if (metricsRes.ok) {
@@ -306,6 +312,9 @@ export default function Profile() {
               <div className="profile-header-info">
                 <div className="profile-header-topline">
                   <h2 className="profile-header-name">{user?.phone ?? user?.name ?? 'Usuário'}</h2>
+                  <span className="profile-user-badge" aria-label="Badge do usuário">
+                    🏅 Badge: {userBadge}
+                  </span>
                   <button
                     type="button"
                     className="profile-vip-pill"

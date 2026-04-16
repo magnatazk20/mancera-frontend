@@ -184,6 +184,19 @@
   word-break: break-word;
 }
 
+.profile-page .profile-user-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .profile-page .profile-vip-pill {
   display: inline-flex;
   align-items: center;
