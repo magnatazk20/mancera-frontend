@@ -19,6 +19,7 @@ type CycleProduct = {
   imageUrl: string
   isActive: boolean
   sortOrder: number
+  stockQuantity?: number
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -269,7 +270,7 @@ export default function Dashboard() {
               <div className="cycle-plans-grid">
                 {cyclePlans.map((plan, index) => {
                   const compras = Math.max(1, Math.floor((index + 1) * 2))
-                  const estoque = Math.max(120, 1000 - index * 37)
+                  const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
                   const progresso = Math.min(95, 25 + index * 10)
 
                   return (
@@ -302,8 +303,13 @@ export default function Dashboard() {
                               Quantidade de Estoque: <span className="cycle-stock-highlight">{estoque}</span>
                             </div>
                           </div>
-                          <button type="button" onClick={() => handleBuyCycle(plan)} className="cycle-invest-btn">
-                            Investir
+                          <button
+                            type="button"
+                            onClick={() => handleBuyCycle(plan)}
+                            className="cycle-invest-btn"
+                            disabled={estoque <= 0}
+                          >
+                            {estoque <= 0 ? 'Esgotado' : 'Investir'}
                           </button>
                         </div>
 
