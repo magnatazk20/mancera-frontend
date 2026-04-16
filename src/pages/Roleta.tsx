@@ -61,7 +61,19 @@ export default function Roleta() {
               }
             } else {
               setRedeemSuccessMessage(null)
-              setRedeemErrorMessage(String(redeemData?.error ?? 'Não foi possível resgatar o código da roleta.'))
+              const backendError = String(redeemData?.error ?? '').trim()
+              const normalizedError = backendError.toLowerCase()
+              if (
+                normalizedError.includes('não encontrado') ||
+                normalizedError.includes('invalido') ||
+                normalizedError.includes('inválido')
+              ) {
+                setRedeemErrorMessage(`Código inválido: ${codeFromUrl}.`)
+              } else if (normalizedError.includes('já foi resgatado')) {
+                setRedeemErrorMessage(`Este código já foi utilizado por você: ${codeFromUrl}.`)
+              } else {
+                setRedeemErrorMessage(backendError || 'Não foi possível resgatar o código da roleta.')
+              }
             }
           }
         }
@@ -256,7 +268,7 @@ export default function Roleta() {
 
         <section className="spin-cta">
           {redeemSuccessMessage ? <p className="winner-text">{redeemSuccessMessage}</p> : null}
-          {redeemErrorMessage ? <p className="winner-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
+          {redeemErrorMessage ? <p className="redeem-error-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
           <button
             type="button"
             onClick={spin}
