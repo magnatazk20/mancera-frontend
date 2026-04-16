@@ -8,6 +8,7 @@ export default function AdminRouletteCode() {
   const [code, setCode] = useState('')
   const [description, setDescription] = useState('')
   const [reward, setReward] = useState('')
+  const [maxTotalUses, setMaxTotalUses] = useState('0')
   const [message, setMessage] = useState('')
   const [creating, setCreating] = useState(false)
   const [loadingList, setLoadingList] = useState(false)
@@ -17,6 +18,7 @@ export default function AdminRouletteCode() {
       code: string
       reward: string
       description: string
+      maxTotalUses: number
       isActive: boolean
       redeemedCount: number
       isRedeemed: boolean
@@ -57,6 +59,7 @@ export default function AdminRouletteCode() {
         code: String(item.code ?? ''),
         reward: String(item.reward ?? ''),
         description: String(item.description ?? ''),
+        maxTotalUses: Number(item.maxTotalUses ?? 0),
         isActive: Number(item.isActive ?? 1) === 1 || item.isActive === true,
         redeemedCount: Number(item.redeemedCount ?? 0),
         isRedeemed: Number(item.redeemedCount ?? 0) > 0 || item.isRedeemed === true,
@@ -98,6 +101,15 @@ export default function AdminRouletteCode() {
       setCreating(true)
       setMessage('')
 
+      const parsedMaxTotalUses = Number(String(maxTotalUses).replace(',', '.'))
+      if (!Number.isFinite(parsedMaxTotalUses) || parsedMaxTotalUses < 0 || !Number.isInteger(parsedMaxTotalUses)) {
+        const msg = 'Quantidade de usos deve ser um número inteiro maior ou igual a 0.'
+        setMessage(msg)
+        window.alert(msg)
+        setCreating(false)
+        return
+      }
+
       const response = await fetch(`${API_URL}/api/admin/roulette-codes`, {
         method: 'POST',
         headers: {
@@ -108,6 +120,7 @@ export default function AdminRouletteCode() {
           code: normalizedCode,
           reward: reward.trim(),
           description: description.trim(),
+          maxTotalUses: parsedMaxTotalUses,
         }),
       })
 
@@ -130,6 +143,7 @@ export default function AdminRouletteCode() {
       setCode('')
       setReward('')
       setDescription('')
+      setMaxTotalUses('0')
       window.alert(successMessage)
       await loadCodes()
     } catch {
@@ -179,6 +193,20 @@ export default function AdminRouletteCode() {
                 value={reward}
                 onChange={(event) => setReward(event.target.value)}
                 placeholder="Ex.: Giro extra / R$ 10"
+                disabled={creating}
+              />
+            </div>
+
+            <div className="roulette-code-field">
+              <label htmlFor="roulette-max-uses-input">Quantidade de usos</label>
+              <input
+                id="roulette-max-uses-input"
+                type="number"
+                min={0}
+                step={1}
+                value={maxTotalUses}
+                onChange={(event) => setMaxTotalUses(event.target.value)}
+                placeholder="Ex.: 100"
                 disabled={creating}
               />
             </div>
@@ -243,6 +271,9 @@ export default function AdminRouletteCode() {
                     <p style={{ margin: '6px 0 0', color: '#cbd5e1' }}>Descrição: {item.description || '-'}</p>
                     <p style={{ margin: '6px 0 0', color: '#bfdbfe' }}>
                       Utilizado: {item.isRedeemed ? 'Sim' : 'Não'} • Pessoas que usaram: {item.redeemedCount}
+                    </p>
+                    <p style={{ margin: '6px 0 0', color: '#93c5fd' }}>
+                      Limite de usos: {item.maxTotalUses}
                     </p>
                     <p style={{ margin: '6px 0 0', color: '#93c5fd' }}>
                       Criado em:{' '}
