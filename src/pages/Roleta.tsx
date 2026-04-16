@@ -39,9 +39,18 @@ export default function Roleta() {
     const loadRoletaData = async () => {
       try {
         const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
-        if (!rawUser) return
-        const parsed = JSON.parse(rawUser) as { id?: number }
+        const parsed = rawUser ? (JSON.parse(rawUser) as { id?: number }) : null
         const userId = Number(parsed?.id)
+
+        if (codeFromUrl && (!userId || Number.isNaN(userId))) {
+          if (!ignore) {
+            setRedeemSuccessMessage(null)
+            setRedeemErrorMessage('Faça login para resgatar o código da roleta.')
+            setRedeemErrorModalOpen(true)
+          }
+          return
+        }
+
         if (!userId || Number.isNaN(userId)) return
 
         if (codeFromUrl && redeemedCodeRef.current !== codeFromUrl) {
