@@ -48,6 +48,7 @@ import AdminMonthlySalary from './pages/AdminMonthlySalary'
 import AdminSiteBranding from './pages/AdminSiteBranding'
 import AdminCommunityLinks from './pages/AdminCommunityLinks'
 import AdminMiniTasks from './pages/AdminMiniTasks'
+import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -295,6 +296,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminMiniTasks />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/roulette-probabilities"
+          element={(
+            <RequireMaxAdmin>
+              <AdminRouletteProbabilities />
             </RequireMaxAdmin>
           )}
         />

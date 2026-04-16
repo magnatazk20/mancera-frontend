@@ -114,6 +114,7 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Promoções</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-probabilities'); setMenuOpen(false) }}>Probabilidades da Roleta</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-products'); setMenuOpen(false) }}>Produtos (Cycle)</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/mini-tasks'); setMenuOpen(false) }}>Mini Tasks</button>
 
