@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
-import './Admin.css'
+import './AdminRouletteProbabilities.css'
 
 const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || 'http://localhost:3333'
 
@@ -130,71 +130,52 @@ export default function AdminRouletteProbabilities() {
   }
 
   return (
-    <main className="admin-page">
+    <main className="admin-roulette-prob-page">
       <AdminSidebar />
-      <section className="admin-main">
-        <div className="admin-card">
-          <h1>Probabilidades da Roleta</h1>
-          <p style={{ color: '#cbd5e1', marginTop: 8 }}>
+      <section className="admin-roulette-prob-content">
+        <div className="admin-roulette-prob-card">
+          <h1 className="admin-roulette-prob-title">Probabilidades da Roleta</h1>
+          <p className="admin-roulette-prob-subtitle">
             Configure a porcentagem de saída para cada prêmio da roleta. A soma deve ser 100%.
           </p>
 
-          {loading ? <p style={{ color: '#93c5fd' }}>Carregando configuração...</p> : null}
+          {loading ? <p className="admin-roulette-prob-feedback">Carregando configuração...</p> : null}
 
-          <div style={{ display: 'grid', gap: 10, marginTop: 16 }}>
+          <div className="admin-roulette-prob-grid">
             {items.map((item, index) => (
-              <div
-                key={item.label}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 140px',
-                  gap: 10,
-                  alignItems: 'center',
-                }}
-              >
-                <label style={{ color: '#e2e8f0', fontWeight: 600 }}>{item.label}</label>
-                <input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  value={item.percent}
-                  onChange={(e) => handleChange(index, e.target.value)}
-                  style={{
-                    border: '1px solid #334155',
-                    background: '#0f172a',
-                    color: '#e2e8f0',
-                    borderRadius: 8,
-                    padding: '8px 10px',
-                  }}
-                />
+              <div key={item.label} className="admin-roulette-prob-row">
+                <label className="admin-roulette-prob-label">{item.label}</label>
+                <div className="admin-roulette-prob-input-wrap">
+                  <input
+                    className="admin-roulette-prob-input"
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={item.percent}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                  />
+                  <span className="admin-roulette-prob-percent">%</span>
+                </div>
               </div>
             ))}
           </div>
 
-          <p style={{ marginTop: 14, color: Math.abs(totalPercent - 100) < 0.0001 ? '#86efac' : '#fca5a5' }}>
+          <p className={`admin-roulette-prob-total ${Math.abs(totalPercent - 100) < 0.0001 ? 'ok' : 'bad'}`}>
             Soma atual: <strong>{totalPercent.toFixed(2)}%</strong>
           </p>
 
-          <div style={{ marginTop: 14 }}>
+          <div className="admin-roulette-prob-actions">
             <button
               type="button"
               onClick={handleSave}
               disabled={saving}
-              style={{
-                border: '1px solid #3b82f6',
-                background: saving ? '#1e3a8a' : '#1d4ed8',
-                color: '#dbeafe',
-                borderRadius: 8,
-                padding: '10px 14px',
-                fontWeight: 700,
-                cursor: saving ? 'not-allowed' : 'pointer',
-              }}
+              className="admin-roulette-prob-save-btn"
             >
               {saving ? 'Salvando...' : 'Salvar Probabilidades'}
             </button>
           </div>
 
-          {message ? <p style={{ marginTop: 12, color: '#93c5fd' }}>{message}</p> : null}
+          {message ? <p className="admin-roulette-prob-feedback">{message}</p> : null}
         </div>
       </section>
     </main>
