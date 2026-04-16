@@ -223,6 +223,7 @@ export default function Admin() {
             <div className="admin-shortcuts">
               <button type="button" onClick={() => navigate('/dashboard')}>Visão do App</button>
               <button type="button" onClick={() => navigate('/team-report')}>Relatório de Equipe</button>
+              <button type="button" onClick={() => navigate('/adf/mini-tasks')}>Mini Tasks</button>
               <button type="button" onClick={() => navigate('/adf/withdraw-config')}>Configuração de Saque</button>
               <button type="button" onClick={() => navigate('/withdraw-password')}>Segurança de Saque</button>
             </div>
