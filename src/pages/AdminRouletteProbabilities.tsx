@@ -25,6 +25,7 @@ export default function AdminRouletteProbabilities() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
 
   const totalPercent = useMemo(
     () => items.reduce((acc, item) => acc + (Number(String(item.percent).replace(',', '.')) || 0), 0),
@@ -76,24 +77,20 @@ export default function AdminRouletteProbabilities() {
 
     const parsed = items.map((item) => ({
       label: item.label,
-      percent: Number(String(item.percent).replace(',', '.')),
+      percent: Number(String(item.percent).replace(',', '.') || '0'),
     }))
 
     const hasInvalid = parsed.some((p) => !Number.isFinite(p.percent) || p.percent < 0)
     if (hasInvalid) {
-      window.alert('Todos os percentuais devem ser números válidos maiores ou iguais a 0.')
-      return
-    }
-
-    const sum = parsed.reduce((acc, p) => acc + p.percent, 0)
-    if (Math.abs(sum - 100) > 0.0001) {
-      window.alert(`A soma dos percentuais deve ser 100%. Soma atual: ${sum.toFixed(2)}%`)
+      setIsError(true)
+      setMessage('Todos os percentuais devem ser números válidos maiores ou iguais a 0.')
       return
     }
 
     try {
       setSaving(true)
       setMessage('')
+      setIsError(false)
       const res = await fetch(`${API_URL}/api/admin/roulette-probabilities`, {
         method: 'PUT',
         headers: {
@@ -104,26 +101,25 @@ export default function AdminRouletteProbabilities() {
       })
 
       const data = await res.json().catch(() => ({} as Record<string, unknown>))
-      if (!res.ok) {
+      if (!res.ok || !(data as { ok?: boolean })?.ok) {
         const err =
-          typeof data?.error === 'string' && data.error.trim()
-            ? data.error.trim()
-            : 'Não foi possível salvar as probabilidades.'
+          typeof (data as { error?: string })?.error === 'string' && (data as { error?: string }).error!.trim()
+            ? (data as { error?: string }).error!.trim()
+            : `Erro HTTP ${res.status}: não foi possível salvar as probabilidades.`
+        setIsError(true)
         setMessage(err)
-        window.alert(err)
         return
       }
 
       const success =
-        typeof data?.message === 'string' && data.message.trim()
-          ? data.message.trim()
+        typeof (data as { message?: string })?.message === 'string' && (data as { message?: string }).message!.trim()
+          ? (data as { message?: string }).message!.trim()
           : 'Probabilidades salvas com sucesso.'
+      setIsError(false)
       setMessage(success)
-      window.alert(success)
     } catch {
-      const err = 'Erro de conexão ao salvar probabilidades.'
-      setMessage(err)
-      window.alert(err)
+      setIsError(true)
+      setMessage('Erro de conexão ao salvar probabilidades.')
     } finally {
       setSaving(false)
     }
@@ -136,7 +132,7 @@ export default function AdminRouletteProbabilities() {
         <div className="admin-roulette-prob-card">
           <h1 className="admin-roulette-prob-title">Probabilidades da Roleta</h1>
           <p className="admin-roulette-prob-subtitle">
-            Configure a porcentagem de saída para cada prêmio da roleta. A soma deve ser 100%.
+            Configure a porcentagem de saída para cada prêmio da roleta. Itens com 0% nunca serão sorteados.
           </p>
 
           {loading ? <p className="admin-roulette-prob-feedback">Carregando configuração...</p> : null}
@@ -160,7 +156,7 @@ export default function AdminRouletteProbabilities() {
             ))}
           </div>
 
-          <p className={`admin-roulette-prob-total ${Math.abs(totalPercent - 100) < 0.0001 ? 'ok' : 'bad'}`}>
+          <p className="admin-roulette-prob-total">
             Soma atual: <strong>{totalPercent.toFixed(2)}%</strong>
           </p>
 
@@ -175,7 +171,11 @@ export default function AdminRouletteProbabilities() {
             </button>
           </div>
 
-          {message ? <p className="admin-roulette-prob-feedback">{message}</p> : null}
+          {message ? (
+            <p className={`admin-roulette-prob-feedback${isError ? ' admin-roulette-prob-feedback--error' : ''}`}>
+              {message}
+            </p>
+          ) : null}
         </div>
       </section>
     </main>

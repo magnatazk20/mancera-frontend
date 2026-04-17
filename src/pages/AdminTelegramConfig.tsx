@@ -10,6 +10,7 @@ export default function AdminTelegramConfig() {
   const [saving, setSaving] = useState(false)
   const [botToken, setBotToken] = useState('')
   const [groupId, setGroupId] = useState('')
+  const [logsGroupId, setLogsGroupId] = useState('')
   const [welcomeMessage, setWelcomeMessage] = useState('')
   const [privateChatOnlyMessage, setPrivateChatOnlyMessage] = useState('')
   const [privateLinkSuccessMessage, setPrivateLinkSuccessMessage] = useState('')
@@ -46,6 +47,7 @@ export default function AdminTelegramConfig() {
 
       setBotToken(String(data?.config?.botToken ?? ''))
       setGroupId(String(data?.config?.groupId ?? ''))
+      setLogsGroupId(String(data?.config?.logsGroupId ?? ''))
       setWelcomeMessage(String(data?.config?.welcomeMessage ?? ''))
       setPrivateChatOnlyMessage(
         String(data?.config?.privateChatOnlyMessage ?? 'Conexão permitida somente no chat privado do bot.')
@@ -90,6 +92,7 @@ export default function AdminTelegramConfig() {
 
     const normalizedBotToken = botToken.trim()
     const normalizedGroupId = groupId.trim()
+    const normalizedLogsGroupId = logsGroupId.trim()
     const normalizedWelcomeMessage = welcomeMessage.trim()
     const normalizedPrivateChatOnlyMessage =
       privateChatOnlyMessage.trim() || 'Conexão permitida somente no chat privado do bot.'
@@ -126,6 +129,7 @@ export default function AdminTelegramConfig() {
         body: JSON.stringify({
           botToken: normalizedBotToken,
           groupId: normalizedGroupId,
+          logsGroupId: normalizedLogsGroupId,
           welcomeMessage: normalizedWelcomeMessage,
           privateChatOnlyMessage: normalizedPrivateChatOnlyMessage,
           privateLinkSuccessMessage: normalizedPrivateLinkSuccessMessage,
@@ -184,7 +188,7 @@ export default function AdminTelegramConfig() {
               </div>
 
               <div className="admin-withdraw-filter-field">
-                <label htmlFor="telegram-group-id">Group ID</label>
+                <label htmlFor="telegram-group-id">Group ID (grupo principal)</label>
                 <input
                   id="telegram-group-id"
                   type="text"
@@ -192,6 +196,18 @@ export default function AdminTelegramConfig() {
                   placeholder="Ex.: -1001234567890"
                   value={groupId}
                   onChange={(event) => setGroupId(event.target.value)}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="telegram-logs-group-id">Group ID de Logs</label>
+                <input
+                  id="telegram-logs-group-id"
+                  type="text"
+                  className="admin-withdraw-filter-input"
+                  placeholder="Ex.: -1009876543210 (grupo onde serão enviados os logs)"
+                  value={logsGroupId}
+                  onChange={(event) => setLogsGroupId(event.target.value)}
                 />
               </div>
 

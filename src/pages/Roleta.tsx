@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import './Roleta.css'
 
-const PRIZES = ['1 BRL', '16 BRL', '35 BRL', '73 BRL', '183 BRL', '16600 BRL', '50 BRL', '90 BRL']
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+
+const DEFAULT_PRIZES = ['1 BRL', '16 BRL', '35 BRL', '50 BRL', '73 BRL', '90 BRL', '183 BRL', '16600 BRL']
+
 const WINNERS_SEED = [
   { phone: '****15658', amount: '35 BRL' },
   { phone: '****38633', amount: '73 BRL' },
@@ -14,9 +15,16 @@ const WINNERS_SEED = [
   { phone: '****60030', amount: '16 BRL' },
 ]
 
+type RedeemModal =
+  | { type: 'success'; code: string; spinsAdded: number; availableSpins: number }
+  | { type: 'error'; message: string }
+  | null
+
 export default function Roleta() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const [prizes, setPrizes] = useState<string[]>(DEFAULT_PRIZES)
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [winner, setWinner] = useState<string | null>(null)
@@ -24,154 +32,184 @@ export default function Roleta() {
   const [myWins, setMyWins] = useState<Array<{ amount: string; at: string }>>([])
   const [liveWinners, setLiveWinners] = useState(WINNERS_SEED)
   const [remainingSpins, setRemainingSpins] = useState(0)
-  const [redeemSuccessMessage, setRedeemSuccessMessage] = useState<string | null>(null)
-  const [redeemErrorMessage, setRedeemErrorMessage] = useState<string | null>(null)
-  const [redeemErrorModalOpen, setRedeemErrorModalOpen] = useState(false)
+  const [redeemModal, setRedeemModal] = useState<RedeemModal>(null)
   const [celebration, setCelebration] = useState<{ amount: string } | null>(null)
-  const redeemedCodeRef = useRef<string | null>(null)
 
-  const segmentAngle = 360 / PRIZES.length
+  // Guard: chave do último resgate tentado — evita duplo disparo se o codeFromUrl mudar por re-render
+  const redeemedCodeRef = useRef<string | null>(null)
+  // Ref para prizes usado no timer (evita prizes no dep array do effect de dados)
+  const prizesRef = useRef<string[]>(DEFAULT_PRIZES)
+
+  const segmentAngle = 360 / prizes.length
   const codeFromUrl = (searchParams.get('codigo') ?? '').trim().toUpperCase()
 
+  // ── Effect 1: carrega segmentos da roda (roda 1x só)
   useEffect(() => {
-    let ignore = false
-    const clearCodigoFromUrl = () => {
-      const nextParams = new URLSearchParams(searchParams.toString())
-      nextParams.delete('codigo')
-      setSearchParams(nextParams, { replace: true })
+    fetch(`${API_URL}/api/roleta/segments`)
+      .then((r) => r.json())
+      .then((data: { ok?: boolean; segments?: string[] }) => {
+        if (data?.ok && Array.isArray(data.segments) && data.segments.length > 0) {
+          setPrizes(data.segments)
+          prizesRef.current = data.segments
+        }
+      })
+      .catch(() => {})
+  }, [])
+
+  // ── Effect 2: resgate do código da URL
+  useEffect(() => {
+    if (!codeFromUrl) {
+      redeemedCodeRef.current = null
+      return
     }
 
-    const loadRoletaData = async () => {
-      try {
-        const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
-        const parsed = rawUser ? (JSON.parse(rawUser) as { id?: number }) : null
-        const userId = Number(parsed?.id)
+    // Lê token e user do storage
+    const rawToken = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+    const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
 
-        if (!codeFromUrl) {
-          redeemedCodeRef.current = null
-        }
+    if (!rawToken || !rawUser) {
+      // Não está logado — salva a URL atual e redireciona para login
+      const returnTo = `/roleta?codigo=${encodeURIComponent(codeFromUrl)}`
+      sessionStorage.setItem('loginReturnTo', returnTo)
+      navigate('/', { replace: true })
+      return
+    }
 
-        if (codeFromUrl && (!userId || Number.isNaN(userId))) {
-          if (!ignore) {
-            setRedeemSuccessMessage(null)
-            setRedeemErrorMessage('Faça login para resgatar o código da roleta.')
-            setRedeemErrorModalOpen(true)
+    let userId = 0
+    try {
+      const parsed = JSON.parse(rawUser) as { id?: number | string }
+      userId = Number(parsed?.id ?? 0)
+    } catch {
+      const returnTo = `/roleta?codigo=${encodeURIComponent(codeFromUrl)}`
+      sessionStorage.setItem('loginReturnTo', returnTo)
+      navigate('/', { replace: true })
+      return
+    }
+
+    if (!userId || Number.isNaN(userId)) {
+      const returnTo = `/roleta?codigo=${encodeURIComponent(codeFromUrl)}`
+      sessionStorage.setItem('loginReturnTo', returnTo)
+      navigate('/', { replace: true })
+      return
+    }
+
+    // Evita disparar duas vezes para o mesmo código+usuário
+    const attemptKey = `${userId}:${codeFromUrl}`
+    if (redeemedCodeRef.current === attemptKey) return
+    redeemedCodeRef.current = attemptKey
+
+    fetch(`${API_URL}/api/roleta/redeem-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, code: codeFromUrl }),
+    })
+      .then((res) =>
+        res.json().then((data: { ok?: boolean; error?: string; spinsAdded?: number; availableSpins?: number }) => ({
+          ok: res.ok,
+          data,
+        }))
+      )
+      .then(({ ok, data }) => {
+        if (ok && data?.ok) {
+          const spinsAdded = Number(data.spinsAdded ?? 1)
+          const availableSpins = Number(data.availableSpins ?? 0)
+          setRemainingSpins(availableSpins)
+          setRedeemModal({ type: 'success', code: codeFromUrl, spinsAdded, availableSpins })
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev.toString())
+            next.delete('codigo')
+            return next
+          }, { replace: true })
+        } else {
+          const raw = String(data?.error ?? '').trim()
+          const lower = raw.toLowerCase()
+          let msg: string
+          if (lower.includes('já resgatou') || lower.includes('já foi resgatado')) {
+            msg = 'Você já resgatou este código anteriormente.'
+          } else if (lower.includes('limite máximo')) {
+            msg = 'Este código já atingiu o limite máximo de usos.'
+          } else if (lower.includes('inativo')) {
+            msg = 'Este código está inativo.'
+          } else if (lower.includes('não encontrado') || lower.includes('invalido') || lower.includes('inválido')) {
+            msg = 'Código inválido ou não encontrado.'
+          } else {
+            msg = raw || 'Não foi possível resgatar o código da roleta.'
           }
-          return
+          setRedeemModal({ type: 'error', message: msg })
         }
+      })
+      .catch(() => {
+        setRedeemModal({ type: 'error', message: 'Erro de conexão ao resgatar o código.' })
+      })
+  }, [codeFromUrl, setSearchParams])
 
-        if (!userId || Number.isNaN(userId)) return
+  // ── Effect 3: carrega giros/vitórias e timer de winners (não depende de prizes)
+  useEffect(() => {
+    const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
+    const parsed = rawUser ? (JSON.parse(rawUser) as { id?: number }) : null
+    const userId = Number(parsed?.id ?? 0)
 
-        const redeemAttemptKey = codeFromUrl && userId && !Number.isNaN(userId)
-          ? `${userId}:${codeFromUrl}`
-          : null
+    let cancelled = false
 
-        if (redeemAttemptKey && redeemedCodeRef.current !== redeemAttemptKey) {
-          redeemedCodeRef.current = redeemAttemptKey
-          const redeemResponse = await fetch(`${API_URL}/api/roleta/redeem-code`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, code: codeFromUrl }),
-          })
+    if (userId && !Number.isNaN(userId)) {
+      const loadData = async () => {
+        try {
+          const [winsRes, spinsRes] = await Promise.all([
+            fetch(`${API_URL}/api/roleta/spins/${userId}?limit=20`),
+            fetch(`${API_URL}/api/roleta/spins-available/${userId}`),
+          ])
 
-          const redeemData = await redeemResponse.json().catch(() => ({} as { ok?: boolean; message?: string; error?: string; availableSpins?: number }))
-          if (!ignore) {
-            if (redeemResponse.ok && redeemData?.ok) {
-              setRedeemErrorMessage(null)
-              setRedeemErrorModalOpen(false)
-              setRedeemSuccessMessage(`🎉 Parabéns! Você resgatou o código ${codeFromUrl}.`)
-              if (typeof redeemData.availableSpins === 'number') {
-                setRemainingSpins(Number(redeemData.availableSpins))
-              }
-              clearCodigoFromUrl()
-            } else {
-              redeemedCodeRef.current = null
-              setRedeemSuccessMessage(null)
-              const backendError = String(redeemData?.error ?? '').trim()
-              const normalizedError = backendError.toLowerCase()
-              if (normalizedError.includes('já foi resgatado')) {
-                setRedeemErrorMessage('Este código já foi resgatado por você.')
-              } else if (
-                normalizedError.includes('não encontrado') ||
-                normalizedError.includes('invalido') ||
-                normalizedError.includes('inválido')
-              ) {
-                setRedeemErrorMessage('Código inválido.')
-              } else {
-                setRedeemErrorMessage(backendError || 'Não foi possível resgatar o código da roleta.')
-              }
-              setRedeemErrorModalOpen(true)
-              clearCodigoFromUrl()
-            }
-          }
-        }
-
-        const [winsRes, spinsRes] = await Promise.all([
-          fetch(`${API_URL}/api/roleta/spins/${userId}?limit=20`),
-          fetch(`${API_URL}/api/roleta/spins-available/${userId}`),
-        ])
-
-        if (winsRes.ok) {
-          const winsData = await winsRes.json() as {
-            ok?: boolean
-            spins?: Array<{ prizeLabel?: string; createdAt?: string }>
-          }
-
-          if (!ignore && winsData?.ok && Array.isArray(winsData.spins)) {
-            setMyWins(
-              winsData.spins.map((s) => ({
+          if (!cancelled && winsRes.ok) {
+            const d = await winsRes.json() as { ok?: boolean; spins?: Array<{ prizeLabel?: string; createdAt?: string }> }
+            if (d?.ok && Array.isArray(d.spins)) {
+              setMyWins(d.spins.map((s) => ({
                 amount: String(s.prizeLabel ?? ''),
                 at: s.createdAt ? new Date(s.createdAt).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'),
-              }))
-            )
-          }
-        }
-
-        if (spinsRes.ok) {
-          const spinsData = await spinsRes.json() as {
-            ok?: boolean
-            availableSpins?: number
+              })))
+            }
           }
 
-          if (!ignore && spinsData?.ok) {
-            setRemainingSpins(Number(spinsData.availableSpins ?? 0))
+          if (!cancelled && spinsRes.ok) {
+            const d = await spinsRes.json() as { ok?: boolean; availableSpins?: number }
+            if (d?.ok) setRemainingSpins(Number(d.availableSpins ?? 0))
           }
-        }
-      } catch {
-        // noop
+        } catch { /* noop */ }
       }
+      loadData()
     }
 
+    // Timer de live winners usa prizesRef (não coloca prizes no dep array)
     const timer = window.setInterval(() => {
+      const list = prizesRef.current
       setLiveWinners((prev) => {
         const randomPhone = `****${Math.floor(10000 + Math.random() * 89999)}`
-        const randomAmount = PRIZES[Math.floor(Math.random() * PRIZES.length)]
-        const next = [{ phone: randomPhone, amount: randomAmount }, ...prev]
-        return next.slice(0, 18)
+        const randomAmount = list[Math.floor(Math.random() * list.length)]
+        return [{ phone: randomPhone, amount: randomAmount }, ...prev].slice(0, 18)
       })
     }, 1800)
 
-    loadRoletaData()
-
     return () => {
-      ignore = true
+      cancelled = true
       window.clearInterval(timer)
     }
-  }, [codeFromUrl, setSearchParams])
+  }, []) // roda 1x só
 
   const wheelStyle = useMemo(() => {
-    const colors = ['#0ea5e9', '#0284c7', '#06b6d4', '#0891b2', '#2563eb', '#1d4ed8', '#0ea5e9', '#0284c7']
-    const stops = PRIZES.map((_, i) => {
+    const colors = [
+      '#0ea5e9', '#0284c7', '#06b6d4', '#0891b2',
+      '#2563eb', '#1d4ed8', '#7c3aed', '#0369a1',
+      '#0ea5e9', '#0284c7', '#06b6d4', '#0891b2',
+    ]
+    const stops = prizes.map((_, i) => {
       const start = i * segmentAngle
       const end = start + segmentAngle
       return `${colors[i % colors.length]} ${start}deg ${end}deg`
     }).join(', ')
-
     return {
       background: `conic-gradient(${stops})`,
       transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
     }
-  }, [rotation, segmentAngle])
+  }, [rotation, segmentAngle, prizes])
 
   const spin = async () => {
     if (isSpinning || remainingSpins <= 0) return
@@ -180,17 +218,11 @@ export default function Roleta() {
 
     try {
       const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
-      if (!rawUser) {
-        setIsSpinning(false)
-        return
-      }
+      if (!rawUser) { setIsSpinning(false); return }
 
       const parsed = JSON.parse(rawUser) as { id?: number }
       const userId = Number(parsed?.id)
-      if (!userId || Number.isNaN(userId)) {
-        setIsSpinning(false)
-        return
-      }
+      if (!userId || Number.isNaN(userId)) { setIsSpinning(false); return }
 
       const response = await fetch(`${API_URL}/api/roleta/spin`, {
         method: 'POST',
@@ -200,28 +232,35 @@ export default function Roleta() {
 
       const data = await response.json() as {
         ok?: boolean
-        spin?: { prizeLabel?: string; prizeIndex?: number; createdAt?: string }
+        spin?: { prizeLabel?: string; prizeIndex?: number; centerAngle?: number; segmentCount?: number; createdAt?: string }
         availableSpinsAfter?: number
       }
 
-      if (!response.ok || !data?.ok || !data.spin) {
-        setIsSpinning(false)
-        return
-      }
+      if (!response.ok || !data?.ok || !data.spin) { setIsSpinning(false); return }
 
-      const selectedIndex = 0
-      const center = selectedIndex * segmentAngle + segmentAngle / 2
-      const pointerAngle = 270
-      const finalRotation = rotation + 2160 + (pointerAngle - center - (rotation % 360))
+      const prizeLabel = String(data.spin.prizeLabel ?? prizes[0])
+      const prizeIndex = Number(data.spin.prizeIndex ?? 0)
+
+      // O conic-gradient começa no topo (0°) e vai no sentido horário.
+      // Quando a roda rotaciona +R graus (CSS rotate), o ponto que fica sob o
+      // ponteiro (topo) é aquele que estava em (360 - R % 360)° no gradiente.
+      // Para o centro do segmento vencedor (centerAngle) ficar no topo:
+      //   R % 360 = 360 - centerAngle
+      const centerAngle = prizeIndex * segmentAngle + segmentAngle / 2
+      const targetMod = (360 - centerAngle + 360) % 360
+      const currentMod = rotation % 360
+      let delta = targetMod - currentMod
+      if (delta <= 0) delta += 360
+      const finalRotation = rotation + delta + 1800
+
       setRotation(finalRotation)
 
       setTimeout(() => {
-        const result = '1 BRL'
-        setWinner(result)
-        setCelebration({ amount: result })
+        setWinner(prizeLabel)
+        setCelebration({ amount: prizeLabel })
         window.setTimeout(() => setCelebration(null), 3200)
         setMyWins((prev) => [
-          { amount: result, at: data.spin?.createdAt ? new Date(data.spin.createdAt).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR') },
+          { amount: prizeLabel, at: data.spin?.createdAt ? new Date(data.spin.createdAt).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR') },
           ...prev,
         ])
         if (typeof data.availableSpinsAfter === 'number') {
@@ -236,19 +275,70 @@ export default function Roleta() {
     }
   }
 
+  const closeRedeemModal = () => {
+    setRedeemModal(null)
+    redeemedCodeRef.current = null
+    if (searchParams.get('codigo')) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev.toString())
+        next.delete('codigo')
+        return next
+      }, { replace: true })
+    }
+  }
+
   return (
     <main className="roleta-pro">
-      {redeemErrorModalOpen && redeemErrorMessage ? (
-        <div className="redeem-error-modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby="redeem-error-title">
-          <div className="redeem-error-modal">
-            <h2 id="redeem-error-title">Erro ao resgatar código</h2>
-            <p>{redeemErrorMessage}</p>
-            <button type="button" onClick={() => setRedeemErrorModalOpen(false)}>
+
+      {/* ── Modal de sucesso no resgate ── */}
+      {redeemModal?.type === 'success' ? (
+        <div
+          className="redeem-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="redeem-success-title"
+          onClick={closeRedeemModal}
+        >
+          <div className="redeem-modal redeem-modal--success" onClick={(e) => e.stopPropagation()}>
+            <div className="redeem-modal-icon">🎉</div>
+            <h2 id="redeem-success-title">Código Resgatado!</h2>
+            <p className="redeem-modal-code">
+              <span>Código:</span> <strong>{redeemModal.code}</strong>
+            </p>
+            <p className="redeem-modal-reward">
+              Você ganhou <strong>{redeemModal.spinsAdded} giro{redeemModal.spinsAdded > 1 ? 's' : ''}</strong> na roleta!
+            </p>
+            <p className="redeem-modal-spins">
+              Giros disponíveis: <strong>{redeemModal.availableSpins}</strong>
+            </p>
+            <button type="button" className="redeem-modal-btn redeem-modal-btn--success" onClick={closeRedeemModal}>
+              Jogar Agora!
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Modal de erro no resgate ── */}
+      {redeemModal?.type === 'error' ? (
+        <div
+          className="redeem-modal-overlay"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="redeem-error-title"
+          onClick={closeRedeemModal}
+        >
+          <div className="redeem-modal redeem-modal--error" onClick={(e) => e.stopPropagation()}>
+            <div className="redeem-modal-icon">❌</div>
+            <h2 id="redeem-error-title">Erro ao Resgatar</h2>
+            <p className="redeem-modal-message">{redeemModal.message}</p>
+            <button type="button" className="redeem-modal-btn redeem-modal-btn--error" onClick={closeRedeemModal}>
               Fechar
             </button>
           </div>
         </div>
       ) : null}
+
+      {/* ── Modal de celebração (prêmio ganho) ── */}
       {celebration ? (
         <div className="roleta-celebration" role="status" aria-live="polite">
           <div className="roleta-celebration-card">
@@ -258,11 +348,10 @@ export default function Roleta() {
           </div>
         </div>
       ) : null}
+
       <div className="roleta-wrap">
         <header className="roleta-head">
-          <button className="roleta-back-btn" onClick={() => navigate('/dashboard')} type="button">
-            ←
-          </button>
+          <button className="roleta-back-btn" onClick={() => navigate('/dashboard')} type="button">←</button>
           <h1>Roda da Sorte</h1>
           <div className="roleta-head-spacer" />
         </header>
@@ -271,15 +360,16 @@ export default function Roleta() {
           <div className="wheel-pointer" />
           <div className="wheel-ring" />
           <div className="wheel-disc" style={wheelStyle}>
-            {PRIZES.map((text, i) => {
+            {prizes.map((text, i) => {
               const angle = i * segmentAngle + segmentAngle / 2
+              const rad = (angle * Math.PI) / 180
               return (
                 <div
                   key={`${text}-${i}`}
                   className="wheel-label"
                   style={{
-                    left: `${50 + 34 * Math.sin((angle * Math.PI) / 180)}%`,
-                    top: `${50 - 34 * Math.cos((angle * Math.PI) / 180)}%`,
+                    left: `${50 + 34 * Math.sin(rad)}%`,
+                    top: `${50 - 34 * Math.cos(rad)}%`,
                     transform: `translate(-50%, -50%) rotate(${angle}deg)`,
                   }}
                 >
@@ -287,7 +377,7 @@ export default function Roleta() {
                 </div>
               )
             })}
-            {PRIZES.map((_, i) => (
+            {prizes.map((_, i) => (
               <span
                 key={`line-${i}`}
                 className="wheel-line"
@@ -296,9 +386,7 @@ export default function Roleta() {
             ))}
           </div>
 
-          <button className="wheel-center-btn" disabled>
-            IR
-          </button>
+          <button className="wheel-center-btn" disabled>IR</button>
 
           <div className="spins-badge">
             Giros Restantes: <strong>{remainingSpins}</strong>
@@ -306,8 +394,6 @@ export default function Roleta() {
         </section>
 
         <section className="spin-cta">
-          {redeemSuccessMessage ? <p className="winner-text">{redeemSuccessMessage}</p> : null}
-          {redeemErrorMessage && !redeemErrorModalOpen ? <p className="redeem-error-text">Erro ao resgatar código: {redeemErrorMessage}</p> : null}
           <button
             type="button"
             onClick={spin}

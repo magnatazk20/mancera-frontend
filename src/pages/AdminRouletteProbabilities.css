@@ -119,6 +119,15 @@
 .admin-roulette-prob-feedback {
   margin-top: 12px;
   color: #93c5fd;
+  font-weight: 600;
+}
+
+.admin-roulette-prob-feedback--error {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
 }
 
 @media (max-width: 1100px) {

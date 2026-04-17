@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import ceoBanner from '../assets/ceo.jpg'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -14,45 +13,12 @@ interface AuthResponse {
 
 export default function Login() {
   const navigate = useNavigate()
-  const [activeSlide, setActiveSlide] = useState(0)
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  const bannerSlides = [
-    {
-      id: 'premium',
-      title: 'PGLM',
-      subtitle: 'Acesso seguro, experiência premium.',
-      kicker: 'PLATAFORMA OFICIAL',
-      image: '',
-    },
-    {
-      id: 'ceo',
-      title: 'Liderança PGLM',
-      subtitle: 'Conheça a visão por trás da plataforma.',
-      kicker: 'DESTAQUE',
-      image: ceoBanner,
-    },
-    {
-      id: 'community',
-      title: 'Comunidade Forte',
-      subtitle: 'Conecte-se e cresça com a PGLM.',
-      kicker: 'EVOLUÇÃO',
-      image: '',
-    },
-  ]
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % bannerSlides.length)
-    }, 3800)
-
-    return () => window.clearInterval(interval)
-  }, [bannerSlides.length])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -81,8 +47,10 @@ export default function Login() {
 
       setMessage(data.message ?? 'Login realizado com sucesso.')
 
-      // Redirecionar para o dashboard após 800ms
-      setTimeout(() => navigate('/dashboard'), 800)
+      // Redireciona para o destino salvo (ex: /roleta?codigo=...) ou dashboard
+      const returnTo = sessionStorage.getItem('loginReturnTo') ?? '/dashboard'
+      sessionStorage.removeItem('loginReturnTo')
+      setTimeout(() => navigate(returnTo), 800)
     } catch {
       setError('Não foi possível conectar ao servidor.')
     } finally {
@@ -92,47 +60,14 @@ export default function Login() {
 
   return (
     <main className="auth-page">
-      <section className="auth-shell">
-        <aside className="hero-panel login-banner-panel" aria-hidden="true">
-          <div className="pglm-banner-slider-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-            {bannerSlides.map((slide) => (
-              <div key={slide.id} className="pglm-banner-slide">
-                {slide.image ? (
-                  <img src={slide.image} alt="" className="pglm-banner-slide-image" />
-                ) : null}
-                <div className="pglm-banner-bg-glow" />
-                <div className="pglm-banner-content">
-                  <p className="pglm-banner-kicker">{slide.kicker}</p>
-                  <h2 className="pglm-banner-title">{slide.title}</h2>
-                  <p className="pglm-banner-subtitle">{slide.subtitle}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {activeSlide === 0 ? (
-            <>
-              <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
-                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-              </svg>
-
-              <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
-                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-              </svg>
-            </>
-          ) : null}
-
-          <div className="pglm-banner-dots" aria-hidden="true">
-            {bannerSlides.map((slide, index) => (
-              <span
-                key={slide.id}
-                className={`pglm-banner-dot${index === activeSlide ? ' active' : ''}`}
-              />
-            ))}
-          </div>
-        </aside>
-
+      <section className="auth-shell auth-shell-no-banner">
         <section className="form-panel" aria-labelledby="login-title">
+          <div className="login-invite-notice">
+            👉 Convide amigos e ganhe recompensas<br />
+            👉 Convide 1 amigo e ganhe <span className="login-invite-highlight">R$ 5,00</span> automaticamente<br />
+            Assim que as tarefas forem concluídas, o bônus é liberado.
+          </div>
+
           <h1 id="login-title">Login</h1>
           <p className="subtitle">Use sua conta para acessar o painel.</p>
 
