@@ -79,14 +79,6 @@ export default function Withdraw() {
   const [userBalance, setUserBalance] = useState<number | null>(null)
   const [hasWithdrawPassword, setHasWithdrawPassword] = useState<boolean | null>(null)
 
-  // ── Segurança: sanitiza strings removendo tags HTML e caracteres de controle ──
-  const sanitizeText = (value: string) =>
-    String(value ?? '')
-      .replace(/<[^>]*>/g, '')           // strip HTML/XML tags
-      .replace(/[<>"'`]/g, '')           // remove caracteres perigosos
-      .replace(/[\x00-\x1F\x7F]/g, '')   // remove controles ASCII
-      .trim()
-
   // ── Segurança: aceita apenas dígitos e vírgula/ponto para valor monetário ──
   const sanitizeAmount = (value: string) =>
     String(value ?? '').replace(/[^0-9.,]/g, '').slice(0, 12)

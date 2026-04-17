@@ -46,13 +46,6 @@ type ProfileMetricsResponse = {
   }
 }
 
-type MiningTasksResponse = {
-  ok?: boolean
-  tasks?: Array<{
-    earnedToday?: number
-  }>
-}
-
 type MiniTasksBadgeResponse = {
   ok?: boolean
   badges?: string[]
