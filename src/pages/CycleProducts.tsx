@@ -26,6 +26,8 @@ type CycleProduct = {
   requireCommissionLevel1Count: number
   requireCommissionLevel2Count: number
   requireCommissionLevel3Count: number
+  stockQuantity: number
+  expiresAt: string | null
 }
 
 const normalizePlanType = (value: unknown): PlanCategory => {
@@ -41,6 +43,7 @@ export default function CycleProducts() {
   const navigate = useNavigate()
   const [user, setUser] = useState<StoredUser | null>(null)
   const [cyclePlans, setCyclePlans] = useState<CycleProduct[]>([])
+  const [initialStock, setInitialStock] = useState<Record<number, number>>({})
   const [loading, setLoading] = useState(true)
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
@@ -93,9 +96,15 @@ export default function CycleProducts() {
           requireCommissionLevel1Count: Number(item.requireCommissionLevel1Count ?? 0),
           requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
           requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
+          stockQuantity: Number(item.stockQuantity ?? 0),
+          expiresAt: item.expiresAt == null ? null : String(item.expiresAt),
         }))
 
         setCyclePlans(mappedPlans)
+        // Guarda o estoque inicial para calcular progresso de vendas
+        const stockMap: Record<number, number> = {}
+        mappedPlans.forEach((p) => { stockMap[p.id] = p.stockQuantity })
+        setInitialStock(stockMap)
       } catch {
         setCyclePlans([])
       } finally {
@@ -116,6 +125,7 @@ export default function CycleProducts() {
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     })
 
   const closePurchaseModal = () => {
@@ -147,6 +157,15 @@ export default function CycleProducts() {
         alert(data?.error ?? 'Não foi possível adquirir este ciclo.')
         return
       }
+
+      // Decrementa o estoque localmente para feedback imediato
+      setCyclePlans((prev) =>
+        prev.map((p) =>
+          p.id === selectedPlan.id
+            ? { ...p, stockQuantity: Math.max(0, p.stockQuantity - 1) }
+            : p
+        )
+      )
 
       alert(data?.message ?? 'Ciclo adquirido com sucesso.')
       setSelectedPlan(null)
@@ -244,14 +263,18 @@ export default function CycleProducts() {
               <p style={{ color: '#6b7280' }}>Nenhum plano disponível nesta categoria.</p>
             ) : (
               <div style={{ display: 'grid', gap: 10 }}>
-                {filteredCyclePlans.map((plan, index) => {
-                  const compras = Math.max(1, Math.floor((index + 1) * 2))
-                  const estoque = Math.max(120, 1000 - index * 37)
-                  const progresso = Math.min(95, 25 + index * 10)
+                {filteredCyclePlans.map((plan) => {
+                  const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
+                  const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
+                  const vendidos = Math.max(0, estoqueInicial - estoque)
+                  const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
+                  const compras = vendidos
                   const shouldShowCommissionRules =
                     plan.requireCommissionLevel1Count > 0 ||
                     plan.requireCommissionLevel2Count > 0 ||
                     plan.requireCommissionLevel3Count > 0
+                  const parsedExpiresAt = plan.expiresAt ? new Date(plan.expiresAt) : null
+                  const hasValidExpiresAt = parsedExpiresAt != null && !Number.isNaN(parsedExpiresAt.getTime())
 
                   return (
                     <article
@@ -325,19 +348,20 @@ export default function CycleProducts() {
                           <button
                             type="button"
                             onClick={() => setSelectedPlan(plan)}
+                            disabled={estoque <= 0}
                             style={{
                               border: 'none',
                               borderRadius: 14,
-                              background: '#0b63ff',
+                              background: estoque <= 0 ? '#94a3b8' : '#0b63ff',
                               color: '#fff',
                               fontWeight: 800,
                               fontSize: 20,
                               padding: '10px 16px',
-                              cursor: 'pointer',
+                              cursor: estoque <= 0 ? 'not-allowed' : 'pointer',
                               whiteSpace: 'nowrap',
                             }}
                           >
-                            Investir
+                            {estoque <= 0 ? 'Esgotado' : 'Investir'}
                           </button>
                         </div>
 
@@ -356,6 +380,28 @@ export default function CycleProducts() {
                           >
                             Regras de compra • Nível 1: {plan.requireCommissionLevel1Count} • Nível 2:{' '}
                             {plan.requireCommissionLevel2Count} • Nível 3: {plan.requireCommissionLevel3Count}
+                          </div>
+                        ) : null}
+
+                        {(hasValidExpiresAt || plan.planType === 'vip_day') ? (
+                          <div
+                            style={{
+                              marginTop: 10,
+                              padding: '8px 10px',
+                              borderRadius: 8,
+                              background: '#fff7ed',
+                              border: '1px solid #fdba74',
+                              color: '#9a3412',
+                              fontSize: 14,
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            <strong>Expira em:</strong>{' '}
+                            <span style={{ fontWeight: 800, color: '#c2410c' }}>
+                              {hasValidExpiresAt && parsedExpiresAt
+                                ? formatDateTime(parsedExpiresAt)
+                                : 'Sem expiração'}
+                            </span>
                           </div>
                         ) : null}
 

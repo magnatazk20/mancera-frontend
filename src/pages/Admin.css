@@ -53,6 +53,29 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
+.admin-chip--online {
+  background: rgba(16, 185, 80, 0.15);
+  border-color: rgba(16, 185, 80, 0.4);
+  color: #34d470;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  animation: admin-pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes admin-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.7); }
+}
+
 .admin-kpis {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -85,6 +108,50 @@
   margin: 6px 0 0;
   font-size: 0.82rem;
   color: #95a7d2;
+}
+
+/* segunda linha de KPIs (depósitos e saques hoje/mês) */
+.admin-kpis--split {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+/* card destaque — cadastros hoje */
+.admin-kpi-card--highlight {
+  border-color: #2563eb;
+  background: linear-gradient(180deg, #1a2f5a, #111a31);
+}
+
+.admin-kpi-card--highlight strong {
+  color: #60a5fa;
+}
+
+/* cards de depósito */
+.admin-kpi-card--deposit {
+  border-color: #166534;
+  background: linear-gradient(180deg, #14281f, #111a31);
+}
+
+.admin-kpi-card--deposit strong {
+  color: #4ade80;
+}
+
+.admin-kpi-card--deposit p {
+  color: #86efac;
+}
+
+/* cards de saque */
+.admin-kpi-card--withdraw {
+  border-color: #7f1d1d;
+  background: linear-gradient(180deg, #2a1515, #111a31);
+}
+
+.admin-kpi-card--withdraw strong {
+  color: #f87171;
+}
+
+.admin-kpi-card--withdraw p {
+  color: #fca5a5;
 }
 
 .admin-grid {

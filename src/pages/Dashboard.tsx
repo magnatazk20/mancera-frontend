@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
+import ceoImage from '../assets/ceo.jpg'
 import './Dashboard.css'
 
 interface User {
@@ -20,6 +21,14 @@ type CycleProduct = {
   isActive: boolean
   sortOrder: number
   stockQuantity?: number
+}
+
+type CommissionLevel = {
+  id: number
+  level: number
+  name: string
+  commissionPercent: number
+  isActive: boolean
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -65,8 +74,13 @@ export default function Dashboard() {
   const [balance, setBalance] = useState(0)
   const [totalDeposits, setTotalDeposits] = useState(0)
   const [cyclePlans, setCyclePlans] = useState<CycleProduct[]>([])
+  const [initialStock, setInitialStock] = useState<Record<number, number>>({})
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true)
+  const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
+  const [modalSlide, setModalSlide] = useState(0)
+  const modalTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -106,14 +120,47 @@ export default function Dashboard() {
         const data = (await response.json()) as { ok?: boolean; products?: CycleProduct[] }
         if (!data?.ok || !Array.isArray(data.products)) return
         setCyclePlans(data.products)
+        // Guarda estoque inicial para calcular progresso real de vendas
+        const stockMap: Record<number, number> = {}
+        data.products.forEach((p) => { stockMap[p.id] = Number(p.stockQuantity ?? 0) })
+        setInitialStock(stockMap)
       } catch {
         // silencioso para não quebrar dashboard
       }
     }
 
+    const loadCommissionLevels = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/referral/commission-levels`)
+        if (!response.ok) return
+        const data = (await response.json()) as { ok?: boolean; levels?: CommissionLevel[] }
+        if (!data?.ok || !Array.isArray(data.levels)) return
+        setCommissionLevels(data.levels)
+      } catch {
+        // silencioso
+      }
+    }
+
     loadSummary()
     loadCyclePlans()
+    loadCommissionLevels()
   }, [user?.id])
+
+  // timer do carrossel do modal de boas-vindas
+  useEffect(() => {
+    if (!showWelcomeModal) {
+      if (modalTimerRef.current) clearInterval(modalTimerRef.current)
+      return
+    }
+    const totalSlides = 1 + (commissionLevels.length > 0 ? 1 : 0)
+    if (totalSlides <= 1) return
+    modalTimerRef.current = setInterval(() => {
+      setModalSlide((prev) => (prev + 1) % totalSlides)
+    }, 4000)
+    return () => {
+      if (modalTimerRef.current) clearInterval(modalTimerRef.current)
+    }
+  }, [showWelcomeModal, commissionLevels.length])
 
   const formatBRL = (value: number) =>
     Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -163,6 +210,14 @@ export default function Dashboard() {
       }
 
       setBalance(Number(data.balanceAfter ?? balance))
+      // Decrementa o estoque localmente para feedback imediato
+      setCyclePlans((prev) =>
+        prev.map((p) =>
+          p.id === selectedPlan.id
+            ? { ...p, stockQuantity: Math.max(0, Number(p.stockQuantity ?? 0) - 1) }
+            : p
+        )
+      )
       alert(data?.message ?? 'Ciclo adquirido com sucesso.')
       setSelectedPlan(null)
     } catch {
@@ -187,9 +242,32 @@ export default function Dashboard() {
         <AppSidebar />
 
         <div className="dash-content">
-          <section className="welcome-card">
-            <h1>{getGreeting(user.name)}</h1>
-            <p>Bem-vindo ao seu painel. Gerencie tudo com rapidez no celular.</p>
+          <section className="welcome-banner" aria-label="Banner de boas-vindas">
+            <div className="welcome-banner-track">
+              <div className="welcome-banner-item">
+                <img src={ceoImage} alt="CEO PGLM" className="welcome-banner-ceo" />
+                <div className="welcome-banner-text-wrap">
+                  <strong>{getGreeting(user.name)}</strong>
+                  <span>Bem-vindo ao seu painel. Gerencie tudo com rapidez no celular.</span>
+                </div>
+              </div>
+
+              <div className="welcome-banner-item">
+                <img src={ceoImage} alt="CEO PGLM" className="welcome-banner-ceo" />
+                <div className="welcome-banner-text-wrap">
+                  <strong>Seja bem-vindo à PGLM</strong>
+                  <span>Nosso CEO deseja ótimos resultados e crescimento diário na plataforma.</span>
+                </div>
+              </div>
+
+              <div className="welcome-banner-item">
+                <img src={ceoImage} alt="CEO PGLM" className="welcome-banner-ceo" />
+                <div className="welcome-banner-text-wrap">
+                  <strong>{getGreeting(user.name)}</strong>
+                  <span>Bem-vindo ao seu painel. Gerencie tudo com rapidez no celular.</span>
+                </div>
+              </div>
+            </div>
           </section>
 
           <section className="dash-notice-bar" aria-label="Avisos de convite">
@@ -202,12 +280,16 @@ export default function Dashboard() {
               <div className="dash-notice-track">
                 <span>
                   Convide mais amigos para entrarem na PGLM. Quanto mais pessoas você indicar, maior sua comissão.
-                  Indicação de 1º nível: 10% • 2º nível: 3% • 3º nível: 1%. Compartilhe seu link e aumente seus ganhos!
+                  {commissionLevels.length > 0
+                    ? ' ' + commissionLevels.map((lvl) => `${lvl.name}: ${Number(lvl.commissionPercent).toFixed(1)}%`).join(' • ')
+                    : ' Compartilhe seu link e aumente seus ganhos!'}
                 </span>
                 <span className="dash-notice-sep">★</span>
                 <span>
                   Convide mais amigos para entrarem na PGLM. Quanto mais pessoas você indicar, maior sua comissão.
-                  Indicação de 1º nível: 10% • 2º nível: 3% • 3º nível: 1%. Compartilhe seu link e aumente seus ganhos!
+                  {commissionLevels.length > 0
+                    ? ' ' + commissionLevels.map((lvl) => `${lvl.name}: ${Number(lvl.commissionPercent).toFixed(1)}%`).join(' • ')
+                    : ' Compartilhe seu link e aumente seus ganhos!'}
                 </span>
               </div>
             </div>
@@ -268,10 +350,12 @@ export default function Dashboard() {
               <p style={{ color: '#6b7280' }}>Nenhum plano disponível no momento.</p>
             ) : (
               <div className="cycle-plans-grid">
-                {cyclePlans.map((plan, index) => {
-                  const compras = Math.max(1, Math.floor((index + 1) * 2))
+                {cyclePlans.map((plan) => {
                   const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
-                  const progresso = Math.min(95, 25 + index * 10)
+                  const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
+                  const vendidos = Math.max(0, estoqueInicial - estoque)
+                  const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
+                  const compras = vendidos
 
                   return (
                     <article key={plan.id} className="cycle-card">
@@ -364,6 +448,73 @@ export default function Dashboard() {
                 {isBuying ? 'Processando...' : 'Confirmar compra'}
               </button>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showWelcomeModal ? (
+        <div className="welcome-modal-backdrop" onClick={() => setShowWelcomeModal(false)}>
+          <div className="welcome-modal-card" onClick={(e) => e.stopPropagation()}>
+
+            {/* slides wrapper */}
+            <div className="welcome-modal-slides">
+              {/* slide 0 — boas-vindas */}
+              <div
+                className="welcome-modal-slide"
+                style={{ transform: `translateX(${(0 - modalSlide) * 100}%)` }}
+              >
+                <img src={ceoImage} alt="CEO PGLM" className="welcome-modal-image" />
+                <h3 className="welcome-modal-title">Bem-vindo à PGLM</h3>
+                <p className="welcome-modal-text">
+                  Estamos felizes por ter você aqui. Explore seu dashboard e aproveite as oportunidades da plataforma.
+                </p>
+              </div>
+
+              {/* slide 1 — níveis de comissão */}
+              {commissionLevels.length > 0 ? (
+                <div
+                  className="welcome-modal-slide"
+                  style={{ transform: `translateX(${(1 - modalSlide) * 100}%)` }}
+                >
+                  <div className="welcome-modal-commission-icon">💰</div>
+                  <h3 className="welcome-modal-title">Ganhe indicando amigos!</h3>
+                  <p className="welcome-modal-text">
+                    Compartilhe seu link e receba comissão por cada amigo que entrar.
+                  </p>
+                  <div className="welcome-modal-commission-list">
+                    {commissionLevels.map((lvl) => (
+                      <div key={lvl.id} className="welcome-modal-commission-row">
+                        <span className="wmc-level">{lvl.name}</span>
+                        <span className="wmc-percent">{Number(lvl.commissionPercent).toFixed(1)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* dots */}
+            {commissionLevels.length > 0 ? (
+              <div className="welcome-modal-dots">
+                {[0, 1].map((i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`welcome-modal-dot${modalSlide === i ? ' active' : ''}`}
+                    onClick={() => setModalSlide(i)}
+                    aria-label={`Slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              className="welcome-modal-btn"
+              onClick={() => setShowWelcomeModal(false)}
+            >
+              Continuar
+            </button>
           </div>
         </div>
       ) : null}

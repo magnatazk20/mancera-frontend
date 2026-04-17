@@ -32,6 +32,7 @@ type ProfileMetricsResponse = {
   metrics?: {
     teamTotal?: number
     withdrawableBalance?: number
+    todayIncome?: number
     hasActiveCyclePlan?: boolean
     activeCyclePlan?: {
       id?: number
@@ -152,19 +153,13 @@ export default function Profile() {
           const metrics = metricsData?.metrics
           if (metrics) {
             setWithdrawableBalance(Number(metrics.withdrawableBalance ?? 0))
+            setTodayIncome(Number(metrics.todayIncome ?? 0))
           }
         }
 
+        // miningRes ainda é feito (para não quebrar outros usos), mas todayIncome vem de metrics
         if (miningRes.ok) {
-          const miningData = (await miningRes.json()) as MiningTasksResponse
-          if (miningData?.ok && Array.isArray(miningData.tasks)) {
-            const earnedToday = miningData.tasks.reduce((sum, task) => sum + Number(task?.earnedToday ?? 0), 0)
-            setTodayIncome(Number(earnedToday.toFixed(2)))
-          } else {
-            setTodayIncome(0)
-          }
-        } else {
-          setTodayIncome(0)
+          await miningRes.json().catch(() => null)
         }
 
         const referralRes = await fetch(`${API_URL}/api/referral/${user.id}`)

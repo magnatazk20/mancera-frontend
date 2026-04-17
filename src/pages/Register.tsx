@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import ceoBanner from '../assets/ceo.jpg'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
@@ -14,7 +13,6 @@ interface AuthResponse {
 
 export default function Register() {
   const navigate = useNavigate()
-  const [activeSlide, setActiveSlide] = useState(0)
   const [searchParams] = useSearchParams()
   const initialRef = (searchParams.get('ref') ?? '').trim().toUpperCase()
   const [name, setName] = useState('')
@@ -25,38 +23,6 @@ export default function Register() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  const bannerSlides = [
-    {
-      id: 'premium',
-      title: 'PGLM',
-      subtitle: 'Cadastre-se e receba benefícios exclusivos.',
-      kicker: 'BEM-VINDO À PLATAFORMA',
-      image: '',
-    },
-    {
-      id: 'ceo',
-      title: 'Liderança PGLM',
-      subtitle: 'Conheça a visão por trás da plataforma.',
-      kicker: 'DESTAQUE',
-      image: ceoBanner,
-    },
-    {
-      id: 'community',
-      title: 'Comunidade Forte',
-      subtitle: 'Conecte-se e cresça com a PGLM.',
-      kicker: 'EVOLUÇÃO',
-      image: '',
-    },
-  ]
-
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % bannerSlides.length)
-    }, 3800)
-
-    return () => window.clearInterval(interval)
-  }, [bannerSlides.length])
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -111,47 +77,14 @@ export default function Register() {
 
   return (
     <main className="auth-page">
-      <section className="auth-shell">
-        <aside className="hero-panel login-banner-panel" aria-hidden="true">
-          <div className="pglm-banner-slider-track" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
-            {bannerSlides.map((slide) => (
-              <div key={slide.id} className="pglm-banner-slide">
-                {slide.image ? (
-                  <img src={slide.image} alt="" className="pglm-banner-slide-image" />
-                ) : null}
-                <div className="pglm-banner-bg-glow" />
-                <div className="pglm-banner-content">
-                  <p className="pglm-banner-kicker">{slide.kicker}</p>
-                  <h2 className="pglm-banner-title">{slide.title}</h2>
-                  <p className="pglm-banner-subtitle">{slide.subtitle}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {activeSlide === 0 ? (
-            <>
-              <svg className="pglm-banner-lightning left" viewBox="0 0 120 220" aria-hidden="true">
-                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-              </svg>
-
-              <svg className="pglm-banner-lightning right" viewBox="0 0 120 220" aria-hidden="true">
-                <path d="M72 8L42 98h28l-20 114l62-116H82L102 8z" />
-              </svg>
-            </>
-          ) : null}
-
-          <div className="pglm-banner-dots" aria-hidden="true">
-            {bannerSlides.map((slide, index) => (
-              <span
-                key={slide.id}
-                className={`pglm-banner-dot${index === activeSlide ? ' active' : ''}`}
-              />
-            ))}
-          </div>
-        </aside>
-
+      <section className="auth-shell auth-shell-no-banner">
         <section className="form-panel" aria-labelledby="register-title">
+          <div className="login-invite-notice">
+            👉 Convide amigos e ganhe recompensas<br />
+            👉 Convide 1 amigo e ganhe <span className="login-invite-highlight">R$ 5,00</span> automaticamente<br />
+            Assim que as tarefas forem concluídas, o bônus é liberado.
+          </div>
+
           <h1 id="register-title">Cadastro</h1>
           <p className="subtitle">Preencha os dados para criar sua conta.</p>
 

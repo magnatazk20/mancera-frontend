@@ -46,6 +46,14 @@ type ReferralItem = {
   totalDepositsPaid: number
 }
 
+type CommissionLevelStat = {
+  level: number
+  name: string
+  commissionPercent: number
+  referralCount: number
+  referralsWithDeposit: number
+}
+
 type UserDetailsResponse = {
   ok?: boolean
   error?: string
@@ -57,10 +65,13 @@ type UserDetailsResponse = {
     is_banned: number
     created_at?: string
     balance: number
+    telegramConectado?: number | boolean
+    activeContract?: string | null
     totalDepositsPaid: number
     totalWithdrawals: number
     totalCyclePlansBought: number
     totalVipPlansBought: number
+    commissionLevelStats?: CommissionLevelStat[]
     accountLogs?: UserLogItem[]
     vipPurchases?: PurchaseItem[]
     cyclePurchases?: PurchaseItem[]
@@ -250,6 +261,8 @@ export default function AdminUserDetails() {
               <p><strong>Telefone:</strong> {user.phone}</p>
               <p><strong>Admin:</strong> {user.is_admin ? 'Sim' : 'Não'}</p>
               <p><strong>Status:</strong> {user.is_banned ? 'Banido' : 'Ativo'}</p>
+              <p><strong>Telegram conectado:</strong> {Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</p>
+              <p><strong>Contrato ativo:</strong> {String(user.activeContract ?? '').trim() || 'Sem contrato ativo'}</p>
               <p><strong>Cadastrado em:</strong> {user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</p>
             </section>
 
@@ -327,6 +340,31 @@ export default function AdminUserDetails() {
                 <strong>{user.totalVipPlansBought}</strong>
               </article>
             </section>
+
+            {(user.commissionLevelStats ?? []).length > 0 ? (
+              <section className="admin-panel admin-user-list-panel">
+                <div className="admin-log-header">
+                  <h3>Convidados por nível de comissão</h3>
+                </div>
+                <div className="admin-user-metrics-grid">
+                  {(user.commissionLevelStats ?? []).map((stat) => (
+                    <article key={`cl-${stat.level}`} className="admin-kpi-card admin-kpi-card--referral">
+                      <p className="admin-kpi-label">
+                        {stat.name}
+                        <span className="admin-kpi-commission-badge">{stat.commissionPercent}%</span>
+                      </p>
+                      <strong className="admin-kpi-value">{stat.referralCount}</strong>
+                      <small className="admin-kpi-sub">
+                        {stat.referralsWithDeposit} depositaram
+                        {stat.referralCount > 0
+                          ? ` (${Math.round((stat.referralsWithDeposit / stat.referralCount) * 100)}%)`
+                          : ''}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             <section className="admin-panel admin-user-list-panel">
               <div className="admin-log-header">

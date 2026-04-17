@@ -11,6 +11,8 @@ export default function AdminCommunityLinks() {
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState('')
   const [vipGroupUrl, setVipGroupUrl] = useState('')
   const [managerContact, setManagerContact] = useState('')
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [youtubeUrl, setYoutubeUrl] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const token = useMemo(
@@ -42,6 +44,8 @@ export default function AdminCommunityLinks() {
       setWhatsappGroupUrl(String(data?.links?.whatsappGroupUrl ?? ''))
       setVipGroupUrl(String(data?.links?.vipGroupUrl ?? ''))
       setManagerContact(String(data?.links?.managerContact ?? ''))
+      setInstagramUrl(String(data?.links?.instagramUrl ?? ''))
+      setYoutubeUrl(String(data?.links?.youtubeUrl ?? ''))
     } catch {
       setToast({ type: 'error', message: 'Falha de conexão ao carregar links da comunidade.' })
     } finally {
@@ -62,6 +66,8 @@ export default function AdminCommunityLinks() {
     const normalizedWhatsappGroupUrl = whatsappGroupUrl.trim()
     const normalizedVipGroupUrl = vipGroupUrl.trim()
     const normalizedManagerContact = managerContact.trim()
+    const normalizedInstagramUrl = instagramUrl.trim()
+    const normalizedYoutubeUrl = youtubeUrl.trim()
 
     if (!normalizedWhatsappGroupUrl) {
       setToast({ type: 'error', message: 'Link do grupo WhatsApp é obrigatório.' })
@@ -85,6 +91,8 @@ export default function AdminCommunityLinks() {
           whatsappGroupUrl: normalizedWhatsappGroupUrl,
           vipGroupUrl: normalizedVipGroupUrl,
           managerContact: normalizedManagerContact,
+          instagramUrl: normalizedInstagramUrl,
+          youtubeUrl: normalizedYoutubeUrl,
         }),
       })
 
@@ -157,6 +165,30 @@ export default function AdminCommunityLinks() {
                   placeholder="Ex.: @gerente ou +55..."
                   value={managerContact}
                   onChange={(event) => setManagerContact(event.target.value)}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="community-instagram-url">Instagram</label>
+                <input
+                  id="community-instagram-url"
+                  type="text"
+                  className="admin-withdraw-filter-input"
+                  placeholder="https://www.instagram.com/..."
+                  value={instagramUrl}
+                  onChange={(event) => setInstagramUrl(event.target.value)}
+                />
+              </div>
+
+              <div className="admin-withdraw-filter-field">
+                <label htmlFor="community-youtube-url">YouTube</label>
+                <input
+                  id="community-youtube-url"
+                  type="text"
+                  className="admin-withdraw-filter-input"
+                  placeholder="https://www.youtube.com/..."
+                  value={youtubeUrl}
+                  onChange={(event) => setYoutubeUrl(event.target.value)}
                 />
               </div>
 

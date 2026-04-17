@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { io as socketIO } from 'socket.io-client'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 
@@ -59,10 +60,19 @@ export default function Admin() {
   const [kpiError, setKpiError] = useState('')
   const [kpi, setKpi] = useState({
     activeUsers: 0,
+    registrationsToday: 0,
     depositsToday: 0,
+    depositsTodayCount: 0,
+    depositsMonthAmount: 0,
+    depositsMonthCount: 0,
+    withdrawalsTodayCount: 0,
+    withdrawalsTodayAmount: 0,
+    withdrawalsMonthCount: 0,
+    withdrawalsMonthAmount: 0,
     pendingWithdrawals: 0,
     netRevenue: 0,
   })
+  const [onlineCount, setOnlineCount] = useState<number | null>(null)
   const [withdrawalsLoading, setWithdrawalsLoading] = useState(false)
   const [withdrawalsError, setWithdrawalsError] = useState('')
   const [latestWithdrawals, setLatestWithdrawals] = useState<AdminWithdrawalRow[]>([])
@@ -93,7 +103,15 @@ export default function Admin() {
           ok?: boolean
           summary?: {
             activeUsers?: number
+            registrationsToday?: number
             depositsToday?: number
+            depositsTodayCount?: number
+            depositsMonthAmount?: number
+            depositsMonthCount?: number
+            withdrawalsTodayCount?: number
+            withdrawalsTodayAmount?: number
+            withdrawalsMonthCount?: number
+            withdrawalsMonthAmount?: number
             pendingWithdrawals?: number
             netRevenue?: number
           }
@@ -105,11 +123,20 @@ export default function Admin() {
           return
         }
 
+        const s = data.summary ?? {}
         setKpi({
-          activeUsers: Number(data.summary?.activeUsers ?? 0),
-          depositsToday: Number(data.summary?.depositsToday ?? 0),
-          pendingWithdrawals: Number(data.summary?.pendingWithdrawals ?? 0),
-          netRevenue: Number(data.summary?.netRevenue ?? 0),
+          activeUsers: Number(s.activeUsers ?? 0),
+          registrationsToday: Number(s.registrationsToday ?? 0),
+          depositsToday: Number(s.depositsToday ?? 0),
+          depositsTodayCount: Number(s.depositsTodayCount ?? 0),
+          depositsMonthAmount: Number(s.depositsMonthAmount ?? 0),
+          depositsMonthCount: Number(s.depositsMonthCount ?? 0),
+          withdrawalsTodayCount: Number(s.withdrawalsTodayCount ?? 0),
+          withdrawalsTodayAmount: Number(s.withdrawalsTodayAmount ?? 0),
+          withdrawalsMonthCount: Number(s.withdrawalsMonthCount ?? 0),
+          withdrawalsMonthAmount: Number(s.withdrawalsMonthAmount ?? 0),
+          pendingWithdrawals: Number(s.pendingWithdrawals ?? 0),
+          netRevenue: Number(s.netRevenue ?? 0),
         })
       } catch {
         setKpiError('Erro de conexão ao carregar indicadores.')
@@ -119,6 +146,35 @@ export default function Admin() {
     }
 
     loadOverview()
+  }, [])
+
+  const socketRef = useRef<ReturnType<typeof socketIO> | null>(null)
+
+  useEffect(() => {
+    // Busca REST imediato como fallback inicial enquanto o WS conecta
+    fetch(`${API_URL}/api/presence/online-count`)
+      .then((r) => r.json())
+      .then((d: { ok?: boolean; onlineCount?: number }) => {
+        if (d?.ok) setOnlineCount(Number(d.onlineCount ?? 0))
+      })
+      .catch(() => {})
+
+    // Conecta via WebSocket e escuta atualizações em tempo real
+    const socket = socketIO(API_URL, {
+      transports: ['websocket', 'polling'],
+      reconnectionDelay: 2000,
+      reconnectionAttempts: 10,
+    })
+    socketRef.current = socket
+
+    socket.on('online-count', (data: { onlineCount?: number }) => {
+      setOnlineCount(Number(data?.onlineCount ?? 0))
+    })
+
+    return () => {
+      socket.disconnect()
+      socketRef.current = null
+    }
   }, [])
 
   useEffect(() => {
@@ -184,6 +240,10 @@ export default function Admin() {
             </p>
           </div>
           <div className="admin-header-meta">
+            <span className="admin-chip admin-chip--online">
+              <span className="admin-online-dot" />
+              {onlineCount === null ? '...' : onlineCount} online agora
+            </span>
             <span className="admin-chip">Nível Admin: {adminLevel}</span>
             <span className="admin-chip soft">{today}</span>
           </div>
@@ -191,14 +251,14 @@ export default function Admin() {
 
         <section className="admin-kpis">
           <article className="admin-kpi-card">
-            <h3>Usuários Ativos</h3>
+            <h3>Total de Usuários</h3>
             <strong>{kpiLoading ? '...' : kpi.activeUsers.toLocaleString('pt-BR')}</strong>
-            <p>Total de contas cadastradas</p>
+            <p>Contas cadastradas no total</p>
           </article>
-          <article className="admin-kpi-card">
-            <h3>Depósitos Hoje</h3>
-            <strong>{kpiLoading ? '...' : formatBRL(kpi.depositsToday)}</strong>
-            <p>Transações pagas do dia atual</p>
+          <article className="admin-kpi-card admin-kpi-card--highlight">
+            <h3>Cadastros Hoje</h3>
+            <strong>{kpiLoading ? '...' : kpi.registrationsToday.toLocaleString('pt-BR')}</strong>
+            <p>Novos usuários registrados hoje</p>
           </article>
           <article className="admin-kpi-card">
             <h3>Saques Pendentes</h3>
@@ -209,6 +269,29 @@ export default function Admin() {
             <h3>Receita Líquida</h3>
             <strong>{kpiLoading ? '...' : formatBRL(kpi.netRevenue)}</strong>
             <p>Depósitos pagos - saques pagos</p>
+          </article>
+        </section>
+
+        <section className="admin-kpis admin-kpis--split">
+          <article className="admin-kpi-card admin-kpi-card--deposit">
+            <h3>Depósitos — Hoje</h3>
+            <strong>{kpiLoading ? '...' : formatBRL(kpi.depositsToday)}</strong>
+            <p>{kpiLoading ? '...' : `${kpi.depositsTodayCount} transação(ões) paga(s)`}</p>
+          </article>
+          <article className="admin-kpi-card admin-kpi-card--deposit">
+            <h3>Depósitos — Mês</h3>
+            <strong>{kpiLoading ? '...' : formatBRL(kpi.depositsMonthAmount)}</strong>
+            <p>{kpiLoading ? '...' : `${kpi.depositsMonthCount} transação(ões) paga(s)`}</p>
+          </article>
+          <article className="admin-kpi-card admin-kpi-card--withdraw">
+            <h3>Saques — Hoje</h3>
+            <strong>{kpiLoading ? '...' : formatBRL(kpi.withdrawalsTodayAmount)}</strong>
+            <p>{kpiLoading ? '...' : `${kpi.withdrawalsTodayCount} solicitação(ões)`}</p>
+          </article>
+          <article className="admin-kpi-card admin-kpi-card--withdraw">
+            <h3>Saques — Mês</h3>
+            <strong>{kpiLoading ? '...' : formatBRL(kpi.withdrawalsMonthAmount)}</strong>
+            <p>{kpiLoading ? '...' : `${kpi.withdrawalsMonthCount} solicitação(ões)`}</p>
           </article>
         </section>
 

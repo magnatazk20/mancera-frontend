@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -72,6 +73,28 @@ function AnimatedBackground() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
+    const sendHeartbeat = () => {
+      try {
+        const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
+        if (!raw) return // nao envia se nao estiver logado
+        const userId = String((JSON.parse(raw) as { id?: unknown })?.id ?? '')
+        if (!userId || userId === '0') return // nao envia se nao tiver userId valido
+        fetch(`${API_URL}/api/presence/heartbeat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }).catch(() => {})
+      } catch {
+        // silencioso
+      }
+    }
+    sendHeartbeat()
+    const interval = setInterval(sendHeartbeat, 30_000)
+    return () => clearInterval(interval)
+  }, [])
+
   return (
     <BrowserRouter>
       <AnimatedBackground />

@@ -160,6 +160,48 @@
   color: #f87171;
 }
 
+/* ── Cards de convidados por nível de comissão ── */
+.admin-kpi-card--referral {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-kpi-card--referral .admin-kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.admin-kpi-commission-badge {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.2px;
+  flex-shrink: 0;
+}
+
+.admin-kpi-card--referral .admin-kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  line-height: 1.1;
+}
+
+.admin-kpi-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
 @media (max-width: 560px) {
   .admin-user-metrics-grid {
     grid-template-columns: 1fr;

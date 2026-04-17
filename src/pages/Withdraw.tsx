@@ -75,6 +75,21 @@ export default function Withdraw() {
   const [copiedActivationMessage, setCopiedActivationMessage] = useState(false)
   const [isWithdrawActivated, setIsWithdrawActivated] = useState(false)
   const [withdrawActivationExpiresAt, setWithdrawActivationExpiresAt] = useState<string | null>(null)
+  const [groupUrl, setGroupUrl] = useState('')
+  const [userBalance, setUserBalance] = useState<number | null>(null)
+  const [hasWithdrawPassword, setHasWithdrawPassword] = useState<boolean | null>(null)
+
+  // ── Segurança: sanitiza strings removendo tags HTML e caracteres de controle ──
+  const sanitizeText = (value: string) =>
+    String(value ?? '')
+      .replace(/<[^>]*>/g, '')           // strip HTML/XML tags
+      .replace(/[<>"'`]/g, '')           // remove caracteres perigosos
+      .replace(/[\x00-\x1F\x7F]/g, '')   // remove controles ASCII
+      .trim()
+
+  // ── Segurança: aceita apenas dígitos e vírgula/ponto para valor monetário ──
+  const sanitizeAmount = (value: string) =>
+    String(value ?? '').replace(/[^0-9.,]/g, '').slice(0, 12)
 
   const normalizeCpf = (value: string) => value.replace(/\D/g, '')
 
@@ -192,9 +207,50 @@ export default function Withdraw() {
       }
     }
 
+    const loadGroupUrl = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/community-links`)
+        const data = (await res.json()) as { ok?: boolean; links?: { whatsappGroupUrl?: string } }
+        if (data?.ok && data?.links?.whatsappGroupUrl) {
+          setGroupUrl(data.links.whatsappGroupUrl)
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
+    const loadBalance = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/user/summary/${user.id}`)
+        const data = (await res.json()) as { ok?: boolean; balance?: number }
+        if (res.ok && data?.balance !== undefined) {
+          setUserBalance(Number(data.balance ?? 0))
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
+    const loadWithdrawPasswordStatus = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/user/withdraw-password/status/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = (await res.json()) as { ok?: boolean; hasWithdrawPassword?: boolean }
+        if (res.ok && data?.ok) {
+          setHasWithdrawPassword(Boolean(data.hasWithdrawPassword))
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
     loadStoredPix()
     loadWithdrawActivationStatus()
     loadWithdrawConfig()
+    loadGroupUrl()
+    loadBalance()
+    loadWithdrawPasswordStatus()
   }, [navigate, token, user?.id])
 
   useEffect(() => {
@@ -229,9 +285,31 @@ export default function Withdraw() {
       return
     }
 
-    const parsedAmount = Number(amount.replace(',', '.'))
+    if (hasWithdrawPassword === false) {
+      navigate('/withdraw-password')
+      return
+    }
+
+    // ── Segurança: sanitiza e valida valor antes de qualquer lógica ──
+    const rawAmount = sanitizeAmount(amount)
+
+    // bloqueia valores com mais de 2 casas decimais (ex: 10,001)
+    const decimalMatch = rawAmount.replace(',', '.').match(/\.(\d+)/)
+    if (decimalMatch && decimalMatch[1].length > 2) {
+      setError('Informe um valor com no máximo 2 casas decimais (ex: 150,00).')
+      return
+    }
+
+    const parsedAmount = Number(rawAmount.replace(',', '.'))
+
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       setError('Informe um valor de saque válido.')
+      return
+    }
+
+    // limite absoluto de segurança no frontend (R$ 100.000)
+    if (parsedAmount > 100_000) {
+      setError('Valor de saque excede o limite permitido.')
       return
     }
 
@@ -242,6 +320,11 @@ export default function Withdraw() {
 
     if (maxWithdrawAmount > 0 && parsedAmount > maxWithdrawAmount) {
       setError(`O valor máximo de saque é ${formatBRL(maxWithdrawAmount)}.`)
+      return
+    }
+
+    if (userBalance !== null && parsedAmount > userBalance) {
+      setError(`Saldo insuficiente. Seu saldo atual é ${formatBRL(userBalance)}.`)
       return
     }
 
@@ -442,12 +525,48 @@ export default function Withdraw() {
       {showActivationModal ? (
         <div className="withdraw-activation-modal-backdrop" role="presentation">
           <div className="withdraw-activation-modal" role="dialog" aria-modal="true" aria-labelledby="withdraw-activation-title">
-            <h3 id="withdraw-activation-title">Ativação de saque necessária</h3>
-            <p>O saque só é ativado quando você enviar no grupo a mensagem abaixo:</p>
+            <h3 id="withdraw-activation-title">⚠️ Ativação de saque necessária</h3>
+
+            <div className="withdraw-activation-steps">
+              <div className="withdraw-activation-step">
+                <span className="withdraw-activation-step-num">1</span>
+                <span>Copie a mensagem abaixo</span>
+              </div>
+              <div className="withdraw-activation-step">
+                <span className="withdraw-activation-step-num">2</span>
+                <span>Acesse o grupo oficial da PGLM</span>
+              </div>
+              <div className="withdraw-activation-step">
+                <span className="withdraw-activation-step-num">3</span>
+                <span>Cole e envie a mensagem no grupo</span>
+              </div>
+              <div className="withdraw-activation-step">
+                <span className="withdraw-activation-step-num">4</span>
+                <span>Aguarde a ativação automática</span>
+              </div>
+            </div>
+
+            <p className="withdraw-activation-label">Mensagem para enviar:</p>
             <pre className="withdraw-activation-code">{activationMessage}</pre>
+
+            {groupUrl ? (
+              <a
+                href={groupUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="withdraw-activation-group-link"
+              >
+                📲 Ir para o Grupo Oficial da PGLM
+              </a>
+            ) : (
+              <p className="withdraw-activation-no-link">
+                Acesse o grupo oficial da PGLM e envie a mensagem acima para ativar seu saque.
+              </p>
+            )}
+
             <div className="withdraw-activation-actions">
               <button type="button" className="withdraw-activation-copy" onClick={copyActivationMessage}>
-                {copiedActivationMessage ? 'Copiado!' : 'Copiar mensagem'}
+                {copiedActivationMessage ? '✅ Copiado!' : 'Copiar mensagem'}
               </button>
               <button type="button" className="withdraw-activation-close" onClick={() => setShowActivationModal(false)}>
                 Fechar
@@ -459,6 +578,48 @@ export default function Withdraw() {
 
       <section className="withdraw-card">
         <h2>Solicitação de Saque PIX</h2>
+
+        <div className="withdraw-balance-display">
+          <span className="withdraw-balance-label">Saldo disponível</span>
+          <strong className="withdraw-balance-value">
+            {userBalance !== null ? formatBRL(userBalance) : '—'}
+          </strong>
+        </div>
+
+        {hasWithdrawPassword === false ? (
+          <div className="withdraw-no-pwd-backdrop" role="presentation">
+            <div className="withdraw-no-pwd-modal" role="dialog" aria-modal="true" aria-labelledby="no-pwd-title">
+              <div className="withdraw-no-pwd-icon-wrap">
+                <svg className="withdraw-no-pwd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="5" y="10" width="14" height="10" rx="2.2" />
+                  <path d="M8 10V7.7a4 4 0 0 1 8 0V10" />
+                </svg>
+              </div>
+              <h3 id="no-pwd-title" className="withdraw-no-pwd-title">Senha de saque necessária</h3>
+              <p className="withdraw-no-pwd-desc">
+                Você ainda não cadastrou uma senha de saque.<br />
+                É necessário criar uma senha antes de solicitar qualquer saque na plataforma.
+              </p>
+              <div className="withdraw-no-pwd-actions">
+                <button
+                  type="button"
+                  className="withdraw-no-pwd-btn-primary"
+                  onClick={() => navigate('/withdraw-password')}
+                >
+                  Criar senha de saque
+                </button>
+                <button
+                  type="button"
+                  className="withdraw-no-pwd-btn-secondary"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Voltar ao início
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         <p className="withdraw-help">
           Seus dados PIX são carregados automaticamente e ficam bloqueados aqui.
           Para alterar a chave PIX, use o botão abaixo.
@@ -503,7 +664,14 @@ export default function Withdraw() {
               inputMode="decimal"
               placeholder="0,00"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              maxLength={12}
+              autoComplete="off"
+              onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
+              onPaste={(e) => {
+                e.preventDefault()
+                const pasted = e.clipboardData.getData('text')
+                setAmount(sanitizeAmount(pasted))
+              }}
             />
           </label>
 
@@ -558,7 +726,11 @@ export default function Withdraw() {
               type="password"
               placeholder="Senha de saque cadastrada"
               value={withdrawPassword}
-              onChange={(e) => setWithdrawPassword(e.target.value)}
+              maxLength={72}
+              autoComplete="current-password"
+              onChange={(e) => setWithdrawPassword(
+                String(e.target.value).replace(/[\x00-\x1F\x7F]/g, '').slice(0, 72)
+              )}
             />
           </label>
         </div>
@@ -572,7 +744,12 @@ export default function Withdraw() {
         </div>
 
         <div className="withdraw-actions">
-          <button type="button" className="withdraw-submit" disabled={loading || !isWithdrawWindowOpen} onClick={submitWithdraw}>
+          <button
+            type="button"
+            className="withdraw-submit"
+            disabled={loading || !isWithdrawWindowOpen || hasWithdrawPassword === false}
+            onClick={submitWithdraw}
+          >
             {loading ? 'Enviando...' : 'Solicitar saque'}
           </button>
         </div>

@@ -14,6 +14,8 @@ type CycleProduct = {
   requireCommissionLevel1Count: number
   requireCommissionLevel2Count: number
   requireCommissionLevel3Count: number
+  stockQuantity: number
+  expiresAt: string | null
   isActive: boolean
   createdAt: string | null
 }
@@ -37,6 +39,8 @@ type FormState = {
   requireCommissionLevel1Count: string
   requireCommissionLevel2Count: string
   requireCommissionLevel3Count: string
+  stockQuantity: string
+  expiresAt: string
   isActive: boolean
 }
 
@@ -56,6 +60,8 @@ const emptyForm: FormState = {
   requireCommissionLevel1Count: '0',
   requireCommissionLevel2Count: '0',
   requireCommissionLevel3Count: '0',
+  stockQuantity: '0',
+  expiresAt: '',
   isActive: true,
 }
 
@@ -140,6 +146,8 @@ export default function AdminCycleProducts() {
           requireCommissionLevel1Count?: number
           requireCommissionLevel2Count?: number
           requireCommissionLevel3Count?: number
+          stockQuantity?: number
+          expiresAt?: string | null
           isActive?: boolean
           createdAt?: string | null
         }>
@@ -167,6 +175,8 @@ export default function AdminCycleProducts() {
             requireCommissionLevel1Count: Number(item.requireCommissionLevel1Count ?? 0),
             requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
             requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
+            stockQuantity: Number(item.stockQuantity ?? 0),
+            expiresAt: item.expiresAt ?? null,
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
           }))
@@ -199,6 +209,8 @@ export default function AdminCycleProducts() {
       requireCommissionLevel1Count: String(product.requireCommissionLevel1Count ?? 0),
       requireCommissionLevel2Count: String(product.requireCommissionLevel2Count ?? 0),
       requireCommissionLevel3Count: String(product.requireCommissionLevel3Count ?? 0),
+      stockQuantity: String(product.stockQuantity ?? 0),
+      expiresAt: product.expiresAt ? String(product.expiresAt).slice(0, 16) : '',
       isActive: product.isActive,
     })
     setFeedback(null)
@@ -214,6 +226,7 @@ export default function AdminCycleProducts() {
     const numericRequireLevel1 = Number(form.requireCommissionLevel1Count.replace(',', '.'))
     const numericRequireLevel2 = Number(form.requireCommissionLevel2Count.replace(',', '.'))
     const numericRequireLevel3 = Number(form.requireCommissionLevel3Count.replace(',', '.'))
+    const numericStockQuantity = Number(form.stockQuantity.replace(',', '.'))
 
     if (!token) {
       setFeedback({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
@@ -260,6 +273,11 @@ export default function AdminCycleProducts() {
       return
     }
 
+    if (!Number.isInteger(numericStockQuantity) || numericStockQuantity < 0) {
+      setFeedback({ type: 'error', text: 'Informe uma quantidade de estoque válida (inteiro maior ou igual a 0).' })
+      return
+    }
+
     setSaving(true)
     setFeedback(null)
 
@@ -287,6 +305,8 @@ export default function AdminCycleProducts() {
           requireCommissionLevel1Count: numericRequireLevel1,
           requireCommissionLevel2Count: numericRequireLevel2,
           requireCommissionLevel3Count: numericRequireLevel3,
+          stockQuantity: numericStockQuantity,
+          expiresAt: form.planType === 'vip_day' ? (form.expiresAt || null) : null,
           isActive: form.isActive,
         }),
       })
@@ -409,6 +429,7 @@ export default function AdminCycleProducts() {
                   setForm((prev) => ({
                     ...prev,
                     planType: e.target.value as 'normal' | 'vip' | 'vip_day',
+                    expiresAt: e.target.value === 'vip_day' ? prev.expiresAt : '',
                   }))
                 }
               >
@@ -417,6 +438,17 @@ export default function AdminCycleProducts() {
                 <option value="vip_day">VIP do dia</option>
               </select>
             </div>
+
+            {form.planType === 'vip_day' ? (
+              <div className="admin-cycle-field">
+                <label>Expira em (opcional)</label>
+                <input
+                  type="datetime-local"
+                  value={form.expiresAt}
+                  onChange={(e) => setForm((prev) => ({ ...prev, expiresAt: e.target.value }))}
+                />
+              </div>
+            ) : null}
 
             <div className="admin-cycle-field">
               <label>Exigência Convite Nível 1 ({commissionLevels.find((lvl) => lvl.level === 1)?.name || 'Nível 1'})</label>
@@ -451,6 +483,18 @@ export default function AdminCycleProducts() {
                 value={form.requireCommissionLevel3Count}
                 onChange={(e) => setForm((prev) => ({ ...prev, requireCommissionLevel3Count: e.target.value }))}
                 placeholder="Ex.: 7"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Estoque</label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.stockQuantity}
+                onChange={(e) => setForm((prev) => ({ ...prev, stockQuantity: e.target.value }))}
+                placeholder="Ex.: 100"
               />
             </div>
 
@@ -523,8 +567,16 @@ export default function AdminCycleProducts() {
                       <p className="admin-cycle-item-meta secondary">
                         Tipo: {product.planType === 'vip' ? 'Plano VIP' : product.planType === 'vip_day' ? 'VIP do dia' : 'Plano normal'} • Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}
                       </p>
+                      {product.planType === 'vip_day' ? (
+                        <p className="admin-cycle-item-meta secondary">
+                          Expiração: {product.expiresAt ? new Date(product.expiresAt).toLocaleString('pt-BR') : 'Sem expiração'}
+                        </p>
+                      ) : null}
                       <p className="admin-cycle-item-meta secondary">
                         Exigência de convite • Nível 1: {product.requireCommissionLevel1Count} • Nível 2: {product.requireCommissionLevel2Count} • Nível 3: {product.requireCommissionLevel3Count}
+                      </p>
+                      <p className="admin-cycle-item-meta secondary">
+                        Estoque: {product.stockQuantity}
                       </p>
                     </div>
                     <div className="admin-cycle-item-actions">
