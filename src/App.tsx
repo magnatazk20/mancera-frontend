@@ -26,6 +26,7 @@ import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
 import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
+import CaixasBox from './pages/CaixasBox'
 import CycleProducts from './pages/CycleProducts'
 import MiniTasks from './pages/MiniTasks'
 import MonthlySalary from './pages/MonthlySalary'
@@ -50,6 +51,7 @@ import AdminSiteBranding from './pages/AdminSiteBranding'
 import AdminCommunityLinks from './pages/AdminCommunityLinks'
 import AdminMiniTasks from './pages/AdminMiniTasks'
 import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
+import AdminCaixasBox from './pages/AdminCaixasBox'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -135,6 +137,14 @@ export default function App() {
           element={(
             <RequireAuth>
               <GiftVouchers />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/caixas-box"
+          element={(
+            <RequireAuth>
+              <CaixasBox />
             </RequireAuth>
           )}
         />
@@ -327,6 +337,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminRouletteProbabilities />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/caixas-box"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCaixasBox />
             </RequireMaxAdmin>
           )}
         />
