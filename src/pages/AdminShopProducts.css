@@ -1,0 +1,252 @@
+/* ── AdminShopProducts ───────────────────────────────────── */
+
+.admin-shop-products-page .admin-content { padding: 28px 32px; }
+
+.asp-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
+.asp-card {
+  background: var(--card-bg, #1a2035);
+  border: 1px solid var(--border, rgba(255,255,255,0.08));
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.asp-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: var(--text, #f1f5f9);
+}
+
+/* ── Form ─────────────────────────────────────────────────── */
+.asp-form { display: flex; flex-direction: column; gap: 14px; }
+
+.asp-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.asp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.asp-field-lg { flex: 2; min-width: 220px; }
+
+.asp-field label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text2, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.asp-field input,
+.asp-field select,
+.asp-field textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  color: var(--text, #f1f5f9);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+}
+
+.asp-field input:focus,
+.asp-field select:focus,
+.asp-field textarea:focus {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.asp-field select option { background: #1a2035; }
+.asp-field textarea { resize: vertical; }
+
+.asp-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text2, #94a3b8);
+  cursor: pointer;
+}
+
+.asp-checkbox input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--accent, #6366f1);
+  cursor: pointer;
+}
+
+.asp-form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+/* ── List header ──────────────────────────────────────────── */
+.asp-list-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.asp-list-header .asp-card-title { margin-bottom: 0; }
+
+.asp-filters {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.asp-search,
+.asp-select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  color: var(--text, #f1f5f9);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.asp-search { width: 220px; }
+.asp-search:focus, .asp-select:focus { border-color: var(--accent, #6366f1); }
+.asp-search::placeholder { color: var(--text3, #64748b); }
+.asp-select option { background: #1a2035; }
+
+/* ── Table ────────────────────────────────────────────────── */
+.asp-table-wrap { overflow-x: auto; }
+
+.asp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.asp-table thead th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text3, #64748b);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+
+.asp-table tbody td {
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text, #f1f5f9);
+  vertical-align: middle;
+}
+
+.asp-table tbody tr:last-child td { border-bottom: none; }
+.asp-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.asp-row-inactive td { opacity: 0.5; }
+
+.asp-td-id { color: var(--text3, #64748b); font-size: 0.78rem; width: 48px; }
+.asp-td-price { font-weight: 700; color: var(--accent3, #a5b4fc); white-space: nowrap; }
+
+/* ── Product name cell ────────────────────────────────────── */
+.asp-product-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.asp-product-img {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.asp-product-icon {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent, #6366f1), var(--purple, #8b5cf6));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── Category chips ───────────────────────────────────────── */
+.asp-cat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.asp-cat-games     { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+.asp-cat-streaming { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+.asp-cat-musica    { background: rgba(34,197,94,0.12);  color: #86efac; }
+.asp-cat-compras   { background: rgba(245,158,11,0.12); color: #fcd34d; }
+.asp-cat-social    { background: rgba(59,130,246,0.12); color: #93c5fd; }
+.asp-cat-outros    { background: rgba(139,92,246,0.12); color: #c4b5fd; }
+
+/* ── Toggle ───────────────────────────────────────────────── */
+.asp-toggle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.asp-toggle-on  { background: rgba(16,185,129,0.12); color: #34d399; }
+.asp-toggle-off { background: rgba(100,116,139,0.12); color: #94a3b8; }
+.asp-toggle-on:hover  { background: rgba(16,185,129,0.22); }
+.asp-toggle-off:hover { background: rgba(100,116,139,0.22); }
+
+/* ── Row actions ──────────────────────────────────────────── */
+.asp-row-actions { display: flex; gap: 6px; }
+
+/* ── Misc ─────────────────────────────────────────────────── */
+.asp-loading,
+.asp-empty {
+  font-size: 0.9rem;
+  color: var(--text3, #64748b);
+  padding: 24px 0;
+  text-align: center;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .admin-shop-products-page .admin-content { padding: 20px 16px; }
+  .asp-search { width: 160px; }
+}
+
+@media (max-width: 600px) {
+  .asp-list-header { flex-direction: column; }
+  .asp-filters { width: 100%; }
+  .asp-search { flex: 1; width: auto; }
+}

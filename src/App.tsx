@@ -52,6 +52,7 @@ import AdminCommunityLinks from './pages/AdminCommunityLinks'
 import AdminMiniTasks from './pages/AdminMiniTasks'
 import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
 import AdminCaixasBox from './pages/AdminCaixasBox'
+import AdminShopProducts from './pages/AdminShopProducts'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -345,6 +346,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCaixasBox />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/shop-products"
+          element={(
+            <RequireMaxAdmin>
+              <AdminShopProducts />
             </RequireMaxAdmin>
           )}
         />
