@@ -65,12 +65,14 @@ type UserDetailsResponse = {
     is_banned: number
     created_at?: string
     balance: number
+    shopBalance: number
     telegramConectado?: number | boolean
     activeContract?: string | null
     totalDepositsPaid: number
     totalWithdrawals: number
     totalCyclePlansBought: number
     totalVipPlansBought: number
+    totalShopGiftCardPurchases: number
     commissionLevelStats?: CommissionLevelStat[]
     accountLogs?: UserLogItem[]
     vipPurchases?: PurchaseItem[]
@@ -324,12 +326,20 @@ export default function AdminUserDetails() {
                 <strong>{formatBRL(user.balance)}</strong>
               </article>
               <article className="admin-kpi-card">
+                <p>Saldo da loja (gift cards)</p>
+                <strong>{formatBRL(user.shopBalance ?? 0)}</strong>
+              </article>
+              <article className="admin-kpi-card">
                 <p>Total depósitos pagos</p>
                 <strong>{formatBRL(user.totalDepositsPaid)}</strong>
               </article>
               <article className="admin-kpi-card">
                 <p>Total saques</p>
                 <strong>{formatBRL(user.totalWithdrawals)}</strong>
+              </article>
+              <article className="admin-kpi-card">
+                <p>Compras de gift card (loja)</p>
+                <strong>{user.totalShopGiftCardPurchases ?? 0}</strong>
               </article>
               <article className="admin-kpi-card">
                 <p>Total planos ciclo comprados</p>
