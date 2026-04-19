@@ -92,8 +92,12 @@ export default function MiniTasks() {
     const userId = Number(user?.id ?? 0)
     if (!userId || Number.isNaN(userId)) return
 
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+
     try {
-      const response = await fetch(`${API_URL}/api/mini-tasks/${userId}`)
+      const response = await fetch(`${API_URL}/api/mini-tasks/${userId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
       const data = await response.json().catch(() => ({}))
 
       if (!response.ok || data?.ok === false || !Array.isArray(data?.tasks)) {
@@ -105,9 +109,9 @@ export default function MiniTasks() {
         id: Number(item?.id ?? 0),
         title: String(item?.title ?? ''),
         inviteGoal: Number(item?.inviteGoal ?? 0),
-        reward: Number(item?.reward ?? 0),
-        badge: String(item?.badge ?? ''),
-        isClaimed: Boolean(item?.isClaimed),
+        reward: Number(item?.rewardAmount ?? item?.reward ?? 0),
+        badge: String(item?.badgeLabel ?? item?.badge ?? ''),
+        isClaimed: Boolean(item?.redeemed ?? item?.isClaimed),
       }))
 
       setTasks(normalizedTasks)
@@ -144,10 +148,15 @@ export default function MiniTasks() {
         throw new Error('Usuário não autenticado.')
       }
 
-      const response = await fetch(`${API_URL}/api/mini-tasks/${userId}/redeem`, {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+
+      const response = await fetch(`${API_URL}/api/mini-tasks/${task.id}/redeem`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId: task.id }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({}),
       })
 
       const data = await response.json().catch(() => ({}))
