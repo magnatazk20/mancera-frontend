@@ -17,10 +17,11 @@ RUN npm run build
 # ── Serve stage ───────────────────────────────────────────────────────────────
 FROM nginx:alpine
 
-# Copia build gerado
+# Copia build gerado na raiz e também em /adf/ para compatibilidade com proxy reverso
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html/adf
 
-# Config nginx: SPA fallback para React Router
+# Config nginx: serve na raiz e em /adf/ com SPA fallback
 RUN printf 'server {\n\
   listen 80;\n\
   root /usr/share/nginx/html;\n\
