@@ -638,14 +638,14 @@ export default function AdminShopProducts() {
               <div className="asp-stock-add">
                 <label className="asp-stock-add-label">
                   Adicionar códigos ao estoque
-                  <span className="asp-stock-hint">Um código por linha</span>
+                  <span className="asp-stock-hint">Separados por vírgula ou um por linha</span>
                 </label>
                 <textarea
                   className="asp-stock-textarea"
                   rows={5}
                   value={newCodes}
                   onChange={(e) => setNewCodes(e.target.value)}
-                  placeholder={'XXXX-XXXX-XXXX\nYYYY-YYYY-YYYY\nZZZZ-ZZZZ-ZZZZ'}
+                  placeholder={'XXXX-XXXX-XXXX,YYYY-YYYY-YYYY,ZZZZ-ZZZZ-ZZZZ\n\nou um por linha:\nXXXX-XXXX-XXXX\nYYYY-YYYY-YYYY'}
                 />
                 <button
                   className="btn primary"
