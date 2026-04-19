@@ -57,6 +57,23 @@ type DepositHistoryItem = {
   createdAt: string | null
 }
 
+type ShopDepositHistoryItem = {
+  id: number
+  amount: number
+  status: string
+  externalId: string | null
+  paidAt: string | null
+  createdAt: string | null
+}
+
+type ShopPurchaseHistoryItem = {
+  id: number
+  amount: number
+  reason: string
+  referenceId: string | null
+  createdAt: string | null
+}
+
 type WithdrawalHistoryItem = {
   id: number
   amount: number
@@ -96,6 +113,8 @@ type UserDetailsResponse = {
     dailyCheckinRedemptions?: DailyCheckinRedemptionItem[]
     depositHistory?: DepositHistoryItem[]
     withdrawalHistory?: WithdrawalHistoryItem[]
+    shopDepositHistory?: ShopDepositHistoryItem[]
+    shopPurchaseHistory?: ShopPurchaseHistoryItem[]
     rouletteSpins?: RouletteSpinItem[]
     rouletteSpinBalance?: RouletteSpinBalance
     accountLogs?: UserLogItem[]
@@ -121,6 +140,8 @@ export default function AdminUserHistory() {
   const [showDailyCheckins, setShowDailyCheckins] = useState(false)
   const [showDepositHistory, setShowDepositHistory] = useState(false)
   const [showWithdrawalHistory, setShowWithdrawalHistory] = useState(false)
+  const [showShopDepositHistory, setShowShopDepositHistory] = useState(false)
+  const [showShopPurchaseHistory, setShowShopPurchaseHistory] = useState(false)
   const [showRouletteSpins, setShowRouletteSpins] = useState(false)
 
   const token = useMemo(
@@ -379,6 +400,73 @@ export default function AdminUserHistory() {
                   </div>
                 ) : <p>Nenhum saque encontrado.</p>
               ) : <p className='admin-log-hint'>Clique em Mostrar saques para visualizar o historico.</p>}
+            </section>
+
+            {/* ── DEPÓSITOS NA LOJA ── */}
+            <section className='admin-panel admin-user-list-panel'>
+              <div className='admin-log-header'>
+                <h3>🏪 Depósitos na loja (shop_balance)</h3>
+                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowShopDepositHistory((p) => !p)}>
+                  {showShopDepositHistory ? 'Ocultar' : 'Mostrar depósitos loja'}
+                </button>
+              </div>
+              {showShopDepositHistory ? (
+                (user.shopDepositHistory ?? []).length ? (
+                  <div className='admin-user-list'>
+                    {(user.shopDepositHistory ?? []).map((dep) => {
+                      const isPaid = ['paid', 'payment.paid'].includes(dep.status.toLowerCase())
+                      const isExp  = ['expired', 'canceled', 'failed'].includes(dep.status.toLowerCase())
+                      const color  = isPaid ? '#22c55e' : isExp ? '#f87171' : '#94a3b8'
+                      const bg     = isPaid ? 'rgba(34,197,94,0.15)' : isExp ? 'rgba(248,113,113,0.15)' : 'rgba(148,163,184,0.12)'
+                      const border = isPaid ? '#166534' : isExp ? '#7f1d1d' : '#334155'
+                      return (
+                        <article key={`sdep-${dep.id}`} className='admin-user-list-item'>
+                          <div>
+                            <strong style={{ color }}>
+                              {isPaid ? '✅' : isExp ? '❌' : '⏳'} {formatBRL(dep.amount)}
+                            </strong>
+                            <p>Criado: {dep.createdAt ? new Date(dep.createdAt).toLocaleString('pt-BR') : '-'}</p>
+                            {dep.paidAt && <p>Pago: {new Date(dep.paidAt).toLocaleString('pt-BR')}</p>}
+                            {dep.externalId && <small style={{ color: '#64748b' }}>ID: {dep.externalId}</small>}
+                          </div>
+                          <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:'999px', fontSize:'0.75rem', fontWeight:700, background:bg, color, border:`1px solid ${border}` }}>
+                            {dep.status}
+                          </span>
+                        </article>
+                      )
+                    })}
+                  </div>
+                ) : <p>Nenhum depósito na loja encontrado.</p>
+              ) : <p className='admin-log-hint'>Clique para ver depósitos PIX feitos na loja.</p>}
+            </section>
+
+            {/* ── COMPRAS DE GIFT CARD ── */}
+            <section className='admin-panel admin-user-list-panel'>
+              <div className='admin-log-header'>
+                <h3>🎁 Compras de gift card (loja)</h3>
+                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowShopPurchaseHistory((p) => !p)}>
+                  {showShopPurchaseHistory ? 'Ocultar' : 'Mostrar compras gift card'}
+                </button>
+              </div>
+              {showShopPurchaseHistory ? (
+                (user.shopPurchaseHistory ?? []).length ? (
+                  <div className='admin-user-list'>
+                    {(user.shopPurchaseHistory ?? []).map((purch) => (
+                      <article key={`spurch-${purch.id}`} className='admin-user-list-item'>
+                        <div>
+                          <strong style={{ color: '#f87171' }}>🎁 -{formatBRL(purch.amount)}</strong>
+                          <p>{purch.reason}</p>
+                          <p>{purch.createdAt ? new Date(purch.createdAt).toLocaleString('pt-BR') : '-'}</p>
+                          {purch.referenceId && <small style={{ color: '#64748b' }}>Ref: {purch.referenceId}</small>}
+                        </div>
+                        <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:'999px', fontSize:'0.75rem', fontWeight:700, background:'rgba(248,113,113,0.12)', color:'#f87171', border:'1px solid #7f1d1d' }}>
+                          débito
+                        </span>
+                      </article>
+                    ))}
+                  </div>
+                ) : <p>Nenhuma compra de gift card encontrada.</p>
+              ) : <p className='admin-log-hint'>Clique para ver compras de gift card feitas na loja.</p>}
             </section>
 
             <section className='admin-panel admin-user-list-panel'>
