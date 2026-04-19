@@ -42,13 +42,56 @@
 }
 
 .status-chip {
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* variantes de status */
+.status-pending {
   background: rgba(245, 158, 11, 0.16);
   color: #fcd34d;
   border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: 999px;
-  padding: 6px 12px;
+}
+.status-paid {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.status-processing {
+  background: rgba(99, 102, 241, 0.16);
+  color: #a78bfa;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+}
+.status-expired {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* banner de pagamento confirmado */
+.paid-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  color: #6ee7b7;
   font-weight: 600;
-  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.hint-small {
+  font-size: 0.78rem;
+  color: #60a5fa;
+  word-break: break-all;
 }
 
 .checkout-grid {
