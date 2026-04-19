@@ -317,6 +317,139 @@
   padding: 5px 10px !important;
 }
 
+/* ── Botão accent ─────────────────────────────────────────── */
+.btn.accent {
+  background: rgba(99,102,241,0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99,102,241,0.25);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn.accent:hover { background: rgba(99,102,241,0.22); }
+
+/* ── Stock panel ──────────────────────────────────────────── */
+.asp-stock-card {
+  border-color: rgba(99,102,241,0.25);
+}
+
+.asp-stock-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.asp-stock-header .asp-card-title { margin-bottom: 4px; }
+
+.asp-stock-sub {
+  font-size: 0.82rem;
+  color: var(--text3, #64748b);
+  margin: 0;
+}
+
+.asp-stock-summary {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.asp-stock-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 90px;
+}
+
+.asp-stock-stat strong {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text, #f1f5f9);
+}
+
+.asp-stock-stat span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text3, #64748b);
+}
+
+.asp-stock-available strong { color: #34d399; }
+.asp-stock-used     strong { color: #f87171; }
+
+.asp-stock-add {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.asp-stock-add-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text2, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.asp-stock-hint {
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text3, #64748b);
+  background: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  padding: 2px 8px;
+}
+
+.asp-stock-textarea {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  padding: 10px 12px;
+  font-size: 0.84rem;
+  font-family: 'Courier New', monospace;
+  color: var(--text, #f1f5f9);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+}
+
+.asp-stock-textarea:focus {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.asp-stock-textarea::placeholder { color: var(--text3, #64748b); }
+
+/* ── Codes table ──────────────────────────────────────────── */
+.asp-codes-table .asp-code-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 0.84rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  padding: 2px 8px;
+  color: #a5b4fc;
+  letter-spacing: 0.04em;
+}
+
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 900px) {
   .admin-shop-products-page .admin-content { padding: 20px 16px; }

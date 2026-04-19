@@ -27,6 +27,22 @@ type FormState = {
   sortOrder: string
 }
 
+type ProductCode = {
+  id: number
+  code: string
+  status: 'available' | 'used'
+  usedBy: number | null
+  usedAt: string | null
+  createdAt: string
+}
+
+type StockInfo = {
+  codes: ProductCode[]
+  available: number
+  used: number
+  total: number
+}
+
 const CATEGORIES = ['games', 'streaming', 'musica', 'compras', 'social', 'outros']
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -45,6 +61,11 @@ const defaultForm: FormState = {
 const formatBRL = (v: number) =>
   Number(v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
+const fmtDate = (raw: string | null) => {
+  if (!raw) return '—'
+  return new Date(raw).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+}
+
 export default function AdminShopProducts() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -57,6 +78,13 @@ export default function AdminShopProducts() {
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // ── Estoque de códigos ─────────────────────────────────────
+  const [stockProduct, setStockProduct] = useState<Product | null>(null)
+  const [stockInfo, setStockInfo] = useState<StockInfo | null>(null)
+  const [stockLoading, setStockLoading] = useState(false)
+  const [newCodes, setNewCodes] = useState('')
+  const [addingCodes, setAddingCodes] = useState(false)
+
   const token = useMemo(() => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '', [])
 
   const authHeaders = useMemo(
@@ -67,11 +95,11 @@ export default function AdminShopProducts() {
     [token]
   )
 
+  // ── Upload de imagem ───────────────────────────────────────
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Mostra preview imediato via object URL
     const previewUrl = URL.createObjectURL(file)
     setForm((p) => ({ ...p, imageUrl: previewUrl }))
 
@@ -94,12 +122,10 @@ export default function AdminShopProducts() {
           setForm((p) => ({ ...p, imageUrl: url }))
           setToast({ type: 'success', message: 'Imagem enviada com sucesso!' })
         } else {
-          // API existe mas não retornou URL — mantém preview local
           setToast({ type: 'error', message: 'Upload OK, mas URL não retornada. Cole a URL manualmente.' })
         }
       } else if (res.status === 404) {
-        // Backend não tem rota de upload — mantém object URL como preview apenas
-        setToast({ type: 'error', message: 'Endpoint de upload não configurado no servidor. Cole a URL da imagem manualmente.' })
+        setToast({ type: 'error', message: 'Endpoint de upload não configurado. Cole a URL manualmente.' })
         setForm((p) => ({ ...p, imageUrl: '' }))
         URL.revokeObjectURL(previewUrl)
       } else {
@@ -110,11 +136,11 @@ export default function AdminShopProducts() {
       setToast({ type: 'error', message: err?.message ?? 'Erro ao enviar imagem.' })
     } finally {
       setUploading(false)
-      // Limpa o input para permitir re-selecionar o mesmo arquivo
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
+  // ── Produtos ───────────────────────────────────────────────
   const loadProducts = async () => {
     setLoading(true)
     try {
@@ -210,6 +236,7 @@ export default function AdminShopProducts() {
       if (!res.ok || data?.ok === false) throw new Error(data?.error ?? 'Falha ao remover produto.')
       setToast({ type: 'success', message: 'Produto removido.' })
       if (editingId === id) resetForm()
+      if (stockProduct?.id === id) setStockProduct(null)
       await loadProducts()
     } catch (err: any) {
       setToast({ type: 'error', message: err?.message ?? 'Erro ao remover produto.' })
@@ -232,6 +259,69 @@ export default function AdminShopProducts() {
     }
   }
 
+  // ── Estoque de códigos ─────────────────────────────────────
+  const openStock = async (p: Product) => {
+    setStockProduct(p)
+    setNewCodes('')
+    setStockInfo(null)
+    setStockLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/shop/products/${p.id}/codes`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data?.ok === false) throw new Error(data?.error ?? 'Falha ao carregar estoque.')
+      setStockInfo({
+        codes:     data.codes ?? [],
+        available: Number(data.available ?? 0),
+        used:      Number(data.used ?? 0),
+        total:     Number(data.total ?? 0),
+      })
+    } catch (err: any) {
+      setToast({ type: 'error', message: err?.message ?? 'Erro ao carregar estoque.' })
+    } finally {
+      setStockLoading(false)
+    }
+  }
+
+  const handleAddCodes = async () => {
+    if (!stockProduct || !newCodes.trim()) return
+    setAddingCodes(true)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/shop/products/${stockProduct.id}/codes`, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ codes: newCodes }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data?.ok === false) throw new Error(data?.error ?? 'Falha ao adicionar códigos.')
+      setToast({ type: 'success', message: `${data.added} código(s) adicionado(s) ao estoque.` })
+      setNewCodes('')
+      await openStock(stockProduct)
+    } catch (err: any) {
+      setToast({ type: 'error', message: err?.message ?? 'Erro ao adicionar códigos.' })
+    } finally {
+      setAddingCodes(false)
+    }
+  }
+
+  const handleDeleteCode = async (codeId: number) => {
+    if (!stockProduct) return
+    if (!window.confirm('Remover este código do estoque?')) return
+    try {
+      const res = await fetch(`${API_URL}/api/admin/shop/products/codes/${codeId}`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data?.ok === false) throw new Error(data?.error ?? 'Falha ao remover código.')
+      setToast({ type: 'success', message: 'Código removido.' })
+      await openStock(stockProduct)
+    } catch (err: any) {
+      setToast({ type: 'error', message: err?.message ?? 'Erro ao remover código.' })
+    }
+  }
+
   const filtered = products.filter((p) => {
     const matchCat = filterCat === 'all' || p.category === filterCat
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.platform.toLowerCase().includes(search.toLowerCase())
@@ -245,7 +335,7 @@ export default function AdminShopProducts() {
         <header className="admin-users-header">
           <div>
             <h1>Produtos da Loja PGLM</h1>
-            <p>Gerencie o catálogo de produtos exibidos na landing page da loja.</p>
+            <p>Gerencie o catálogo de produtos e os códigos de gift card do estoque.</p>
           </div>
         </header>
 
@@ -327,7 +417,6 @@ export default function AdminShopProducts() {
               <div className="asp-field">
                 <label>Imagem do produto</label>
                 <div className="asp-image-wrap">
-                  {/* Preview */}
                   <div className="asp-image-preview">
                     {form.imageUrl ? (
                       <img
@@ -344,7 +433,6 @@ export default function AdminShopProducts() {
                   </div>
 
                   <div className="asp-image-controls">
-                    {/* URL manual */}
                     <input
                       type="text"
                       value={form.imageUrl}
@@ -352,8 +440,6 @@ export default function AdminShopProducts() {
                       placeholder="Cole a URL da imagem (https://...)"
                       className="asp-image-url-input"
                     />
-
-                    {/* Botão de upload */}
                     <button
                       type="button"
                       className="btn ghost asp-upload-btn"
@@ -363,8 +449,6 @@ export default function AdminShopProducts() {
                     >
                       {uploading ? 'Enviando…' : '📁 Enviar arquivo'}
                     </button>
-
-                    {/* Limpar imagem */}
                     {form.imageUrl && (
                       <button
                         type="button"
@@ -377,7 +461,6 @@ export default function AdminShopProducts() {
                     )}
                   </div>
 
-                  {/* Input file oculto */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -491,6 +574,14 @@ export default function AdminShopProducts() {
                             <button className="btn ghost" type="button" onClick={() => startEdit(p)}>
                               Editar
                             </button>
+                            <button
+                              className="btn accent"
+                              type="button"
+                              onClick={() => openStock(p)}
+                              title="Gerenciar estoque de códigos"
+                            >
+                              📦 Estoque
+                            </button>
                             <button className="btn danger" type="button" onClick={() => handleDelete(p.id)}>
                               Remover
                             </button>
@@ -503,6 +594,124 @@ export default function AdminShopProducts() {
               </div>
             )}
           </article>
+
+          {/* ── Painel de Estoque de Códigos ─────── */}
+          {stockProduct && (
+            <article className="asp-card asp-stock-card">
+              <div className="asp-stock-header">
+                <div>
+                  <h2 className="asp-card-title">
+                    📦 Estoque — {stockProduct.name}
+                  </h2>
+                  <p className="asp-stock-sub">
+                    Cada código será entregue automaticamente ao usuário quando ele comprar o produto.
+                  </p>
+                </div>
+                <button
+                  className="btn ghost"
+                  type="button"
+                  onClick={() => setStockProduct(null)}
+                >
+                  Fechar
+                </button>
+              </div>
+
+              {/* Resumo */}
+              {stockInfo && (
+                <div className="asp-stock-summary">
+                  <div className="asp-stock-stat asp-stock-available">
+                    <strong>{stockInfo.available}</strong>
+                    <span>Disponíveis</span>
+                  </div>
+                  <div className="asp-stock-stat asp-stock-used">
+                    <strong>{stockInfo.used}</strong>
+                    <span>Usados</span>
+                  </div>
+                  <div className="asp-stock-stat">
+                    <strong>{stockInfo.total}</strong>
+                    <span>Total</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Adicionar novos códigos */}
+              <div className="asp-stock-add">
+                <label className="asp-stock-add-label">
+                  Adicionar códigos ao estoque
+                  <span className="asp-stock-hint">Um código por linha</span>
+                </label>
+                <textarea
+                  className="asp-stock-textarea"
+                  rows={5}
+                  value={newCodes}
+                  onChange={(e) => setNewCodes(e.target.value)}
+                  placeholder={'XXXX-XXXX-XXXX\nYYYY-YYYY-YYYY\nZZZZ-ZZZZ-ZZZZ'}
+                />
+                <button
+                  className="btn primary"
+                  type="button"
+                  onClick={handleAddCodes}
+                  disabled={addingCodes || !newCodes.trim()}
+                >
+                  {addingCodes ? 'Adicionando...' : '+ Adicionar ao estoque'}
+                </button>
+              </div>
+
+              {/* Lista de códigos */}
+              {stockLoading ? (
+                <p className="asp-loading">Carregando estoque...</p>
+              ) : stockInfo && stockInfo.codes.length === 0 ? (
+                <p className="asp-empty">Nenhum código cadastrado. Adicione códigos acima.</p>
+              ) : stockInfo ? (
+                <div className="asp-table-wrap" style={{ marginTop: 20 }}>
+                  <table className="asp-table asp-codes-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Código</th>
+                        <th>Status</th>
+                        <th>Usado por</th>
+                        <th>Data</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stockInfo.codes.map((c) => (
+                        <tr key={c.id} className={c.status === 'used' ? 'asp-row-inactive' : ''}>
+                          <td className="asp-td-id">{c.id}</td>
+                          <td>
+                            <code className="asp-code-cell">{c.code}</code>
+                          </td>
+                          <td>
+                            <span className={`asp-toggle ${c.status === 'available' ? 'asp-toggle-on' : 'asp-toggle-off'}`}>
+                              {c.status === 'available' ? 'Disponível' : 'Usado'}
+                            </span>
+                          </td>
+                          <td className="asp-td-id">{c.usedBy ?? '—'}</td>
+                          <td style={{ whiteSpace: 'nowrap', fontSize: '0.78rem', color: 'var(--text3)' }}>
+                            {c.status === 'used' ? fmtDate(c.usedAt) : fmtDate(c.createdAt)}
+                          </td>
+                          <td>
+                            {c.status === 'available' && (
+                              <button
+                                className="btn danger"
+                                type="button"
+                                style={{ fontSize: '0.75rem', padding: '4px 10px' }}
+                                onClick={() => handleDeleteCode(c.id)}
+                              >
+                                Remover
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+            </article>
+          )}
+
         </div>
       </section>
 
