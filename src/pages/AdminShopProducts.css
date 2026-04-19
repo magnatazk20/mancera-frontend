@@ -239,6 +239,84 @@
   text-align: center;
 }
 
+/* ── Image upload ─────────────────────────────────────────── */
+.asp-image-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.asp-image-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  border: 2px dashed rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.03);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.asp-image-preview:hover {
+  border-color: var(--accent, #6366f1);
+}
+
+.asp-image-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.asp-image-preview-placeholder {
+  font-size: 1.6rem;
+  opacity: 0.5;
+}
+
+.asp-image-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.asp-image-url-input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  color: var(--text, #f1f5f9);
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  width: 100%;
+}
+
+.asp-image-url-input:focus {
+  border-color: var(--accent, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.asp-image-url-input::placeholder { color: var(--text3, #64748b); }
+
+.asp-upload-btn {
+  align-self: flex-start;
+  font-size: 0.82rem !important;
+  padding: 7px 14px !important;
+  white-space: nowrap;
+}
+
+.asp-clear-img-btn {
+  align-self: flex-start;
+  font-size: 0.78rem !important;
+  padding: 5px 10px !important;
+}
+
 /* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 900px) {
   .admin-shop-products-page .admin-content { padding: 20px 16px; }

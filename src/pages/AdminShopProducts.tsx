@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
@@ -54,6 +54,8 @@ export default function AdminShopProducts() {
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('all')
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const token = useMemo(() => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '', [])
 
@@ -64,6 +66,54 @@ export default function AdminShopProducts() {
     }),
     [token]
   )
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Mostra preview imediato via object URL
+    const previewUrl = URL.createObjectURL(file)
+    setForm((p) => ({ ...p, imageUrl: previewUrl }))
+
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+
+      const res = await fetch(`${API_URL}/api/admin/shop/products/image`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      })
+
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}))
+        const url = data?.url ?? data?.imageUrl ?? data?.path ?? ''
+        if (url) {
+          URL.revokeObjectURL(previewUrl)
+          setForm((p) => ({ ...p, imageUrl: url }))
+          setToast({ type: 'success', message: 'Imagem enviada com sucesso!' })
+        } else {
+          // API existe mas não retornou URL — mantém preview local
+          setToast({ type: 'error', message: 'Upload OK, mas URL não retornada. Cole a URL manualmente.' })
+        }
+      } else if (res.status === 404) {
+        // Backend não tem rota de upload — mantém object URL como preview apenas
+        setToast({ type: 'error', message: 'Endpoint de upload não configurado no servidor. Cole a URL da imagem manualmente.' })
+        setForm((p) => ({ ...p, imageUrl: '' }))
+        URL.revokeObjectURL(previewUrl)
+      } else {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data?.error ?? `Erro ${res.status} ao enviar imagem.`)
+      }
+    } catch (err: any) {
+      setToast({ type: 'error', message: err?.message ?? 'Erro ao enviar imagem.' })
+    } finally {
+      setUploading(false)
+      // Limpa o input para permitir re-selecionar o mesmo arquivo
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   const loadProducts = async () => {
     setLoading(true)
@@ -273,14 +323,69 @@ export default function AdminShopProducts() {
                 />
               </div>
 
+              {/* ── Imagem do produto ─────────────────── */}
               <div className="asp-field">
-                <label>URL da imagem / ícone</label>
-                <input
-                  type="text"
-                  value={form.imageUrl}
-                  onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-                  placeholder="https://..."
-                />
+                <label>Imagem do produto</label>
+                <div className="asp-image-wrap">
+                  {/* Preview */}
+                  <div className="asp-image-preview">
+                    {form.imageUrl ? (
+                      <img
+                        src={form.imageUrl}
+                        alt="preview"
+                        className="asp-image-preview-img"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                      />
+                    ) : (
+                      <span className="asp-image-preview-placeholder">
+                        {uploading ? '⏳' : '🖼️'}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="asp-image-controls">
+                    {/* URL manual */}
+                    <input
+                      type="text"
+                      value={form.imageUrl}
+                      onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
+                      placeholder="Cole a URL da imagem (https://...)"
+                      className="asp-image-url-input"
+                    />
+
+                    {/* Botão de upload */}
+                    <button
+                      type="button"
+                      className="btn ghost asp-upload-btn"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      title="Fazer upload de imagem do computador"
+                    >
+                      {uploading ? 'Enviando…' : '📁 Enviar arquivo'}
+                    </button>
+
+                    {/* Limpar imagem */}
+                    {form.imageUrl && (
+                      <button
+                        type="button"
+                        className="btn danger asp-clear-img-btn"
+                        onClick={() => setForm((p) => ({ ...p, imageUrl: '' }))}
+                        title="Remover imagem"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Input file oculto */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleImageUpload}
+                  />
+                </div>
               </div>
 
               <label className="asp-checkbox">
