@@ -180,7 +180,7 @@ export default function Withdraw() {
 
     const loadWithdrawConfig = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
+        const res = await fetch(`${API_URL}/api/withdraw-config`)
         const data = (await res.json()) as WithdrawConfigResponse
         if (!res.ok || !data?.ok || !data.config) return
 
