@@ -36,7 +36,7 @@ export default function CashIn() {
     const loadDepositConfig = async () => {
       try {
         const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
-        const response = await fetch(`${API_URL}/api/admin/deposit-config`, {
+        const response = await fetch(`${API_URL}/api/deposit-config`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         })
 
