@@ -31,53 +31,48 @@ const normalizePlanType = (value: unknown): 'normal' | 'vip' | 'vip_day' => {
   return 'normal'
 }
 
-// ── Ícones SVG inline ───────────────────────────────────────────────────────
 const IconCrown = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M2 20h20M4 20L6 9l6 5l6-9l2 15" />
   </svg>
 )
 const IconBolt = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
   </svg>
 )
 const IconMoney = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="9" />
     <path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1" />
     <path d="M12 7v1M12 16v1" />
   </svg>
 )
 const IconProfit = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
     <polyline points="16 7 22 7 22 13" />
   </svg>
 )
 const IconClock = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="12" cy="12" r="9" />
     <path d="M12 7v5l3 3" />
   </svg>
 )
 const IconUsers = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="9" cy="7" r="3" />
     <circle cx="17" cy="9" r="2.5" />
     <path d="M3 19a6 6 0 0 1 12 0" />
     <path d="M14 16a5 5 0 0 1 7 0" />
   </svg>
 )
-const IconCalendar = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="4" width="18" height="17" rx="2" />
-    <path d="M16 2v4M8 2v4M3 10h18" />
-  </svg>
-)
-const IconCheck = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M5 12l5 5L20 7" />
+const IconPackage = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
   </svg>
 )
 
@@ -124,12 +119,13 @@ export default function VipRules() {
   const filtered = products.filter((p) => p.planType === activeTab)
   const isVip = activeTab === 'vip'
 
-  const accent     = isVip ? '#7c3aed' : '#d97706'
-  const accentLight = isVip ? '#ede9fe' : '#fef3c7'
-  const accentText  = isVip ? '#4c1d95' : '#78350f'
+  const tabAccentColor = isVip ? '#7c3aed' : '#d97706'
+  const tabGradient = isVip
+    ? 'linear-gradient(120deg,#7c3aed,#a855f7)'
+    : 'linear-gradient(120deg,#d97706,#f59e0b)'
 
   return (
-    <main className="tasks-page" style={{ background: '#f8fafc', minHeight: '100vh' }}>
+    <main className="tasks-page" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
       <AppSidebar />
 
       <header className="tasks-header">
@@ -147,9 +143,9 @@ export default function VipRules() {
       <div style={{ display: 'flex', gap: 10, padding: '0 16px 16px' }}>
         {(['vip', 'vip_day'] as const).map((tab) => {
           const active = activeTab === tab
-          const tabAccent = tab === 'vip' ? '#7c3aed' : '#d97706'
-          const tabLight  = tab === 'vip' ? '#ede9fe' : '#fef3c7'
-          const tabText   = tab === 'vip' ? '#4c1d95' : '#78350f'
+          const tAccent = tab === 'vip' ? '#7c3aed' : '#d97706'
+          const tLight  = tab === 'vip' ? '#ede9fe' : '#fef3c7'
+          const tText   = tab === 'vip' ? '#4c1d95' : '#78350f'
           return (
             <button
               key={tab}
@@ -165,12 +161,12 @@ export default function VipRules() {
                 borderRadius: 14,
                 fontWeight: 700,
                 fontSize: 15,
-                border: active ? `2px solid ${tabAccent}` : '1.5px solid #e2e8f0',
-                background: active ? tabLight : '#fff',
-                color: active ? tabText : '#94a3b8',
+                border: active ? `2px solid ${tAccent}` : '1.5px solid #e2e8f0',
+                background: active ? tLight : '#fff',
+                color: active ? tText : '#94a3b8',
                 cursor: 'pointer',
                 transition: 'all 160ms',
-                boxShadow: active ? `0 4px 16px ${tabAccent}33` : 'none',
+                boxShadow: active ? `0 4px 16px ${tAccent}33` : 'none',
               }}
             >
               {tab === 'vip' ? <IconCrown /> : <IconBolt />}
@@ -180,307 +176,223 @@ export default function VipRules() {
         })}
       </div>
 
-      {loading ? (
-        <div className="vip-inline-message">Carregando produtos...</div>
-      ) : filtered.length === 0 ? (
-        <div className="vip-inline-message">Nenhum produto disponível nesta categoria.</div>
-      ) : (
-        <div style={{ padding: '0 16px 40px', display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-          {/* ── Banner explicativo ── */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 12,
-            padding: '14px 16px',
-            borderRadius: 14,
-            background: accentLight,
-            border: `1.5px solid ${accent}44`,
-          }}>
-            <span style={{
-              flexShrink: 0,
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: accent,
-              color: '#fff',
+      {/* ── Content ── */}
+      <div style={{ padding: '0 16px 40px' }}>
+        {loading ? (
+          <div className="vip-inline-message">Carregando produtos...</div>
+        ) : filtered.length === 0 ? (
+          <div className="vip-inline-message">Nenhum produto disponível nesta categoria.</div>
+        ) : (
+          <>
+            {/* ── Legenda rápida ── */}
+            <div style={{
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              gap: 8,
+              marginBottom: 14,
+              flexWrap: 'wrap',
             }}>
-              {isVip ? <IconCrown /> : <IconBolt />}
-            </span>
-            <div style={{ fontSize: 13, color: accentText, lineHeight: 1.65 }}>
-              <strong style={{ display: 'block', marginBottom: 2 }}>Como funciona?</strong>
-              Para adquirir um produto {isVip ? 'VIP' : 'VIP do Dia'}, você precisa ter
-              o número mínimo de indicados <strong>com depósito</strong> em cada nível da sua rede,
-              conforme exigido pelo produto.
-            </div>
-          </div>
-
-          {/* ── Cards dos produtos ── */}
-          {filtered.map((product) => {
-            const hasLvl1 = product.requireCommissionLevel1Count > 0
-            const hasLvl2 = product.requireCommissionLevel2Count > 0
-            const hasLvl3 = product.requireCommissionLevel3Count > 0
-            const hasAny  = hasLvl1 || hasLvl2 || hasLvl3
-            const parsedExpires = product.expiresAt ? new Date(product.expiresAt) : null
-            const expiresValid  = parsedExpires && !Number.isNaN(parsedExpires.getTime())
-
-            return (
-              <div
-                key={product.id}
-                style={{
-                  background: '#fff',
-                  borderRadius: 16,
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 12px rgba(15,23,42,.07)',
-                  border: '1px solid #f1f5f9',
-                }}
-              >
-                {/* cabeçalho colorido */}
-                <div style={{
-                  background: isVip
-                    ? 'linear-gradient(120deg,#7c3aed,#a855f7)'
-                    : 'linear-gradient(120deg,#d97706,#f59e0b)',
-                  padding: '14px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
+              {[
+                { label: 'N1', bg: '#ede9fe', border: '#c4b5fd', color: '#5b21b6', desc: 'Diretos' },
+                { label: 'N2', bg: '#fef3c7', border: '#fde68a', color: '#92400e', desc: 'Indiretos' },
+                { label: 'N3', bg: '#dcfce7', border: '#bbf7d0', color: '#166534', desc: 'Rede profunda' },
+              ].map((r) => (
+                <span key={r.label} style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  padding: '5px 10px', borderRadius: 20,
+                  background: r.bg, border: `1.5px solid ${r.border}`,
+                  fontSize: 12, fontWeight: 700, color: r.color,
                 }}>
-                  {product.imageUrl ? (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover', flexShrink: 0, background: '#fff3' }}
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
-                  ) : (
-                    <span style={{
-                      width: 44, height: 44, borderRadius: 10,
-                      background: '#fff3',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#fff', flexShrink: 0,
-                    }}>
-                      {isVip ? <IconCrown /> : <IconBolt />}
-                    </span>
-                  )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 800, fontSize: 16, color: '#fff', lineHeight: 1.2 }}>{product.name}</div>
-                    {product.description ? (
-                      <div style={{ fontSize: 12, color: '#ffffffcc', marginTop: 2, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {product.description}
-                      </div>
-                    ) : null}
-                  </div>
-                  {!hasAny ? (
-                    <span style={{
-                      flexShrink: 0,
-                      background: '#fff',
-                      color: '#16a34a',
-                      fontWeight: 700,
-                      fontSize: 11,
-                      borderRadius: 20,
-                      padding: '3px 10px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}>
-                      <IconCheck /> Livre
-                    </span>
-                  ) : null}
-                </div>
-
-                {/* corpo */}
-                <div style={{ padding: '14px 16px' }}>
-
-                  {/* métricas */}
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 8,
-                    marginBottom: 14,
-                  }}>
-                    {[
-                      { icon: <IconMoney />, label: 'Montante', value: formatBRL(product.amount), color: '#0f172a' },
-                      { icon: <IconProfit />, label: 'Lucro', value: formatBRL(product.profit), color: '#16a34a' },
-                      { icon: <IconClock />, label: 'Ciclo', value: `${product.cycleDays}d`, color: '#2563eb' },
-                    ].map(({ icon, label, value, color }) => (
-                      <div
-                        key={label}
-                        style={{
-                          background: '#f8fafc',
-                          borderRadius: 10,
-                          padding: '10px 8px',
-                          textAlign: 'center',
-                          border: '1px solid #f1f5f9',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, color: '#64748b', marginBottom: 4 }}>
-                          {icon}
-                          <span style={{ fontSize: 11 }}>{label}</span>
-                        </div>
-                        <div style={{ fontWeight: 800, fontSize: 14, color }}>{value}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* expiração */}
-                  {expiresValid && parsedExpires ? (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '7px 10px',
-                      borderRadius: 8,
-                      background: '#fff7ed',
-                      border: '1px solid #fed7aa',
-                      color: '#c2410c',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      marginBottom: 12,
-                    }}>
-                      <IconCalendar />
-                      Expira em: {parsedExpires.toLocaleString('pt-BR')}
-                    </div>
-                  ) : null}
-
-                  {/* requisitos de convite */}
-                  {hasAny ? (
-                    <div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        marginBottom: 10,
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: '#475569',
-                      }}>
-                        <IconUsers />
-                        Indicados com depósito exigidos
-                      </div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        {[
-                          { level: 1, count: product.requireCommissionLevel1Count, show: hasLvl1, bg: '#ede9fe', border: '#c4b5fd', color: '#5b21b6', label: 'Nível 1 — Diretos', sub: 'Indicados diretos do seu link' },
-                          { level: 2, count: product.requireCommissionLevel2Count, show: hasLvl2, bg: '#fef3c7', border: '#fde68a', color: '#92400e', label: 'Nível 2 — Indiretos', sub: 'Indicados dos seus indicados' },
-                          { level: 3, count: product.requireCommissionLevel3Count, show: hasLvl3, bg: '#dcfce7', border: '#bbf7d0', color: '#166534', label: 'Nível 3 — Rede profunda', sub: 'Terceiro grau da sua rede' },
-                        ].filter((r) => r.show).map((row) => (
-                          <div
-                            key={row.level}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 12,
-                              padding: '10px 12px',
-                              borderRadius: 10,
-                              background: row.bg,
-                              border: `1.5px solid ${row.border}`,
-                            }}
-                          >
-                            {/* badge nível */}
-                            <span style={{
-                              flexShrink: 0,
-                              width: 32,
-                              height: 32,
-                              borderRadius: 8,
-                              background: row.color,
-                              color: '#fff',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontWeight: 900,
-                              fontSize: 14,
-                            }}>
-                              N{row.level}
-                            </span>
-                            {/* texto */}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: row.color }}>{row.label}</div>
-                              <div style={{ fontSize: 11, color: '#64748b', marginTop: 1 }}>{row.sub}</div>
-                            </div>
-                            {/* quantidade */}
-                            <span style={{
-                              flexShrink: 0,
-                              minWidth: 36,
-                              textAlign: 'center',
-                              fontWeight: 900,
-                              fontSize: 22,
-                              color: row.color,
-                              lineHeight: 1,
-                            }}>
-                              {row.count}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '10px 12px',
-                      borderRadius: 10,
-                      background: '#f0fdf4',
-                      border: '1.5px solid #bbf7d0',
-                      color: '#15803d',
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}>
-                      <span style={{ color: '#16a34a' }}><IconCheck /></span>
-                      Sem requisito de convite — basta ter saldo suficiente.
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-
-          {/* ── Legenda ── */}
-          <div style={{
-            background: '#fff',
-            borderRadius: 14,
-            border: '1px solid #e2e8f0',
-            padding: '14px 16px',
-          }}>
-            <div style={{ fontWeight: 700, fontSize: 13, color: '#0f172a', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <IconUsers /> Legenda dos níveis
+                  <span style={{
+                    width: 20, height: 20, borderRadius: 5,
+                    background: r.color, color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 10, fontWeight: 900,
+                  }}>{r.label}</span>
+                  {r.desc}
+                </span>
+              ))}
+              <span style={{ fontSize: 12, color: '#94a3b8', display: 'flex', alignItems: 'center', marginLeft: 4 }}>
+                — Indicados com depósito exigidos
+              </span>
             </div>
-            {[
-              { bg: '#ede9fe', border: '#c4b5fd', color: '#5b21b6', label: 'N1', desc: 'Quem você convidou diretamente pelo seu link e fez depósito' },
-              { bg: '#fef3c7', border: '#fde68a', color: '#92400e', label: 'N2', desc: 'Quem os seus indicados convidaram e fizeram depósito' },
-              { bg: '#dcfce7', border: '#bbf7d0', color: '#166534', label: 'N3', desc: 'Terceiro grau da rede — indicados dos indicados dos seus indicados' },
-            ].map((row) => (
-              <div key={row.label} style={{
+
+            {/* ── Tabela ── */}
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              overflow: 'hidden',
+              boxShadow: '0 4px 24px rgba(15,23,42,.09)',
+              border: '1px solid #e2e8f0',
+            }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 540 }}>
+                  <thead>
+                    <tr style={{ background: tabGradient }}>
+                      {[
+                        { icon: <IconPackage />, label: 'Produto' },
+                        { icon: <IconMoney />,   label: 'Montante' },
+                        { icon: <IconProfit />,  label: 'Lucro' },
+                        { icon: <IconClock />,   label: 'Ciclo' },
+                        { icon: <IconUsers />,   label: 'N1' },
+                        { icon: <IconUsers />,   label: 'N2' },
+                        { icon: <IconUsers />,   label: 'N3' },
+                      ].map(({ icon, label }, i) => (
+                        <th
+                          key={label}
+                          style={{
+                            padding: i === 0 ? '14px 16px' : '14px 10px',
+                            textAlign: i === 0 ? 'left' : 'center',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: 12,
+                            letterSpacing: '0.04em',
+                            textTransform: 'uppercase',
+                            whiteSpace: 'nowrap',
+                            borderBottom: 'none',
+                          }}
+                        >
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            {icon} {label}
+                          </span>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.map((product, idx) => {
+                      const even = idx % 2 === 0
+                      const lvl1 = product.requireCommissionLevel1Count
+                      const lvl2 = product.requireCommissionLevel2Count
+                      const lvl3 = product.requireCommissionLevel3Count
+
+                      const LevelBadge = ({ count, bg, border, color }: { count: number; bg: string; border: string; color: string }) =>
+                        count === 0 ? (
+                          <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>—</span>
+                        ) : (
+                          <span style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                            minWidth: 34, height: 34,
+                            borderRadius: 10,
+                            background: bg,
+                            border: `1.5px solid ${border}`,
+                            color,
+                            fontWeight: 900,
+                            fontSize: 15,
+                          }}>
+                            {count}
+                          </span>
+                        )
+
+                      return (
+                        <tr
+                          key={product.id}
+                          style={{
+                            background: even ? '#fff' : '#f8fafc',
+                            borderTop: '1px solid #f1f5f9',
+                            transition: 'background 120ms',
+                          }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = isVip ? '#f5f3ff' : '#fffbeb' }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.background = even ? '#fff' : '#f8fafc' }}
+                        >
+                          {/* Produto */}
+                          <td style={{ padding: '12px 16px', verticalAlign: 'middle' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              {product.imageUrl ? (
+                                <img
+                                  src={product.imageUrl}
+                                  alt={product.name}
+                                  style={{ width: 36, height: 36, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: '1px solid #e2e8f0' }}
+                                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                                />
+                              ) : (
+                                <span style={{
+                                  width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                                  background: tabGradient,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  color: '#fff',
+                                }}>
+                                  {isVip ? <IconCrown /> : <IconBolt />}
+                                </span>
+                              )}
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a', lineHeight: 1.2 }}>{product.name}</div>
+                                {product.description ? (
+                                  <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {product.description}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Montante */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <span style={{ fontWeight: 800, fontSize: 13, color: '#0f172a' }}>{formatBRL(product.amount)}</span>
+                          </td>
+
+                          {/* Lucro */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '3px 9px', borderRadius: 20,
+                              background: '#f0fdf4', border: '1px solid #bbf7d0',
+                              fontWeight: 800, fontSize: 13, color: '#16a34a',
+                            }}>
+                              {formatBRL(product.profit)}
+                            </span>
+                          </td>
+
+                          {/* Ciclo */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '3px 9px', borderRadius: 20,
+                              background: '#eff6ff', border: '1px solid #bfdbfe',
+                              fontWeight: 700, fontSize: 13, color: '#2563eb',
+                            }}>
+                              {product.cycleDays}d
+                            </span>
+                          </td>
+
+                          {/* N1 */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <LevelBadge count={lvl1} bg="#ede9fe" border="#c4b5fd" color="#5b21b6" />
+                          </td>
+
+                          {/* N2 */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <LevelBadge count={lvl2} bg="#fef3c7" border="#fde68a" color="#92400e" />
+                          </td>
+
+                          {/* N3 */}
+                          <td style={{ padding: '12px 10px', textAlign: 'center', verticalAlign: 'middle' }}>
+                            <LevelBadge count={lvl3} bg="#dcfce7" border="#bbf7d0" color="#166534" />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* rodapé da tabela */}
+              <div style={{
+                padding: '10px 16px',
+                borderTop: '1px solid #f1f5f9',
+                background: '#f8fafc',
+                fontSize: 11,
+                color: '#94a3b8',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                marginBottom: 8,
+                gap: 6,
               }}>
-                <span style={{
-                  flexShrink: 0,
-                  width: 28,
-                  height: 28,
-                  borderRadius: 7,
-                  background: row.bg,
-                  border: `1.5px solid ${row.border}`,
-                  color: row.color,
-                  fontWeight: 800,
-                  fontSize: 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  {row.label}
-                </span>
-                <span style={{ fontSize: 12, color: '#475569', lineHeight: 1.4 }}>{row.desc}</span>
+                <IconUsers />
+                N1 = indicados diretos · N2 = indicados dos seus indicados · N3 = terceiro grau · todos com depósito confirmado
               </div>
-            ))}
-          </div>
-
-        </div>
-      )}
+            </div>
+          </>
+        )}
+      </div>
     </main>
   )
 }
