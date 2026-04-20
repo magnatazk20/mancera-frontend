@@ -67,6 +67,13 @@ type UserDetailsResponse = {
     balance: number
     shopBalance: number
     telegramConectado?: number | boolean
+    telegramConnection?: {
+      telegramChatId: string
+      telegramUserId: string
+      telegramUsername: string
+      telegramFirstName: string
+      connectedAt: string | null
+    } | null
     activeContract?: string | null
     totalDepositsPaid: number
     totalWithdrawals: number
@@ -115,6 +122,7 @@ export default function AdminUserDetails() {
 
   const [telegramDisconnectLoading, setTelegramDisconnectLoading] = useState(false)
   const [telegramDisconnectFeedback, setTelegramDisconnectFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [telegramModalOpen, setTelegramModalOpen] = useState(false)
 
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
@@ -187,9 +195,13 @@ export default function AdminUserDetails() {
     }
   }
 
-  const handleTelegramDisconnect = async () => {
+  const handleTelegramDisconnect = () => {
+    setTelegramDisconnectFeedback(null)
+    setTelegramModalOpen(true)
+  }
+
+  const confirmTelegramDisconnect = async () => {
     if (!id) return
-    if (!window.confirm('Tem certeza que deseja desconectar o Telegram deste usuário?')) return
     setTelegramDisconnectLoading(true)
     setTelegramDisconnectFeedback(null)
     try {
@@ -200,12 +212,15 @@ export default function AdminUserDetails() {
       const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
       if (!res.ok || !data?.ok) {
         setTelegramDisconnectFeedback({ type: 'error', message: data?.error ?? 'Falha ao desconectar Telegram.' })
+        setTelegramModalOpen(false)
         return
       }
       setTelegramDisconnectFeedback({ type: 'success', message: 'Telegram desconectado com sucesso.' })
+      setTelegramModalOpen(false)
       await loadUserDetails()
     } catch {
       setTelegramDisconnectFeedback({ type: 'error', message: 'Erro de conexão.' })
+      setTelegramModalOpen(false)
     } finally {
       setTelegramDisconnectLoading(false)
     }
@@ -301,9 +316,87 @@ export default function AdminUserDetails() {
     )
   }
 
+  const tc = user?.telegramConnection
+
   return (
     <main className="admin-page">
       <AdminSidebar />
+
+      {/* ── Modal confirmação desconectar Telegram ── */}
+      {telegramModalOpen ? (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(15,23,42,0.55)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000, padding: 16,
+        }}>
+          <div style={{
+            width: '100%', maxWidth: 420,
+            background: 'linear-gradient(180deg,#fff 0%,#f8fafc 100%)',
+            borderRadius: 16,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 48px rgba(2,6,23,.18)',
+            padding: 24,
+          }}>
+            <h3 style={{ margin: '0 0 6px', color: '#0f172a', fontSize: 18 }}>
+              Desconectar Telegram
+            </h3>
+            <p style={{ margin: '0 0 18px', color: '#64748b', fontSize: 14 }}>
+              Confirme antes de remover a conexão com o Telegram deste usuário.
+            </p>
+
+            {/* Dados do Telegram conectado */}
+            <div style={{
+              background: '#f1f5f9', borderRadius: 10,
+              padding: '14px 16px', marginBottom: 20,
+              border: '1px solid #e2e8f0',
+              display: 'flex', flexDirection: 'column', gap: 8,
+            }}>
+              {[
+                { label: 'Nome no Telegram', value: tc?.telegramFirstName || '-' },
+                { label: 'Username',         value: tc?.telegramUsername ? `@${tc.telegramUsername}` : '-' },
+                { label: 'Telegram User ID', value: tc?.telegramUserId || '-' },
+                { label: 'Chat ID',          value: tc?.telegramChatId || '-' },
+                { label: 'Conectado em',     value: tc?.connectedAt ? new Date(tc.connectedAt).toLocaleString('pt-BR') : '-' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: 12, color: '#64748b', fontWeight: 600, minWidth: 140 }}>{label}:</span>
+                  <span style={{ fontSize: 13, color: '#0f172a', fontFamily: 'monospace', fontWeight: 500 }}>{value}</span>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setTelegramModalOpen(false)}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: '1.5px solid #e2e8f0', background: 'transparent',
+                  fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={telegramDisconnectLoading}
+                onClick={confirmTelegramDisconnect}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: 'none', background: '#dc2626', color: '#fff',
+                  fontWeight: 700, fontSize: 14,
+                  cursor: telegramDisconnectLoading ? 'not-allowed' : 'pointer',
+                  opacity: telegramDisconnectLoading ? 0.7 : 1,
+                }}
+              >
+                {telegramDisconnectLoading ? 'Desconectando...' : 'Confirmar desconexão'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <section className="admin-content admin-user-details-page">
         <header className="admin-header">
           <div>
