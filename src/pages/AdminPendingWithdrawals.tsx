@@ -15,6 +15,7 @@ type PendingWithdrawal = {
   holderCpf?: string
   pixKeyType?: string
   pixKey?: string
+  holderName?: string
   user: {
     id: number
     name: string
