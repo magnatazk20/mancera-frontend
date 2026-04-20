@@ -124,7 +124,7 @@ export default function VipRules() {
     : 'linear-gradient(120deg,#d97706,#f59e0b)'
 
   return (
-    <main className="tasks-page" style={{ background: '#f1f5f9', minHeight: '100vh' }}>
+    <main className="tasks-page">
       <AppSidebar />
 
       <header className="tasks-header">
