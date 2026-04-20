@@ -119,7 +119,6 @@ export default function VipRules() {
   const filtered = products.filter((p) => p.planType === activeTab)
   const isVip = activeTab === 'vip'
 
-  const tabAccentColor = isVip ? '#7c3aed' : '#d97706'
   const tabGradient = isVip
     ? 'linear-gradient(120deg,#7c3aed,#a855f7)'
     : 'linear-gradient(120deg,#d97706,#f59e0b)'
