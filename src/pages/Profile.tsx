@@ -565,6 +565,15 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Alterar Senha</span>
             </button>
+            <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/gift-vouchers')}>
+              <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 9a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 8v13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5a2.5 2.5 0 0 1 0 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <span className="profile-shortcut-label">Cartões Presentes</span>
+            </button>
             <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/caixas-box')}>
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M7 3v4a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3H7z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
