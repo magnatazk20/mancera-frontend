@@ -108,6 +108,11 @@ export default function AdminUserDetails() {
   const [showAllLevel2, setShowAllLevel2] = useState(false)
   const [showAllLevel3, setShowAllLevel3] = useState(false)
 
+  const [editingPhone, setEditingPhone] = useState(false)
+  const [editPhone, setEditPhone] = useState('')
+  const [editPhoneLoading, setEditPhoneLoading] = useState(false)
+  const [editPhoneFeedback, setEditPhoneFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
@@ -144,6 +149,40 @@ export default function AdminUserDetails() {
   useEffect(() => {
     loadUserDetails()
   }, [id])
+
+  const handlePhoneSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!id || !user) return
+    const newPhone = editPhone.trim()
+    if (!newPhone) {
+      setEditPhoneFeedback({ type: 'error', message: 'Informe um número de telefone válido.' })
+      return
+    }
+    setEditPhoneLoading(true)
+    setEditPhoneFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ name: user.name, phone: newPhone }),
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setEditPhoneFeedback({ type: 'error', message: data?.error ?? 'Falha ao atualizar telefone.' })
+        return
+      }
+      setEditPhoneFeedback({ type: 'success', message: 'Telefone atualizado com sucesso.' })
+      setEditingPhone(false)
+      await loadUserDetails()
+    } catch {
+      setEditPhoneFeedback({ type: 'error', message: 'Erro de conexão.' })
+    } finally {
+      setEditPhoneLoading(false)
+    }
+  }
 
   const handleBalanceAdjust = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -260,7 +299,88 @@ export default function AdminUserDetails() {
             <section className="admin-panel admin-user-identity">
               <h2>{user.name}</h2>
               <p><strong>ID:</strong> #{user.id}</p>
-              <p><strong>Telefone:</strong> {user.phone}</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <strong>Telefone:</strong>
+                {editingPhone ? (
+                  <form
+                    onSubmit={handlePhoneSave}
+                    style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
+                  >
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder={user.phone}
+                      autoFocus
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: 8,
+                        border: '1.5px solid #6366f1',
+                        fontSize: 14,
+                        outline: 'none',
+                        width: 180,
+                      }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={editPhoneLoading}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: 8,
+                        border: 'none',
+                        background: '#6366f1',
+                        color: '#fff',
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: editPhoneLoading ? 'not-allowed' : 'pointer',
+                        opacity: editPhoneLoading ? 0.7 : 1,
+                      }}
+                    >
+                      {editPhoneLoading ? 'Salvando...' : 'Salvar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setEditingPhone(false); setEditPhoneFeedback(null) }}
+                      style={{
+                        padding: '4px 12px',
+                        borderRadius: 8,
+                        border: '1.5px solid #e2e8f0',
+                        background: 'transparent',
+                        fontWeight: 700,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                    {editPhoneFeedback ? (
+                      <span style={{ fontSize: 12, color: editPhoneFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                        {editPhoneFeedback.message}
+                      </span>
+                    ) : null}
+                  </form>
+                ) : (
+                  <>
+                    <span>{user.phone}</span>
+                    <button
+                      type="button"
+                      onClick={() => { setEditPhone(user.phone); setEditingPhone(true); setEditPhoneFeedback(null) }}
+                      style={{
+                        padding: '3px 10px',
+                        borderRadius: 8,
+                        border: '1.5px solid #6366f1',
+                        background: 'transparent',
+                        color: '#6366f1',
+                        fontWeight: 700,
+                        fontSize: 12,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ✏️ Editar
+                    </button>
+                  </>
+                )}
+              </p>
               <p><strong>Admin:</strong> {user.is_admin ? 'Sim' : 'Não'}</p>
               <p><strong>Status:</strong> {user.is_banned ? 'Banido' : 'Ativo'}</p>
               <p><strong>Telegram conectado:</strong> {Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</p>
