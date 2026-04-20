@@ -48,6 +48,7 @@ export default function CycleProducts() {
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
   const [activeCategory, setActiveCategory] = useState<PlanCategory>('normal')
+  const [userInviteCount, setUserInviteCount] = useState<{ level1: number; level2: number; level3: number } | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -113,6 +114,33 @@ export default function CycleProducts() {
     }
 
     loadCyclePlans()
+
+    // Busca contagem de indicados com depósito por nível
+    const loadInviteCounts = async () => {
+      try {
+        const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+        const res = await fetch(`${API_URL}/api/user/invite-counts/${user.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json().catch(() => ({})) as {
+          ok?: boolean
+          level1?: number
+          level2?: number
+          level3?: number
+        }
+        if (res.ok && data?.ok) {
+          setUserInviteCount({
+            level1: Number(data.level1 ?? 0),
+            level2: Number(data.level2 ?? 0),
+            level3: Number(data.level3 ?? 0),
+          })
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
+    loadInviteCounts()
   }, [user?.id])
 
   const formatBRL = (value: number) =>
@@ -476,6 +504,42 @@ export default function CycleProducts() {
               </div>
               <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
             </div>
+
+            {(selectedPlan.requireCommissionLevel1Count > 0 || selectedPlan.requireCommissionLevel2Count > 0 || selectedPlan.requireCommissionLevel3Count > 0) ? (
+              <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: 13 }}>
+                <strong style={{ display: 'block', marginBottom: 6, color: '#0f172a' }}>Requisitos de convite</strong>
+                {selectedPlan.requireCommissionLevel1Count > 0 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    {userInviteCount !== null && userInviteCount.level1 >= selectedPlan.requireCommissionLevel1Count
+                      ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                    <span>
+                      Nível 1: {userInviteCount !== null ? `${userInviteCount.level1}/` : ''}{selectedPlan.requireCommissionLevel1Count} indicados com depósito
+                    </span>
+                  </div>
+                ) : null}
+                {selectedPlan.requireCommissionLevel2Count > 0 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                    {userInviteCount !== null && userInviteCount.level2 >= selectedPlan.requireCommissionLevel2Count
+                      ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                    <span>
+                      Nível 2: {userInviteCount !== null ? `${userInviteCount.level2}/` : ''}{selectedPlan.requireCommissionLevel2Count} indicados com depósito
+                    </span>
+                  </div>
+                ) : null}
+                {selectedPlan.requireCommissionLevel3Count > 0 ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {userInviteCount !== null && userInviteCount.level3 >= selectedPlan.requireCommissionLevel3Count
+                      ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                    <span>
+                      Nível 3: {userInviteCount !== null ? `${userInviteCount.level3}/` : ''}{selectedPlan.requireCommissionLevel3Count} indicados com depósito
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             <div style={{ marginTop: 14, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button
