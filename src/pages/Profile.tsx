@@ -510,6 +510,13 @@ export default function Profile() {
               </svg>
               <span className="profile-shortcut-label">Mini tarefas</span>
             </button>
+            <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/vip-rules')}>
+              <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 17l4-8l5 6l3-4l4 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M3 20h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <span className="profile-shortcut-label">Regras VIP</span>
+            </button>
             <button type="button" className="profile-shortcut-btn" onClick={() => navigate('/community')}>
               <svg className="profile-shortcut-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M21 12a8.5 8.5 0 0 1-8.5 8.5A8.6 8.6 0 0 1 8 19l-5 1.5L4.5 16A8.5 8.5 0 1 1 21 12z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />

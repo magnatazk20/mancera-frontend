@@ -29,6 +29,7 @@ import GiftVouchers from './pages/GiftVouchers'
 import CaixasBox from './pages/CaixasBox'
 import CycleProducts from './pages/CycleProducts'
 import MiniTasks from './pages/MiniTasks'
+import VipRules from './pages/VipRules'
 import MonthlySalary from './pages/MonthlySalary'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
@@ -116,6 +117,7 @@ export default function App() {
         <Route path="/invite" element={<Invite />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mini-tasks" element={<MiniTasks />} />
+        <Route path="/vip-rules" element={<VipRules />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
         <Route
           path="/monthly-salary"
