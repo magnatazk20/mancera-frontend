@@ -16,7 +16,6 @@ type GiftVoucher = {
   description: string
   imageUrl: string
   price: number
-  discountCoupon: string
   redeemRewardValue: number
 }
 
@@ -128,7 +127,7 @@ export default function GiftVouchers() {
 
       setSuccessData({
         message: data?.message || 'Vale presente comprado com sucesso.',
-        voucherName: String(data?.purchase?.name ?? voucher.name),
+        voucherName: voucher.name,
         giftCode,
         rewardValue: Number(data?.purchase?.redeemRewardValue ?? voucher.redeemRewardValue ?? 0),
       })
