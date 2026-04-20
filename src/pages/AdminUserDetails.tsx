@@ -113,6 +113,9 @@ export default function AdminUserDetails() {
   const [editPhoneLoading, setEditPhoneLoading] = useState(false)
   const [editPhoneFeedback, setEditPhoneFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+  const [telegramDisconnectLoading, setTelegramDisconnectLoading] = useState(false)
+  const [telegramDisconnectFeedback, setTelegramDisconnectFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
@@ -181,6 +184,30 @@ export default function AdminUserDetails() {
       setEditPhoneFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
       setEditPhoneLoading(false)
+    }
+  }
+
+  const handleTelegramDisconnect = async () => {
+    if (!id) return
+    if (!window.confirm('Tem certeza que deseja desconectar o Telegram deste usuário?')) return
+    setTelegramDisconnectLoading(true)
+    setTelegramDisconnectFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/telegram`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setTelegramDisconnectFeedback({ type: 'error', message: data?.error ?? 'Falha ao desconectar Telegram.' })
+        return
+      }
+      setTelegramDisconnectFeedback({ type: 'success', message: 'Telegram desconectado com sucesso.' })
+      await loadUserDetails()
+    } catch {
+      setTelegramDisconnectFeedback({ type: 'error', message: 'Erro de conexão.' })
+    } finally {
+      setTelegramDisconnectLoading(false)
     }
   }
 
@@ -383,7 +410,35 @@ export default function AdminUserDetails() {
               </p>
               <p><strong>Admin:</strong> {user.is_admin ? 'Sim' : 'Não'}</p>
               <p><strong>Status:</strong> {user.is_banned ? 'Banido' : 'Ativo'}</p>
-              <p><strong>Telegram conectado:</strong> {Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <strong>Telegram conectado:</strong>
+                <span>{Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</span>
+                {Number(user.telegramConectado ?? 0) === 1 ? (
+                  <button
+                    type="button"
+                    disabled={telegramDisconnectLoading}
+                    onClick={handleTelegramDisconnect}
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: 8,
+                      border: '1.5px solid #dc2626',
+                      background: 'transparent',
+                      color: '#dc2626',
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: telegramDisconnectLoading ? 'not-allowed' : 'pointer',
+                      opacity: telegramDisconnectLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {telegramDisconnectLoading ? 'Desconectando...' : '🔌 Desconectar'}
+                  </button>
+                ) : null}
+                {telegramDisconnectFeedback ? (
+                  <span style={{ fontSize: 12, color: telegramDisconnectFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {telegramDisconnectFeedback.message}
+                  </span>
+                ) : null}
+              </p>
               <p><strong>Contrato ativo:</strong> {String(user.activeContract ?? '').trim() || 'Sem contrato ativo'}</p>
               <p><strong>Cadastrado em:</strong> {user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</p>
             </section>
