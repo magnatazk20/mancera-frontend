@@ -12,6 +12,9 @@ type PendingWithdrawal = {
   feePercent?: number
   feeAmount?: number
   netAmount?: number
+  holderCpf?: string
+  pixKeyType?: string
+  pixKey?: string
   user: {
     id: number
     name: string
@@ -270,6 +273,9 @@ export default function AdminPendingWithdrawals() {
                     <th>ID</th>
                     <th>Usuário</th>
                     <th>Telefone</th>
+                    <th>CPF</th>
+                    <th>Chave PIX</th>
+                    <th>Tipo PIX</th>
                     <th>Valor bruto</th>
                     <th>Taxa</th>
                     <th>Valor líquido</th>
@@ -286,6 +292,15 @@ export default function AdminPendingWithdrawals() {
                         <td>#{item.id}</td>
                         <td>{item.user?.name ?? '-'}</td>
                         <td>{item.user?.phone ?? '-'}</td>
+                        <td style={{ fontFamily: 'monospace', fontSize: 13 }}>
+                          {item.holderCpf ? item.holderCpf : '-'}
+                        </td>
+                        <td style={{ fontFamily: 'monospace', fontSize: 12, maxWidth: 180, wordBreak: 'break-all' }}>
+                          {item.pixKey ? item.pixKey : '-'}
+                        </td>
+                        <td style={{ fontSize: 12 }}>
+                          {item.pixKeyType ? item.pixKeyType : '-'}
+                        </td>
                         <td>{formatBRL(item.amount)}</td>
                         <td>
                           {typeof item.feeAmount === 'number'
