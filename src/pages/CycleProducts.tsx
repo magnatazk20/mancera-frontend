@@ -397,7 +397,7 @@ export default function CycleProducts() {
                         >
                           <div style={{ color: '#64748b', fontSize: 16, lineHeight: 1.5 }}>
                             <div>
-                              Quantidade de Compras: <span style={{ color: '#0f172a', fontWeight: 700 }}>{compras}</span>
+                              Quantidade de Compras: <span style={{ color: '#0f172a', fontWeight: 700 }}>{userPurchaseCount}</span>
                             </div>
                             <div>
                               Quantidade de Estoque: <span style={{ color: '#0f172a', fontWeight: 700 }}>{estoque}</span>
