@@ -103,13 +103,15 @@ export default function Profile() {
 
     const loadProfile = async () => {
       setLoading(true)
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+      const authHeaders = token ? { Authorization: `Bearer ${token}` } : {}
       try {
         const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes] = await Promise.all([
-          fetch(`${API_URL}/api/user/summary/${user.id}`),
-          fetch(`${API_URL}/api/vip/user/${user.id}`),
-          fetch(`${API_URL}/api/profile/metrics/${user.id}`),
-          fetch(`${API_URL}/api/mining/tasks/${user.id}`),
-          fetch(`${API_URL}/api/mini-tasks/${user.id}`),
+          fetch(`${API_URL}/api/user/summary/${user.id}`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/vip/user/${user.id}`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/profile/metrics/${user.id}`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/mining/tasks/${user.id}`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/mini-tasks/${user.id}`, { headers: authHeaders }),
         ])
 
         if (summaryRes.ok) {

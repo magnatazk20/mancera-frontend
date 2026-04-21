@@ -104,7 +104,10 @@ export default function MiningTask() {
       }
 
       try {
-        const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`)
+        const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+        const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
         const data = await response.json()
 
         if (!response.ok || !data?.ok) {
