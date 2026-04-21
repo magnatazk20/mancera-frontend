@@ -159,8 +159,8 @@ export default function AdminPendingWithdrawals() {
       setActionSuccess(msg)
       window.alert(msg)
       await fetchPending()
-    } catch {
-      const msg = 'Falha de conexão ao processar ação do saque.'
+    } catch (err) {
+      const msg = `Falha de conexão ao processar ação do saque. (${String((err as Error)?.message ?? err)})`
       setActionError(msg)
       window.alert(msg)
     } finally {
