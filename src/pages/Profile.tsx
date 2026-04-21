@@ -210,9 +210,13 @@ export default function Profile() {
     setRedeemFeedback(null)
 
     try {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
       const res = await fetch(`${API_URL}/api/gift-codes/redeem`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           userId: user.id,
           code,

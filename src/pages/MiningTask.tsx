@@ -178,9 +178,13 @@ export default function MiningTask() {
     setMessage('')
 
     try {
+      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
       const response = await fetch(`${API_URL}/api/mining/tasks/complete`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ userId: user.id, taskId: Number(taskId) }),
       })
 

@@ -100,7 +100,10 @@ export default function Roleta() {
 
     fetch(`${API_URL}/api/roleta/redeem-code`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${rawToken}`,
+      },
       body: JSON.stringify({ userId, code: codeFromUrl }),
     })
       .then((res) =>
@@ -217,8 +220,9 @@ export default function Roleta() {
     setWinner(null)
 
     try {
+      const rawToken = localStorage.getItem('token') ?? sessionStorage.getItem('token')
       const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
-      if (!rawUser) { setIsSpinning(false); return }
+      if (!rawUser || !rawToken) { setIsSpinning(false); return }
 
       const parsed = JSON.parse(rawUser) as { id?: number }
       const userId = Number(parsed?.id)
@@ -226,7 +230,10 @@ export default function Roleta() {
 
       const response = await fetch(`${API_URL}/api/roleta/spin`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${rawToken}`,
+        },
         body: JSON.stringify({ userId }),
       })
 
