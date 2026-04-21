@@ -27,6 +27,7 @@ type CycleProduct = {
   requireCommissionLevel2Count: number
   requireCommissionLevel3Count: number
   stockQuantity: number
+  maxPurchasesPerUser: number
   expiresAt: string | null
 }
 
@@ -49,6 +50,7 @@ export default function CycleProducts() {
   const [isBuying, setIsBuying] = useState(false)
   const [activeCategory, setActiveCategory] = useState<PlanCategory>('normal')
   const [userInviteCount, setUserInviteCount] = useState<{ level1: number; level2: number; level3: number } | null>(null)
+  const [myPurchases, setMyPurchases] = useState<Record<number, number>>({})
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -98,6 +100,7 @@ export default function CycleProducts() {
           requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
           requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
           stockQuantity: Number(item.stockQuantity ?? 0),
+          maxPurchasesPerUser: Number(item.maxPurchasesPerUser ?? 0),
           expiresAt: item.expiresAt == null ? null : String(item.expiresAt),
         }))
 
@@ -141,6 +144,24 @@ export default function CycleProducts() {
     }
 
     loadInviteCounts()
+
+    const loadMyPurchases = async () => {
+      try {
+        const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+        if (!token) return
+        const res = await fetch(`${API_URL}/api/cycle-products/my-purchases/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = await res.json().catch(() => ({})) as { ok?: boolean; purchases?: Record<number, number> }
+        if (res.ok && data?.ok && data.purchases) {
+          setMyPurchases(data.purchases)
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
+    loadMyPurchases()
   }, [user?.id])
 
   const formatBRL = (value: number) =>
@@ -187,7 +208,7 @@ export default function CycleProducts() {
         return
       }
 
-      // Decrementa o estoque localmente para feedback imediato
+      // Decrementa o estoque e incrementa contagem de compras localmente
       setCyclePlans((prev) =>
         prev.map((p) =>
           p.id === selectedPlan.id
@@ -195,6 +216,10 @@ export default function CycleProducts() {
             : p
         )
       )
+      setMyPurchases((prev) => ({
+        ...prev,
+        [selectedPlan.id]: (prev[selectedPlan.id] ?? 0) + 1,
+      }))
 
       alert(data?.message ?? 'Ciclo adquirido com sucesso.')
       setSelectedPlan(null)
@@ -298,6 +323,10 @@ export default function CycleProducts() {
                   const vendidos = Math.max(0, estoqueInicial - estoque)
                   const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
                   const compras = vendidos
+                  const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
+                  const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
+                  const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
+                  const isUnavailable = estoque <= 0 || limitReached
                   const shouldShowCommissionRules =
                     plan.requireCommissionLevel1Count > 0 ||
                     plan.requireCommissionLevel2Count > 0 ||
@@ -376,17 +405,17 @@ export default function CycleProducts() {
                           </div>
                           <button
                             type="button"
-                            onClick={() => setSelectedPlan(plan)}
-                            disabled={estoque <= 0}
+                            onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
+                            disabled={isUnavailable}
                             style={{
                               border: 'none',
                               borderRadius: 14,
-                              background: estoque <= 0 ? '#94a3b8' : '#0b63ff',
+                              background: isUnavailable ? '#94a3b8' : '#0b63ff',
                               color: '#fff',
                               fontWeight: 800,
                               fontSize: 20,
                               padding: '10px 16px',
-                              cursor: estoque <= 0 ? 'not-allowed' : 'pointer',
+                              cursor: isUnavailable ? 'not-allowed' : 'pointer',
                               whiteSpace: 'nowrap',
                             }}
                           >
