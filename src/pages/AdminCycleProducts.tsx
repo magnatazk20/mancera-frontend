@@ -15,6 +15,7 @@ type CycleProduct = {
   requireCommissionLevel2Count: number
   requireCommissionLevel3Count: number
   stockQuantity: number
+  maxPurchasesPerUser: number
   expiresAt: string | null
   isActive: boolean
   createdAt: string | null
@@ -40,6 +41,7 @@ type FormState = {
   requireCommissionLevel2Count: string
   requireCommissionLevel3Count: string
   stockQuantity: string
+  maxPurchasesPerUser: string
   expiresAt: string
   isActive: boolean
 }
@@ -61,6 +63,7 @@ const emptyForm: FormState = {
   requireCommissionLevel2Count: '0',
   requireCommissionLevel3Count: '0',
   stockQuantity: '0',
+  maxPurchasesPerUser: '0',
   expiresAt: '',
   isActive: true,
 }
@@ -147,6 +150,7 @@ export default function AdminCycleProducts() {
           requireCommissionLevel2Count?: number
           requireCommissionLevel3Count?: number
           stockQuantity?: number
+          maxPurchasesPerUser?: number
           expiresAt?: string | null
           isActive?: boolean
           createdAt?: string | null
@@ -176,6 +180,7 @@ export default function AdminCycleProducts() {
             requireCommissionLevel2Count: Number(item.requireCommissionLevel2Count ?? 0),
             requireCommissionLevel3Count: Number(item.requireCommissionLevel3Count ?? 0),
             stockQuantity: Number(item.stockQuantity ?? 0),
+            maxPurchasesPerUser: Number(item.maxPurchasesPerUser ?? 0),
             expiresAt: item.expiresAt ?? null,
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
@@ -210,6 +215,7 @@ export default function AdminCycleProducts() {
       requireCommissionLevel2Count: String(product.requireCommissionLevel2Count ?? 0),
       requireCommissionLevel3Count: String(product.requireCommissionLevel3Count ?? 0),
       stockQuantity: String(product.stockQuantity ?? 0),
+      maxPurchasesPerUser: String(product.maxPurchasesPerUser ?? 0),
       expiresAt: product.expiresAt ? String(product.expiresAt).slice(0, 16) : '',
       isActive: product.isActive,
     })
@@ -227,6 +233,7 @@ export default function AdminCycleProducts() {
     const numericRequireLevel2 = Number(form.requireCommissionLevel2Count.replace(',', '.'))
     const numericRequireLevel3 = Number(form.requireCommissionLevel3Count.replace(',', '.'))
     const numericStockQuantity = Number(form.stockQuantity.replace(',', '.'))
+    const numericMaxPurchasesPerUser = Number(form.maxPurchasesPerUser.replace(',', '.'))
 
     if (!token) {
       setFeedback({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
@@ -278,6 +285,11 @@ export default function AdminCycleProducts() {
       return
     }
 
+    if (!Number.isInteger(numericMaxPurchasesPerUser) || numericMaxPurchasesPerUser < 0) {
+      setFeedback({ type: 'error', text: 'Limite de compras por usuário deve ser 0 (sem limite) ou um número inteiro positivo.' })
+      return
+    }
+
     setSaving(true)
     setFeedback(null)
 
@@ -306,6 +318,7 @@ export default function AdminCycleProducts() {
           requireCommissionLevel2Count: numericRequireLevel2,
           requireCommissionLevel3Count: numericRequireLevel3,
           stockQuantity: numericStockQuantity,
+          maxPurchasesPerUser: numericMaxPurchasesPerUser,
           expiresAt: form.planType === 'vip_day' ? (form.expiresAt || null) : null,
           isActive: form.isActive,
         }),
@@ -499,6 +512,18 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
+              <label>Limite de compras por usuário <small style={{ color: '#94a3b8', fontWeight: 400 }}>(0 = sem limite)</small></label>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                value={form.maxPurchasesPerUser}
+                onChange={(e) => setForm((prev) => ({ ...prev, maxPurchasesPerUser: e.target.value }))}
+                placeholder="0 = ilimitado"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
               <label>Imagem (URL)</label>
               <input
                 type="url"
@@ -576,7 +601,7 @@ export default function AdminCycleProducts() {
                         Exigência de convite • Nível 1: {product.requireCommissionLevel1Count} • Nível 2: {product.requireCommissionLevel2Count} • Nível 3: {product.requireCommissionLevel3Count}
                       </p>
                       <p className="admin-cycle-item-meta secondary">
-                        Estoque: {product.stockQuantity}
+                        Estoque: {product.stockQuantity} • Limite por usuário: {product.maxPurchasesPerUser === 0 ? 'Ilimitado' : `${product.maxPurchasesPerUser}x`}
                       </p>
                     </div>
                     <div className="admin-cycle-item-actions">
