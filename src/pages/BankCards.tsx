@@ -105,10 +105,11 @@ export default function BankCards() {
 
     setSaving(true)
 
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const res = await fetch(`${API_URL}/api/user/pix-key`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify(payload),
       })
 
