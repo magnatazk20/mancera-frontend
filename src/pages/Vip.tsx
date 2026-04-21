@@ -85,10 +85,11 @@ export default function Vip() {
     setMessage('')
     setSubmittingId(vipLevelId)
 
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const response = await fetch(`${API_URL}/api/vip/activate`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ userId: user.id, vipLevelId }),
       })
 

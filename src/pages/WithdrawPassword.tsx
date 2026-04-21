@@ -76,10 +76,11 @@ export default function WithdrawPassword() {
     setLoading(true)
     setFeedback(null)
 
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const res = await fetch(`${API_URL}/api/user/withdraw-password`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ userId: user.id, password }),
       })
 

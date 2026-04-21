@@ -73,10 +73,11 @@ export default function MonthlySalary() {
     setClaimLoadingPlanId(planId)
     setError('')
 
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const res = await fetch(`${API_URL}/api/monthly-salary-plans/claim`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           userId: user.id,
           planId,

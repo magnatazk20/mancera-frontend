@@ -187,10 +187,11 @@ export default function Dashboard() {
     if (!user?.id || !selectedPlan || isBuying) return
 
     setIsBuying(true)
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const response = await fetch(`${API_URL}/api/cycle-products/purchase`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           userId: user.id,
           cycleProductId: selectedPlan.id,
