@@ -85,7 +85,8 @@ export default function Login() {
                 type="tel"
                 placeholder="(11) 99999-9999"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/[^\d+()\s-]/g, ''))}
+                inputMode="numeric"
                 autoComplete="tel"
                 required
               />
