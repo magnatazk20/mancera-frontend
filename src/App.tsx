@@ -38,6 +38,7 @@ import AdminUserHistory from './pages/AdminUserHistory'
 import AdminWithdrawConfig from './pages/AdminWithdrawConfig'
 import AdminRankings from './pages/AdminRankings'
 import AdminLogs from './pages/AdminLogs'
+import AdminSecurityLogs from './pages/AdminSecurityLogs'
 import AdminPendingWithdrawals from './pages/AdminPendingWithdrawals'
 import AdminUserWithdrawals from './pages/AdminUserWithdrawals'
 import AdminRouletteCode from './pages/AdminRouletteCode'
@@ -228,6 +229,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminLogs />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/security-logs"
+          element={(
+            <RequireMaxAdmin>
+              <AdminSecurityLogs />
             </RequireMaxAdmin>
           )}
         />

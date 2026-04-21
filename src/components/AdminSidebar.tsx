@@ -127,6 +127,7 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/community-links'); setMenuOpen(false) }}>Links da Comunidade</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/security-logs'); setMenuOpen(false) }}>🛡️ Logs de Segurança</button>
         </nav>
 
         <button
