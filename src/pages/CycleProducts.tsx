@@ -322,7 +322,6 @@ export default function CycleProducts() {
                   const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
                   const vendidos = Math.max(0, estoqueInicial - estoque)
                   const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
-                  const compras = vendidos
                   const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
                   const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
                   const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
