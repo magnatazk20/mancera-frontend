@@ -639,15 +639,7 @@ export default function Withdraw() {
           </small>
         </div>
 
-        <div className={`withdraw-feedback ${withdrawAutoApprove ? 'success' : ''}`} style={{ marginBottom: 8 }}>
-          <p>
-            {withdrawAutoApprove
-              ? '⚡ Saque automático ativado — seu saque será processado e enviado imediatamente.'
-              : '🕐 Saque manual — sua solicitação ficará em análise até ser aprovada pelo administrador.'}
-          </p>
-        </div>
-
-        <div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
+<div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
           <span className="withdraw-highlight-label">Taxa de saque</span>
           <strong className="withdraw-highlight-value">{withdrawFeePercent}%</strong>
         </div>
