@@ -18,6 +18,7 @@ type WithdrawConfigResponse = {
     withdrawFeePercent?: number
     minWithdrawAmount?: number
     maxWithdrawAmount?: number
+    withdrawAutoApprove?: boolean
     withdrawStartTime?: string
     withdrawEndTime?: string
     withdrawAllowedDays?: string
@@ -63,6 +64,7 @@ export default function Withdraw() {
   const [withdrawStartTime, setWithdrawStartTime] = useState('00:00')
   const [withdrawEndTime, setWithdrawEndTime] = useState('23:59')
   const [withdrawAllowedDays, setWithdrawAllowedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6])
+  const [withdrawAutoApprove, setWithdrawAutoApprove] = useState(false)
 
   const [lastRequest, setLastRequest] = useState<{
     amount: number
@@ -180,13 +182,14 @@ export default function Withdraw() {
 
     const loadWithdrawConfig = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/withdraw-config`)
+        const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
         const data = (await res.json()) as WithdrawConfigResponse
         if (!res.ok || !data?.ok || !data.config) return
 
         setWithdrawFeePercent(Number(data.config.withdrawFeePercent ?? 0))
         setMinWithdrawAmount(Number(data.config.minWithdrawAmount ?? 0))
         setMaxWithdrawAmount(Number(data.config.maxWithdrawAmount ?? 0))
+        setWithdrawAutoApprove(Boolean(data.config.withdrawAutoApprove))
         setWithdrawStartTime(String(data.config.withdrawStartTime ?? '00:00'))
         setWithdrawEndTime(String(data.config.withdrawEndTime ?? '23:59'))
         const parsedDays = String(data.config.withdrawAllowedDays ?? '0,1,2,3,4,5,6')
@@ -348,7 +351,7 @@ export default function Withdraw() {
 
     setLoading(true)
     try {
-      if (!isWithdrawActivated) {
+      if (!withdrawAutoApprove && !isWithdrawActivated) {
         const activationRes = await fetch(`${API_URL}/api/withdraw/activation-token`, {
           method: 'POST',
           headers: {
@@ -634,6 +637,14 @@ export default function Withdraw() {
           <small>
             Janela configurada: {withdrawStartTime} até {withdrawEndTime} • Dias: {allowedDaysLabel}
           </small>
+        </div>
+
+        <div className={`withdraw-feedback ${withdrawAutoApprove ? 'success' : ''}`} style={{ marginBottom: 8 }}>
+          <p>
+            {withdrawAutoApprove
+              ? '⚡ Saque automático ativado — seu saque será processado e enviado imediatamente.'
+              : '🕐 Saque manual — sua solicitação ficará em análise até ser aprovada pelo administrador.'}
+          </p>
         </div>
 
         <div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
