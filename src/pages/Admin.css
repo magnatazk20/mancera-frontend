@@ -615,6 +615,63 @@
   color: #fff;
 }
 
+/* ── Resumo de saques pendentes ── */
+.apw-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.apw-summary-card {
+  background: linear-gradient(180deg, #1a2440, #111a31);
+  border: 1px solid #2a3a63;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.apw-summary-card--amount {
+  border-color: #7f3a1a;
+  background: linear-gradient(180deg, #2a1a10, #111a31);
+}
+
+.apw-summary-label {
+  font-size: 0.78rem;
+  color: #8a9ec8;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.apw-summary-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.apw-summary-card--amount .apw-summary-value {
+  color: #fb923c;
+}
+
+.apw-summary-sub {
+  font-size: 0.76rem;
+  color: #7a93c8;
+}
+
+@media (max-width: 480px) {
+  .apw-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .apw-summary-value {
+    font-size: 1.25rem;
+  }
+}
+
 @media (max-width: 640px) {
   .admin-kpis {
     grid-template-columns: 1fr;

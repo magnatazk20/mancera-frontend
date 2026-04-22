@@ -84,6 +84,16 @@ export default function AdminPendingWithdrawals() {
 
   const pendingCount = useMemo(() => filteredWithdrawals.length, [filteredWithdrawals])
 
+  const totalAmount = useMemo(
+    () => filteredWithdrawals.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
+    [filteredWithdrawals]
+  )
+
+  const totalAmountAll = useMemo(
+    () => withdrawals.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
+    [withdrawals]
+  )
+
   const fetchPending = async () => {
     setLoading(true)
     setError('')
@@ -185,6 +195,23 @@ export default function AdminPendingWithdrawals() {
             <span>
               exibindo {pendingCount} de {withdrawals.length}
             </span>
+          </div>
+
+          <div className="apw-summary">
+            <div className="apw-summary-card">
+              <span className="apw-summary-label">Saques pendentes</span>
+              <strong className="apw-summary-value">{withdrawals.length}</strong>
+              {pendingCount !== withdrawals.length ? (
+                <small className="apw-summary-sub">{pendingCount} com filtros</small>
+              ) : null}
+            </div>
+            <div className="apw-summary-card apw-summary-card--amount">
+              <span className="apw-summary-label">Total a pagar</span>
+              <strong className="apw-summary-value">{formatBRL(totalAmountAll)}</strong>
+              {pendingCount !== withdrawals.length ? (
+                <small className="apw-summary-sub">{formatBRL(totalAmount)} com filtros</small>
+              ) : null}
+            </div>
           </div>
 
           <div className="admin-withdraw-filters">
