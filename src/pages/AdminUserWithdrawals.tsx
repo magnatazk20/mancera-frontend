@@ -155,6 +155,45 @@ export default function AdminUserWithdrawals() {
               </tbody>
             </table>
           </div>
+
+          <div className="admin-withdraw-cards">
+            {loading ? (
+              <p>Carregando saques...</p>
+            ) : error ? (
+              <p>{error}</p>
+            ) : rows.length === 0 ? (
+              <p>Nenhum saque não pendente encontrado.</p>
+            ) : (
+              rows.map((row) => (
+                <div key={row.id} className="admin-withdraw-card">
+                  <div className="admin-withdraw-row">
+                    <strong>ID</strong>
+                    <span>#{row.id}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Usuário</strong>
+                    <span>{row.user?.name || `Usuário #${row.user?.id ?? ''}`}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Telefone</strong>
+                    <span>{row.user?.phone || '-'}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Valor</strong>
+                    <span>{formatBRL(row.amount)}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Status</strong>
+                    <span className={`status ${mapStatusClass(row.status)}`}>{mapStatusLabel(row.status)}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Data</strong>
+                    <span>{formatDateTime(row.paidAt ?? row.createdAt)}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </section>
       </section>
     </main>
