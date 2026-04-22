@@ -124,6 +124,10 @@ export default function AdminUserDetails() {
   const [telegramDisconnectFeedback, setTelegramDisconnectFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [telegramModalOpen, setTelegramModalOpen] = useState(false)
 
+  const [telegramMsgText, setTelegramMsgText] = useState('')
+  const [telegramMsgLoading, setTelegramMsgLoading] = useState(false)
+  const [telegramMsgFeedback, setTelegramMsgFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
@@ -223,6 +227,39 @@ export default function AdminUserDetails() {
       setTelegramModalOpen(false)
     } finally {
       setTelegramDisconnectLoading(false)
+    }
+  }
+
+  const handleTelegramMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!id) return
+    const text = telegramMsgText.trim()
+    if (!text) {
+      setTelegramMsgFeedback({ type: 'error', message: 'Digite uma mensagem antes de enviar.' })
+      return
+    }
+    setTelegramMsgLoading(true)
+    setTelegramMsgFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/telegram/message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: text }),
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setTelegramMsgFeedback({ type: 'error', message: data?.error ?? 'Falha ao enviar mensagem.' })
+        return
+      }
+      setTelegramMsgFeedback({ type: 'success', message: 'Mensagem enviada com sucesso pelo Telegram!' })
+      setTelegramMsgText('')
+    } catch {
+      setTelegramMsgFeedback({ type: 'error', message: 'Erro de conexão ao enviar mensagem.' })
+    } finally {
+      setTelegramMsgLoading(false)
     }
   }
 
@@ -587,6 +624,60 @@ export default function AdminUserDetails() {
                 ) : null}
               </form>
             </section>
+
+            {Number(user.telegramConectado ?? 0) === 1 ? (
+              <section className="admin-panel admin-user-list-panel">
+                <div className="admin-log-header">
+                  <h3>📨 Enviar mensagem pelo Telegram</h3>
+                </div>
+                <p className="admin-log-hint" style={{ marginBottom: 12 }}>
+                  Envie uma mensagem diretamente para este usuário via bot do Telegram.
+                  {user.telegramConnection?.telegramFirstName
+                    ? ` Conectado como: ${user.telegramConnection.telegramFirstName}${user.telegramConnection.telegramUsername ? ` (@${user.telegramConnection.telegramUsername})` : ''}.`
+                    : ''}
+                </p>
+                <form onSubmit={handleTelegramMessage} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <textarea
+                    value={telegramMsgText}
+                    onChange={(e) => setTelegramMsgText(e.target.value)}
+                    placeholder="Digite a mensagem para enviar ao usuário..."
+                    rows={4}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 10,
+                      border: '1.5px solid #2a3a63',
+                      background: '#0d1526',
+                      color: '#e2e8f0',
+                      fontSize: 14,
+                      resize: 'vertical',
+                      outline: 'none',
+                      fontFamily: 'inherit',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <button
+                      type="submit"
+                      className="admin-toggle-logs-btn"
+                      disabled={telegramMsgLoading}
+                      style={{ opacity: telegramMsgLoading ? 0.7 : 1 }}
+                    >
+                      {telegramMsgLoading ? 'Enviando...' : '📤 Enviar mensagem'}
+                    </button>
+                    {telegramMsgFeedback ? (
+                      <span style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: telegramMsgFeedback.type === 'success' ? '#16a34a' : '#dc2626',
+                      }}>
+                        {telegramMsgFeedback.message}
+                      </span>
+                    ) : null}
+                  </div>
+                </form>
+              </section>
+            ) : null}
 
             <section className="admin-user-metrics-grid">
               <article className="admin-kpi-card">
