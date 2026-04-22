@@ -74,6 +74,7 @@ type UserDetailsResponse = {
       telegramFirstName: string
       connectedAt: string | null
     } | null
+    hasWithdrawPassword?: boolean
     activeContract?: string | null
     totalDepositsPaid: number
     totalWithdrawals: number
@@ -127,6 +128,10 @@ export default function AdminUserDetails() {
   const [telegramMsgText, setTelegramMsgText] = useState('')
   const [telegramMsgLoading, setTelegramMsgLoading] = useState(false)
   const [telegramMsgFeedback, setTelegramMsgFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  const [withdrawPwdDeleteLoading, setWithdrawPwdDeleteLoading] = useState(false)
+  const [withdrawPwdDeleteFeedback, setWithdrawPwdDeleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [withdrawPwdModalOpen, setWithdrawPwdModalOpen] = useState(false)
 
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
@@ -227,6 +232,32 @@ export default function AdminUserDetails() {
       setTelegramModalOpen(false)
     } finally {
       setTelegramDisconnectLoading(false)
+    }
+  }
+
+  const confirmWithdrawPwdDelete = async () => {
+    if (!id) return
+    setWithdrawPwdDeleteLoading(true)
+    setWithdrawPwdDeleteFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/withdraw-password`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setWithdrawPwdDeleteFeedback({ type: 'error', message: data?.error ?? 'Falha ao remover senha de saque.' })
+        setWithdrawPwdModalOpen(false)
+        return
+      }
+      setWithdrawPwdDeleteFeedback({ type: 'success', message: 'Senha de saque removida com sucesso.' })
+      setWithdrawPwdModalOpen(false)
+      await loadUserDetails()
+    } catch {
+      setWithdrawPwdDeleteFeedback({ type: 'error', message: 'Erro de conexão.' })
+      setWithdrawPwdModalOpen(false)
+    } finally {
+      setWithdrawPwdDeleteLoading(false)
     }
   }
 
@@ -434,6 +465,59 @@ export default function AdminUserDetails() {
         </div>
       ) : null}
 
+      {/* ── Modal confirmação deletar senha de saque ── */}
+      {withdrawPwdModalOpen ? (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(15,23,42,0.55)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000, padding: 16,
+        }}>
+          <div style={{
+            width: '100%', maxWidth: 400,
+            background: 'linear-gradient(180deg,#fff 0%,#f8fafc 100%)',
+            borderRadius: 16,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 48px rgba(2,6,23,.18)',
+            padding: 24,
+          }}>
+            <h3 style={{ margin: '0 0 6px', color: '#0f172a', fontSize: 18 }}>
+              Remover senha de saque
+            </h3>
+            <p style={{ margin: '0 0 20px', color: '#64748b', fontSize: 14 }}>
+              Tem certeza que deseja remover a senha de saque deste usuário? Ele precisará cadastrar uma nova senha antes de sacar.
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => setWithdrawPwdModalOpen(false)}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: '1.5px solid #e2e8f0', background: 'transparent',
+                  fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={withdrawPwdDeleteLoading}
+                onClick={confirmWithdrawPwdDelete}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: 'none', background: '#dc2626', color: '#fff',
+                  fontWeight: 700, fontSize: 14,
+                  cursor: withdrawPwdDeleteLoading ? 'not-allowed' : 'pointer',
+                  opacity: withdrawPwdDeleteLoading ? 0.7 : 1,
+                }}
+              >
+                {withdrawPwdDeleteLoading ? 'Removendo...' : 'Confirmar remoção'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <section className="admin-content admin-user-details-page">
         <header className="admin-header">
           <div>
@@ -566,6 +650,37 @@ export default function AdminUserDetails() {
                 {telegramDisconnectFeedback ? (
                   <span style={{ fontSize: 12, color: telegramDisconnectFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
                     {telegramDisconnectFeedback.message}
+                  </span>
+                ) : null}
+              </p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <strong>Senha de saque:</strong>
+                <span style={{ color: user.hasWithdrawPassword ? '#4ade80' : '#f87171', fontWeight: 600 }}>
+                  {user.hasWithdrawPassword ? '✅ Cadastrada' : '❌ Não cadastrada'}
+                </span>
+                {user.hasWithdrawPassword ? (
+                  <button
+                    type="button"
+                    disabled={withdrawPwdDeleteLoading}
+                    onClick={() => { setWithdrawPwdDeleteFeedback(null); setWithdrawPwdModalOpen(true) }}
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: 8,
+                      border: '1.5px solid #dc2626',
+                      background: 'transparent',
+                      color: '#dc2626',
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: withdrawPwdDeleteLoading ? 'not-allowed' : 'pointer',
+                      opacity: withdrawPwdDeleteLoading ? 0.6 : 1,
+                    }}
+                  >
+                    🗑️ Deletar senha
+                  </button>
+                ) : null}
+                {withdrawPwdDeleteFeedback ? (
+                  <span style={{ fontSize: 12, color: withdrawPwdDeleteFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {withdrawPwdDeleteFeedback.message}
                   </span>
                 ) : null}
               </p>
