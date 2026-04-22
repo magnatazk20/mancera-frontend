@@ -1,11 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
+import './AdminUserWithdrawals.css'
 
 type AdminWithdrawalRow = {
   id: number
   amount: number
   status: string
+  holderName?: string
+  holderCpf?: string
+  pixKeyType?: string
+  pixKey?: string
+  externalId?: string | null
+  providerTransactionId?: string | null
   createdAt?: string | null
   paidAt?: string | null
   user: {
@@ -55,10 +62,134 @@ const mapStatusLabel = (status: string) => {
   return String(status ?? '-').toUpperCase()
 }
 
+const maskCpf = (cpf: string) => {
+  const digits = String(cpf ?? '').replace(/\D/g, '')
+  if (digits.length !== 11) return cpf || '-'
+  return `${digits.slice(0, 3)}.***.***-${digits.slice(9)}`
+}
+
+const mapPixTypeLabel = (type: string) => {
+  const t = String(type ?? '').toUpperCase()
+  if (t === 'CPF') return 'CPF'
+  if (t === 'CNPJ') return 'CNPJ'
+  if (t === 'EMAIL') return 'E-mail'
+  if (t === 'TELEFONE') return 'Telefone'
+  if (t === 'CHAVE_ALEATORIA') return 'Chave Aleatória'
+  return type || '-'
+}
+
+function WithdrawalDetailModal({
+  row,
+  onClose,
+}: {
+  row: AdminWithdrawalRow
+  onClose: () => void
+}) {
+  return (
+    <div className="auw-modal-backdrop" role="presentation" onClick={onClose}>
+      <div
+        className="auw-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auw-modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="auw-modal-header">
+          <h3 id="auw-modal-title">Detalhes do Saque #{row.id}</h3>
+          <button className="auw-modal-close" type="button" onClick={onClose} aria-label="Fechar">✕</button>
+        </div>
+
+        <div className="auw-modal-body">
+          <div className="auw-modal-section">
+            <p className="auw-modal-section-title">Usuário</p>
+            <div className="auw-modal-grid">
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Nome</span>
+                <span className="auw-modal-value">{row.user?.name || `Usuário #${row.user?.id ?? ''}`}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Telefone</span>
+                <span className="auw-modal-value">{row.user?.phone || '-'}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">ID do Usuário</span>
+                <span className="auw-modal-value">#{row.user?.id}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auw-modal-section">
+            <p className="auw-modal-section-title">Dados do Saque</p>
+            <div className="auw-modal-grid">
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Valor</span>
+                <span className="auw-modal-value auw-value-highlight">{formatBRL(row.amount)}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Status</span>
+                <span className={`status ${mapStatusClass(row.status)}`}>{mapStatusLabel(row.status)}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Solicitado em</span>
+                <span className="auw-modal-value">{formatDateTime(row.createdAt)}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Pago em</span>
+                <span className="auw-modal-value">{formatDateTime(row.paidAt)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auw-modal-section">
+            <p className="auw-modal-section-title">Dados PIX</p>
+            <div className="auw-modal-grid">
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Titular</span>
+                <span className="auw-modal-value">{row.holderName || '-'}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">CPF</span>
+                <span className="auw-modal-value">{maskCpf(row.holderCpf ?? '')}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Tipo de chave</span>
+                <span className="auw-modal-value">{mapPixTypeLabel(row.pixKeyType ?? '')}</span>
+              </div>
+              <div className="auw-modal-field auw-modal-field--full">
+                <span className="auw-modal-label">Chave PIX</span>
+                <span className="auw-modal-value auw-mono">{row.pixKey || '-'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="auw-modal-section">
+            <p className="auw-modal-section-title">Rastreamento</p>
+            <div className="auw-modal-grid">
+              <div className="auw-modal-field auw-modal-field--full">
+                <span className="auw-modal-label">ID Externo</span>
+                <span className="auw-modal-value auw-mono">{row.externalId || '-'}</span>
+              </div>
+              <div className="auw-modal-field auw-modal-field--full">
+                <span className="auw-modal-label">ID Transação (provedor)</span>
+                <span className="auw-modal-value auw-mono">{row.providerTransactionId || '-'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="auw-modal-footer">
+          <button type="button" className="auw-modal-btn-close" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminUserWithdrawals() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [rows, setRows] = useState<AdminWithdrawalRow[]>([])
+  const [selected, setSelected] = useState<AdminWithdrawalRow | null>(null)
 
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
@@ -123,20 +254,21 @@ export default function AdminUserWithdrawals() {
                   <th>Valor</th>
                   <th>Status</th>
                   <th>Data</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6}>Carregando saques...</td>
+                    <td colSpan={7}>Carregando saques...</td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={6}>{error}</td>
+                    <td colSpan={7}>{error}</td>
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={6}>Nenhum saque não pendente encontrado.</td>
+                    <td colSpan={7}>Nenhum saque não pendente encontrado.</td>
                   </tr>
                 ) : (
                   rows.map((row) => (
@@ -149,6 +281,15 @@ export default function AdminUserWithdrawals() {
                         <span className={`status ${mapStatusClass(row.status)}`}>{mapStatusLabel(row.status)}</span>
                       </td>
                       <td>{formatDateTime(row.paidAt ?? row.createdAt)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="auw-detail-btn"
+                          onClick={() => setSelected(row)}
+                        >
+                          Ver detalhes
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -190,12 +331,23 @@ export default function AdminUserWithdrawals() {
                     <strong>Data</strong>
                     <span>{formatDateTime(row.paidAt ?? row.createdAt)}</span>
                   </div>
+                  <button
+                    type="button"
+                    className="auw-detail-btn auw-detail-btn--full"
+                    onClick={() => setSelected(row)}
+                  >
+                    Ver detalhes
+                  </button>
                 </div>
               ))
             )}
           </div>
         </section>
       </section>
+
+      {selected ? (
+        <WithdrawalDetailModal row={selected} onClose={() => setSelected(null)} />
+      ) : null}
     </main>
   )
 }
