@@ -55,6 +55,7 @@ import AdminMiniTasks from './pages/AdminMiniTasks'
 import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
 import AdminCaixasBox from './pages/AdminCaixasBox'
 import AdminShopProducts from './pages/AdminShopProducts'
+import AdminCorrectionLogs from './pages/AdminCorrectionLogs'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -365,6 +366,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminShopProducts />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/correction-logs"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCorrectionLogs />
             </RequireMaxAdmin>
           )}
         />
