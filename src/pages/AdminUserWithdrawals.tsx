@@ -191,6 +191,10 @@ export default function AdminUserWithdrawals() {
   const [rows, setRows] = useState<AdminWithdrawalRow[]>([])
   const [selected, setSelected] = useState<AdminWithdrawalRow | null>(null)
 
+  // filtros
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
@@ -202,7 +206,7 @@ export default function AdminUserWithdrawals() {
       setError('')
 
       try {
-        const res = await fetch(`${API_URL}/api/admin/withdrawals/latest?limit=200`, {
+        const res = await fetch(`${API_URL}/api/admin/withdrawals/latest?limit=500`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
 
@@ -227,6 +231,66 @@ export default function AdminUserWithdrawals() {
     load()
   }, [token])
 
+  const filteredRows = useMemo(() => {
+    const q = query.trim().toLowerCase()
+
+    return rows.filter((row) => {
+      // filtro de status
+      if (statusFilter !== 'all') {
+        const normalized = String(row.status ?? '').toLowerCase().trim()
+        const isPaid = normalized === 'paid' || normalized === 'payment.paid'
+        const isProcessing = normalized === 'processing'
+        const isFailed = normalized === 'failed' || normalized === 'canceled' || normalized === 'cancelled'
+        if (statusFilter === 'paid' && !isPaid) return false
+        if (statusFilter === 'processing' && !isProcessing) return false
+        if (statusFilter === 'failed' && !isFailed) return false
+      }
+
+      // filtro de busca
+      if (!q) return true
+      const haystack = [
+        row.user?.name,
+        row.user?.phone,
+        String(row.user?.id ?? ''),
+        String(row.id),
+        String(row.amount),
+        row.pixKey,
+        row.holderName,
+        row.externalId,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+      return haystack.includes(q)
+    })
+  }, [rows, query, statusFilter])
+
+  // KPIs
+  const kpis = useMemo(() => {
+    const paid = rows.filter((r) => {
+      const n = String(r.status ?? '').toLowerCase()
+      return n === 'paid' || n === 'payment.paid'
+    })
+    const failed = rows.filter((r) => {
+      const n = String(r.status ?? '').toLowerCase()
+      return n === 'failed' || n === 'canceled' || n === 'cancelled'
+    })
+    const processing = rows.filter((r) => String(r.status ?? '').toLowerCase() === 'processing')
+
+    const totalPaid = paid.reduce((acc, r) => acc + Number(r.amount ?? 0), 0)
+    const totalFailed = failed.reduce((acc, r) => acc + Number(r.amount ?? 0), 0)
+    const totalProcessing = processing.reduce((acc, r) => acc + Number(r.amount ?? 0), 0)
+
+    return {
+      paidCount: paid.length,
+      totalPaid,
+      failedCount: failed.length,
+      totalFailed,
+      processingCount: processing.length,
+      totalProcessing,
+    }
+  }, [rows])
+
   return (
     <main className="admin-page">
       <AdminSidebar />
@@ -236,12 +300,76 @@ export default function AdminUserWithdrawals() {
             <h1>Saques Usuários</h1>
             <p className="admin-subtitle">Histórico de saques dos usuários (exceto pendentes).</p>
           </div>
+          <div className="admin-header-meta">
+            <span className="admin-chip">Total: {rows.length}</span>
+            <span className="admin-chip soft">Filtrados: {filteredRows.length}</span>
+          </div>
         </header>
+
+        {/* KPI Cards */}
+        <div className="admin-kpi-grid" style={{ marginBottom: '1.5rem' }}>
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">✅ Pagos</span>
+            <strong className="admin-kpi-value" style={{ color: '#4ade80' }}>
+              {kpis.paidCount} saque{kpis.paidCount !== 1 ? 's' : ''}
+            </strong>
+            <span className="admin-kpi-sub">{formatBRL(kpis.totalPaid)}</span>
+          </div>
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">⏳ Processando</span>
+            <strong className="admin-kpi-value" style={{ color: '#facc15' }}>
+              {kpis.processingCount} saque{kpis.processingCount !== 1 ? 's' : ''}
+            </strong>
+            <span className="admin-kpi-sub">{formatBRL(kpis.totalProcessing)}</span>
+          </div>
+          <div className="admin-kpi-card">
+            <span className="admin-kpi-label">❌ Falhou/Cancelado</span>
+            <strong className="admin-kpi-value" style={{ color: '#f87171' }}>
+              {kpis.failedCount} saque{kpis.failedCount !== 1 ? 's' : ''}
+            </strong>
+            <span className="admin-kpi-sub">{formatBRL(kpis.totalFailed)}</span>
+          </div>
+        </div>
+
+        {/* Filtros */}
+        <section className="admin-panel admin-users-panel">
+          <div className="admin-panel-head">
+            <h2>Filtros</h2>
+            <span>Busca e status</span>
+          </div>
+          <div className="admin-balance-adjust-grid">
+            <label>
+              Buscar
+              <input
+                className="admin-users-input"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Nome, telefone, ID, valor, chave PIX..."
+              />
+            </label>
+            <label>
+              Status
+              <select
+                className="admin-users-input"
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="all">Todos</option>
+                <option value="paid">Pago</option>
+                <option value="processing">Processando</option>
+                <option value="failed">Falhou / Cancelado</option>
+              </select>
+            </label>
+          </div>
+        </section>
 
         <section className="admin-panel admin-panel-wide">
           <div className="admin-panel-head">
             <h2>Saques (Não Pendentes)</h2>
-            <span>Total: {rows.length}</span>
+            <span>
+              {filteredRows.length} resultado{filteredRows.length !== 1 ? 's' : ''} —
+              Total filtrado: {formatBRL(filteredRows.reduce((a, r) => a + Number(r.amount ?? 0), 0))}
+            </span>
           </div>
 
           <div className="admin-table-wrap">
@@ -266,12 +394,12 @@ export default function AdminUserWithdrawals() {
                   <tr>
                     <td colSpan={7}>{error}</td>
                   </tr>
-                ) : rows.length === 0 ? (
+                ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={7}>Nenhum saque não pendente encontrado.</td>
+                    <td colSpan={7}>Nenhum saque encontrado com os filtros aplicados.</td>
                   </tr>
                 ) : (
-                  rows.map((row) => (
+                  filteredRows.map((row) => (
                     <tr key={row.id}>
                       <td>#{row.id}</td>
                       <td>{row.user?.name || `Usuário #${row.user?.id ?? ''}`}</td>
@@ -302,10 +430,10 @@ export default function AdminUserWithdrawals() {
               <p>Carregando saques...</p>
             ) : error ? (
               <p>{error}</p>
-            ) : rows.length === 0 ? (
-              <p>Nenhum saque não pendente encontrado.</p>
+            ) : filteredRows.length === 0 ? (
+              <p>Nenhum saque encontrado com os filtros aplicados.</p>
             ) : (
-              rows.map((row) => (
+              filteredRows.map((row) => (
                 <div key={row.id} className="admin-withdraw-card">
                   <div className="admin-withdraw-row">
                     <strong>ID</strong>
