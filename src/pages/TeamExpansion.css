@@ -1,3 +1,14 @@
+/* Dark theme override for dashboard compatibility */
+.dash-app {
+  background: #060b18 !important;
+}
+
+.dash-content {
+  background: #060b18;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
 /* ===== Team Expansion Page ===== */
 
 .team-exp-header {
