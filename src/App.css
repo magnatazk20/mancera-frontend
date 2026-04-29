@@ -148,15 +148,7 @@ body::before {
   100% { transform: translate(0, 0) scale(1); }
 }
 
-/* Grid overlay */
-.grid-overlay {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-}
+/* Grid overlay removed per user request */
 
 /* Floating particles */
 .particles {
