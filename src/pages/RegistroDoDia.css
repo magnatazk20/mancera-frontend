@@ -1,0 +1,315 @@
+/* Registro do Dia — layout básico */
+
+.rdd-page {
+  min-height: 100vh;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+}
+
+.rdd-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.rdd-topbar-back {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #333;
+}
+
+.rdd-topbar-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.rdd-topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.rdd-scroll-box {
+  flex: 1;
+  background: #ffffff;
+}
+
+/* Section blocks */
+.rdd-section {
+  background: #ffffff;
+  margin-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 14px 16px;
+}
+
+.rdd-section-title {
+  font-size: 14px;
+  color: #323233;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+/* Summary */
+.rdd-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.rdd-summary-item {
+  background: #f9f9f9;
+  border: 1px solid #ebedf0;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+}
+
+.rdd-summary-label {
+  font-size: 12px;
+  color: #969799;
+}
+
+.rdd-summary-value {
+  font-size: 14px;
+  color: #323233;
+  font-weight: 700;
+}
+
+.rdd-summary-item--deposit .rdd-summary-value {
+  color: #1f7a40;
+}
+
+.rdd-summary-item--withdraw .rdd-summary-value {
+  color: #b15c00;
+}
+
+/* Filters */
+.rdd-filter-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.rdd-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: #969799;
+}
+
+.rdd-field input {
+  height: 36px;
+  border: 1px solid #ebedf0;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #323233;
+  background: #ffffff;
+  font-family: inherit;
+  outline: 0;
+}
+
+.rdd-field input:focus {
+  border-color: rgb(255, 138, 3);
+}
+
+.rdd-quick-range {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.rdd-quick-range button {
+  flex: 1;
+  height: 32px;
+  border: 1px solid #ebedf0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #323233;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rdd-quick-range button:hover {
+  border-color: rgb(255, 138, 3);
+  color: rgb(255, 138, 3);
+}
+
+.rdd-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.rdd-tab {
+  flex: 1;
+  height: 34px;
+  border: 1px solid #ebedf0;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #323233;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.rdd-tab.active {
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* List */
+.rdd-list {
+  background: #ffffff;
+  margin-top: 8px;
+}
+
+.rdd-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rdd-item:last-child {
+  border-bottom: 0;
+}
+
+.rdd-item-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.rdd-item-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.rdd-item--deposit .rdd-item-icon {
+  background: #e8f7ee;
+  color: #1f7a40;
+}
+
+.rdd-item--withdraw .rdd-item-icon {
+  background: #fdf3e3;
+  color: #b15c00;
+}
+
+.rdd-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rdd-item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rdd-item-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #323233;
+}
+
+.rdd-item-date {
+  margin: 0;
+  font-size: 12px;
+  color: #969799;
+}
+
+.rdd-item-tx {
+  margin: 0;
+  font-size: 11px;
+  color: #c8c9cc;
+}
+
+.rdd-status {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.rdd-status--paid {
+  background: #e8f7ee;
+  color: #1f7a40;
+}
+
+.rdd-status--pending {
+  background: #fdf3e3;
+  color: #b15c00;
+}
+
+.rdd-status--processing {
+  background: #e6f0fd;
+  color: #1d4ed8;
+}
+
+.rdd-status--failed {
+  background: #fdecec;
+  color: #b3261e;
+}
+
+.rdd-item-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.rdd-item-amount .amount-positive {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f7a40;
+}
+
+.rdd-item-amount .amount-negative {
+  font-size: 14px;
+  font-weight: 700;
+  color: #b15c00;
+}
+
+.rdd-item-method {
+  font-size: 11px;
+  color: #969799;
+}
+
+.rdd-empty {
+  text-align: center;
+  color: #969799;
+  padding: 28px 16px;
+  font-size: 14px;
+}
+
+.rdd-error {
+  color: #b3261e;
+}

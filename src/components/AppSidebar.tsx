@@ -8,23 +8,6 @@ type StoredUser = {
   phone: string
 }
 
-type PaidTransactionResponse = {
-  ok?: boolean
-  total?: number
-  transactions?: Array<{
-    type?: 'deposit' | 'withdraw'
-    status?: 'paid' | 'pending'
-  }>
-}
-
-type CommunityLinksResponse = {
-  ok?: boolean
-  links?: {
-    whatsappGroupUrl?: string
-    vipGroupUrl?: string
-  }
-}
-
 type SummaryResponse = {
   balance?: number
   totalDeposits?: number
@@ -35,7 +18,7 @@ function SideIcon({
   name,
   className = 'icon-sm',
 }: {
-  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit' | 'products'
+  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit' | 'products' | 'vip'
   className?: string
 }) {
   switch (name) {
@@ -119,6 +102,13 @@ function SideIcon({
           <path d="M8 10h8M8 14h5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
         </svg>
       )
+    case 'vip':
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="14" r="1.1" fill="currentColor" />
+        </svg>
+      )
     default:
       return null
   }
@@ -131,8 +121,6 @@ export default function AppSidebar() {
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
   const [monthlySalaryContract, setMonthlySalaryContract] = useState('Sem contrato ativo')
-  const [canClickVip, setCanClickVip] = useState(false)
-  const [vipGroupUrl, setVipGroupUrl] = useState('')
 
   const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
   let user: StoredUser | null = null
@@ -143,33 +131,6 @@ export default function AppSidebar() {
       user = null
     }
   }
-
-  useEffect(() => {
-    const loadPaidDepositStatus = async () => {
-      if (!user?.id) {
-        setCanClickVip(false)
-        return
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/transactions/paid/${user.id}?limit=1`)
-        if (!res.ok) {
-          setCanClickVip(false)
-          return
-        }
-
-        const data = await res.json() as PaidTransactionResponse
-        const hasPaidDeposit = Array.isArray(data?.transactions)
-          ? data.transactions.some((tx) => tx?.type === 'deposit' && tx?.status === 'paid')
-          : Number(data?.total ?? 0) > 0
-        setCanClickVip(hasPaidDeposit)
-      } catch {
-        setCanClickVip(false)
-      }
-    }
-
-    loadPaidDepositStatus()
-  }, [user?.id])
 
   useEffect(() => {
     const loadMonthlySalaryContract = async () => {
@@ -196,31 +157,6 @@ export default function AppSidebar() {
     loadMonthlySalaryContract()
   }, [user?.id])
 
-  useEffect(() => {
-    const loadCommunityLinks = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/community-links`)
-        if (!res.ok) {
-          setVipGroupUrl('')
-          return
-        }
-
-        const data = await res.json() as CommunityLinksResponse
-        const url = String(data?.links?.vipGroupUrl ?? '').trim()
-        setVipGroupUrl(url)
-      } catch {
-        setVipGroupUrl('')
-      }
-    }
-
-    loadCommunityLinks()
-  }, [])
-
-  const openVipGroup = () => {
-    if (!canClickVip || !vipGroupUrl) return
-    window.open(vipGroupUrl, '_blank', 'noopener,noreferrer')
-  }
-
   const go = (route: string) => {
     navigate(route)
     setMenuOpen(false)
@@ -239,43 +175,6 @@ export default function AppSidebar() {
 
   return (
     <>
-      <header className="dash-topbar app-sidebar-topbar">
-        <button
-          className="menu-toggle"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Abrir menu"
-          type="button"
-        >
-          <SideIcon name="menu" className="icon" />
-        </button>
-
-        <div className="app-sidebar-user-row">
-          <div className="user-chip app-sidebar-chip">
-            <div className="avatar">{(user?.name?.[0] ?? 'U').toUpperCase()}</div>
-            <div>
-              <strong>{user?.name ?? 'Usuário'}</strong>
-              <p>{user?.phone ?? '-'} • Contrato: {monthlySalaryContract}</p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="app-sidebar-vip-btn"
-            onClick={openVipGroup}
-            disabled={!canClickVip || !vipGroupUrl}
-            title={
-              !canClickVip
-                ? 'Disponível apenas para quem tem depósito com status pago'
-                : !vipGroupUrl
-                  ? 'Link do grupo VIP não configurado'
-                  : 'Abrir grupo VIP'
-            }
-          >
-            VIP
-          </button>
-        </div>
-      </header>
-
       {menuOpen ? (
         <button className="dash-overlay" onClick={() => setMenuOpen(false)} aria-label="Fechar menu" />
       ) : null}
@@ -318,10 +217,6 @@ export default function AppSidebar() {
           <button className={`dash-nav-item ${isActive('/monthly-salary') ? 'active' : ''}`} onClick={() => go('/monthly-salary')}>
             <SideIcon name="vjp" className="icon-sm" />
             <span>Salário Mensal</span>
-          </button>
-          <button className={`dash-nav-item ${isActive('/earnings') ? 'active' : ''}`} onClick={() => go('/earnings')}>
-            <SideIcon name="extract" className="icon-sm" />
-            <span>Ganhos</span>
           </button>
           <button className={`dash-nav-item ${isActive('/bank-cards') ? 'active' : ''}`} onClick={() => go('/bank-cards')}>
             <SideIcon name="deposit" className="icon-sm" />
@@ -372,13 +267,13 @@ export default function AppSidebar() {
           <SideIcon name="home" className="icon-sm" />
           <small>Início</small>
         </button>
-        <button className={isActive('/cashin') ? 'active' : ''} onClick={() => go('/cashin')}>
-          <SideIcon name="deposit" className="icon-sm" />
-          <small>Depositar</small>
+        <button className={isActive('/vip') ? 'active' : ''} onClick={() => go('/vip')}>
+          <SideIcon name="vip" className="icon-sm" />
+          <small>VIP</small>
         </button>
-        <button className={isActive('/cycle-products') ? 'active' : ''} onClick={() => go('/cycle-products')}>
+        <button className={isActive('/position') ? 'active' : ''} onClick={() => go('/position')}>
           <SideIcon name="products" className="icon-sm" />
-          <small>Produtos</small>
+          <small>Gestão de Equipe</small>
         </button>
         <button className={isActive('/invite') ? 'active' : ''} onClick={() => go('/invite')}>
           <SideIcon name="invite" className="icon-sm" />

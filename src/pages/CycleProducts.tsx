@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
+import './CycleProducts.css'
 
 type StoredUser = {
   id: number
@@ -29,6 +30,9 @@ type CycleProduct = {
   stockQuantity: number
   maxPurchasesPerUser: number
   expiresAt: string | null
+  minAmount: number
+  maxAmount: number
+  profitPercent: number
 }
 
 const normalizePlanType = (value: unknown): PlanCategory => {
@@ -51,6 +55,7 @@ export default function CycleProducts() {
   const [activeCategory, setActiveCategory] = useState<PlanCategory>('normal')
   const [userInviteCount, setUserInviteCount] = useState<{ level1: number; level2: number; level3: number } | null>(null)
   const [myPurchases, setMyPurchases] = useState<Record<number, number>>({})
+  const [investAmounts, setInvestAmounts] = useState<Record<number, string>>({})
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -102,10 +107,12 @@ export default function CycleProducts() {
           stockQuantity: Number(item.stockQuantity ?? 0),
           maxPurchasesPerUser: Number(item.maxPurchasesPerUser ?? 0),
           expiresAt: item.expiresAt == null ? null : String(item.expiresAt),
+          minAmount: Number(item.minAmount ?? 0),
+          maxAmount: Number(item.maxAmount ?? 0),
+          profitPercent: Number(item.profitPercent ?? 0),
         }))
 
         setCyclePlans(mappedPlans)
-        // Guarda o estoque inicial para calcular progresso de vendas
         const stockMap: Record<number, number> = {}
         mappedPlans.forEach((p) => { stockMap[p.id] = p.stockQuantity })
         setInitialStock(stockMap)
@@ -118,7 +125,6 @@ export default function CycleProducts() {
 
     loadCyclePlans()
 
-    // Busca contagem de indicados com depósito por nível
     const loadInviteCounts = async () => {
       try {
         const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -188,12 +194,15 @@ export default function CycleProducts() {
     setIsBuying(true)
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
+      const userInvestAmount = Number(String(investAmounts[selectedPlan.id] ?? '0').replace(',', '.'))
+
       const response = await fetch(`${API_URL}/api/cycle-products/purchase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           userId: user.id,
           cycleProductId: selectedPlan.id,
+          investAmount: userInvestAmount,
         }),
       })
 
@@ -208,7 +217,6 @@ export default function CycleProducts() {
         return
       }
 
-      // Decrementa o estoque e incrementa contagem de compras localmente
       setCyclePlans((prev) =>
         prev.map((p) =>
           p.id === selectedPlan.id
@@ -243,264 +251,120 @@ export default function CycleProducts() {
         <AppSidebar />
 
         <div className="dash-content">
-          <section className="welcome-card" style={{ marginTop: 14 }}>
-            <h1 style={{ fontSize: 20, marginBottom: 10 }}>Produtos de ciclos</h1>
-            <p style={{ marginBottom: 12 }}>Os mesmos produtos exibidos no Dashboard.</p>
+          {/* ── Banner topo ── */}
+          <div className="cycle-banner-wrap">
+            <img src="/trkml.png" alt="TRK Banner" className="cycle-banner-img" />
+          </div>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                gap: 8,
-                marginBottom: 14,
-              }}
+          <h2 className="cycle-storage-title">Período de armazenamento</h2>
+
+          {/* ── Categoria tabs ── */}
+          <div className="cycle-category-tabs" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <button
+              type="button"
+              className={`cycle-category-tab${activeCategory === 'normal' ? ' active' : ''}`}
+              onClick={() => setActiveCategory('normal')}
             >
-              <button
-                type="button"
-                onClick={() => setActiveCategory('normal')}
-                style={{
-                  border: activeCategory === 'normal' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'normal' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
-                  color: '#0f172a',
-                  borderRadius: 12,
-                  padding: '10px 8px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 180ms ease',
-                  transform: activeCategory === 'normal' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
-                  boxShadow: activeCategory === 'normal' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
-                }}
-              >
-                Plano normal
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCategory('vip')}
-                style={{
-                  border: activeCategory === 'vip' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'vip' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
-                  color: '#0f172a',
-                  borderRadius: 12,
-                  padding: '10px 8px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 180ms ease',
-                  transform: activeCategory === 'vip' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
-                  boxShadow: activeCategory === 'vip' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
-                }}
-              >
-                Plano VIP
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCategory('vip_day')}
-                style={{
-                  border: activeCategory === 'vip_day' ? '2px solid #0b63ff' : '1px solid #cbd5e1',
-                  background: activeCategory === 'vip_day' ? 'linear-gradient(135deg, #e8f0ff 0%, #dbeafe 100%)' : '#fff',
-                  color: '#0f172a',
-                  borderRadius: 12,
-                  padding: '10px 8px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 180ms ease',
-                  transform: activeCategory === 'vip_day' ? 'translateY(-1px) scale(1.02)' : 'translateY(0) scale(1)',
-                  boxShadow: activeCategory === 'vip_day' ? '0 8px 20px rgba(11,99,255,0.22)' : '0 2px 8px rgba(15,23,42,0.06)',
-                }}
-              >
-                VIP do dia
-              </button>
-            </div>
+              Essencial
+            </button>
+            <button
+              type="button"
+              className={`cycle-category-tab${activeCategory === 'vip' ? ' active' : ''}`}
+              onClick={() => setActiveCategory('vip')}
+            >
+              Fundo de ouro
+            </button>
+          </div>
 
-            {loading ? (
-              <p style={{ color: '#6b7280' }}>Carregando produtos...</p>
-            ) : filteredCyclePlans.length === 0 ? (
-              <p style={{ color: '#6b7280' }}>Nenhum plano disponível nesta categoria.</p>
-            ) : (
-              <div style={{ display: 'grid', gap: 10 }}>
-                {filteredCyclePlans.map((plan) => {
-                  const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
-                  const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
-                  const vendidos = Math.max(0, estoqueInicial - estoque)
-                  const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
-                  const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
-                  const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
-                  const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
-                  const isUnavailable = estoque <= 0 || limitReached
-                  const shouldShowCommissionRules =
-                    plan.requireCommissionLevel1Count > 0 ||
-                    plan.requireCommissionLevel2Count > 0 ||
-                    plan.requireCommissionLevel3Count > 0
-                  const parsedExpiresAt = plan.expiresAt ? new Date(plan.expiresAt) : null
-                  const hasValidExpiresAt = parsedExpiresAt != null && !Number.isNaN(parsedExpiresAt.getTime())
+          {loading ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Carregando produtos...</p>
+          ) : filteredCyclePlans.length === 0 ? (
+            <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Nenhum plano disponível nesta categoria.</p>
+          ) : (
+            filteredCyclePlans.map((plan) => {
+              const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
+              const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
+              const vendidos = Math.max(0, estoqueInicial - estoque)
+              const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
+              const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
+              const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
+              const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
+              const isUnavailable = estoque <= 0 || limitReached
+              const effectivePercent = plan.profitPercent > 0 ? plan.profitPercent : plan.profit
+              const totalPercent = Number((effectivePercent * plan.cycleDays).toFixed(2))
 
-                  return (
-                    <article
-                      key={plan.id}
-                      style={{
-                        border: '1px solid #e5e7eb',
-                        borderRadius: 12,
-                        overflow: 'hidden',
-                        background: '#fff',
-                      }}
-                    >
-                      <img
-                        src={plan.imageUrl}
-                        alt={plan.name}
-                        style={{
-                          width: '100%',
-                          height: 120,
-                          objectFit: 'cover',
-                          display: 'block',
-                        }}
-                      />
-                      <div style={{ padding: 10 }}>
-                        <div style={{ color: '#334155', fontSize: 18, fontWeight: 500 }}>{plan.name}</div>
+              return (
+                <article
+                  key={plan.id}
+                  className={`cycle-product-card${isUnavailable ? ' unavailable' : ''}`}
+                  onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
+                >
+                  {/* ── Imagem no topo com badges ── */}
+                  <div className="cycle-product-image-wrap">
+                    <img src={plan.imageUrl} alt={plan.name} />
+                    <span className="cycle-percent-overlay">{totalPercent}%</span>
+                    <span className="cycle-days-overlay">{plan.cycleDays} dias</span>
+                  </div>
 
-                        <div
-                          style={{
-                            marginTop: 8,
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            gap: 8,
-                            textAlign: 'center',
-                          }}
-                        >
-                          <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              {Math.round(plan.amount)}
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Montante</div>
-                          </div>
-                          <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              {plan.cycleDays} dias
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Ciclo</div>
-                          </div>
-                          <div>
-                            <div style={{ color: '#ff3b00', fontSize: 24, fontWeight: 700, lineHeight: 1.1 }}>
-                              R${Math.round(plan.profit)}
-                            </div>
-                            <div style={{ color: '#334155', fontSize: 16, lineHeight: 1 }}>Lucro</div>
-                          </div>
-                        </div>
+                  {/* ── Corpo do card ── */}
+                  <div className="cycle-product-body">
+                    <div className="cycle-product-title">{plan.name}</div>
 
-                        <div
-                          style={{
-                            marginTop: 12,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: 10,
-                          }}
-                        >
-                          <div style={{ color: '#64748b', fontSize: 16, lineHeight: 1.5 }}>
-                            <div>
-                              Quantidade de Compras: <span style={{ color: '#0f172a', fontWeight: 700 }}>{userPurchaseCount}</span>
-                            </div>
-                            <div>
-                              Quantidade de Estoque: <span style={{ color: '#0f172a', fontWeight: 700 }}>{estoque}</span>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
-                            disabled={isUnavailable}
-                            style={{
-                              border: 'none',
-                              borderRadius: 14,
-                              background: isUnavailable ? '#94a3b8' : '#0b63ff',
-                              color: '#fff',
-                              fontWeight: 800,
-                              fontSize: 20,
-                              padding: '10px 16px',
-                              cursor: isUnavailable ? 'not-allowed' : 'pointer',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {estoque <= 0 ? 'Esgotado' : 'Investir'}
-                          </button>
-                        </div>
+                    <div className="cycle-details-list">
+                      <div>Lucro diário: <strong>{effectivePercent}%</strong></div>
+                      <div>Lucro total no ciclo: <strong>{totalPercent}%</strong></div>
+                      <div>Ciclo: <strong>{plan.cycleDays} dias</strong></div>
+                      <div>Mín. depósito: <strong>{formatBRL(plan.minAmount)}</strong></div>
+                    </div>
 
-                        {shouldShowCommissionRules ? (
-                          <div
-                            style={{
-                              marginTop: 10,
-                              padding: '8px 10px',
-                              borderRadius: 8,
-                              background: '#f8fafc',
-                              border: '1px dashed #cbd5e1',
-                              color: '#334155',
-                              fontSize: 14,
-                              lineHeight: 1.4,
-                            }}
-                          >
-                            Regras de compra • Nível 1: {plan.requireCommissionLevel1Count} • Nível 2:{' '}
-                            {plan.requireCommissionLevel2Count} • Nível 3: {plan.requireCommissionLevel3Count}
-                          </div>
-                        ) : null}
+                    {/* ── Badge circular de progresso ── */}
+                    <div className="cycle-percentage-badge">{progresso}%</div>
 
-                        {(hasValidExpiresAt || plan.planType === 'vip_day') ? (
-                          <div
-                            style={{
-                              marginTop: 10,
-                              padding: '8px 10px',
-                              borderRadius: 8,
-                              background: '#fff7ed',
-                              border: '1px solid #fdba74',
-                              color: '#9a3412',
-                              fontSize: 14,
-                              lineHeight: 1.4,
-                            }}
-                          >
-                            <strong>Expira em:</strong>{' '}
-                            <span style={{ fontWeight: 800, color: '#c2410c' }}>
-                              {hasValidExpiresAt && parsedExpiresAt
-                                ? formatDateTime(parsedExpiresAt)
-                                : 'Sem expiração'}
-                            </span>
-                          </div>
-                        ) : null}
+                    {/* ── Info compras / estoque ── */}
+                    <div className="cycle-stock-info">
+                      <span>Compras: <strong>{userPurchaseCount}</strong></span>
+                      <span>Estoque: <strong>{estoque}</strong></span>
+                    </div>
 
-                        <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <div
-                            style={{
-                              flex: 1,
-                              height: 10,
-                              borderRadius: 999,
-                              background: '#eceff3',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: `${progresso}%`,
-                                height: '100%',
-                                background: 'linear-gradient(90deg, #ffb703 0%, #ff9100 55%, #fb8500 100%)',
-                                borderRadius: 999,
-                                transition: 'width 500ms ease',
-                                boxShadow: 'inset 0 0 10px rgba(255,255,255,0.35), 0 0 8px rgba(255,145,0,0.35)',
-                              }}
-                            />
-                          </div>
-                          <div style={{ color: '#334155', fontSize: 15 }}>progresso {progresso}%</div>
-                        </div>
-                      </div>
-                    </article>
-                  )
-                })}
-              </div>
-            )}
-          </section>
+                    {/* ── Tag reinvestimento ── */}
+                    <span className={`cycle-reinvest-tag${isUnavailable ? ' closed' : ''}`}>
+                      {isUnavailable ? 'Não é mais possível investir' : 'Pode ser reinvestido'}
+                    </span>
+
+                    {/* ── Botão ── */}
+                    {isUnavailable ? (
+                      <button
+                        type="button"
+                        className="cycle-product-button disabled"
+                        disabled
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Esgotado <span className="arrow">✕</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="cycle-product-button"
+                        onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan) }}
+                      >
+                        Invista agora <span className="arrow">➜</span>
+                      </button>
+                    )}
+                  </div>
+                </article>
+              )
+            })
+          )}
         </div>
       </section>
 
+      {/* ── Modal de investimento ── */}
       {selectedPlan ? (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.5)',
+            background: 'rgba(0,0,0,0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -514,29 +378,116 @@ export default function CycleProducts() {
               width: '100%',
               maxWidth: 420,
               background: '#fff',
-              borderRadius: 12,
-              padding: 16,
-              boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+              borderRadius: 16,
+              padding: 20,
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ margin: 0, color: '#0f172a' }}>Confirmar investimento</h3>
-            <p style={{ marginTop: 6, color: '#64748b' }}>{selectedPlan.name}</p>
+            <h3 style={{ margin: 0, color: '#2d3b44', fontSize: 18 }}>Confirmar investimento</h3>
+            <p style={{ marginTop: 6, color: '#4b5a64', fontSize: 14 }}>{selectedPlan.name}</p>
 
-            <div style={{ marginTop: 12, display: 'grid', gap: 8, color: '#1e293b', fontSize: 14 }}>
-              <div><strong>Montante:</strong> {formatBRL(selectedPlan.amount)}</div>
-              <div><strong>Lucro final:</strong> {formatBRL(selectedPlan.profit)}</div>
-              <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
-              <div>
-                <strong>Fim do ciclo:</strong>{' '}
-                {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}
-              </div>
-              <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
-            </div>
+            {(() => {
+              const modalInvestStr = investAmounts[selectedPlan.id] ?? ''
+              const modalInvestNum = Number(String(modalInvestStr).replace(',', '.')) || 0
+              const modalEffectivePercent = selectedPlan.profitPercent > 0 ? selectedPlan.profitPercent : selectedPlan.profit
+              const modalTotalPercent = Number((modalEffectivePercent * selectedPlan.cycleDays).toFixed(2))
+              const modalDailyProfit = modalEffectivePercent > 0
+                ? Number((modalInvestNum * (modalEffectivePercent / 100)).toFixed(2))
+                : 0
+              const modalTotalProfit = modalEffectivePercent > 0
+                ? Number((modalDailyProfit * selectedPlan.cycleDays).toFixed(2))
+                : 0
+              const modalTotalReturn = Number((modalInvestNum + modalTotalProfit).toFixed(2))
+              return (
+                <>
+                  <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12, background: '#f4fdff', border: '2px solid #66b8d7' }}>
+                    <div style={{ color: '#0798cb', fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
+                      Escolha o valor do investimento ({formatBRL(selectedPlan.minAmount)} ~ {formatBRL(selectedPlan.maxAmount)})
+                    </div>
+                    <input
+                      type="number"
+                      min={selectedPlan.minAmount}
+                      max={selectedPlan.maxAmount}
+                      step="1"
+                      value={modalInvestStr}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setInvestAmounts((prev) => ({ ...prev, [selectedPlan.id]: e.target.value }))}
+                      placeholder={`Ex.: ${selectedPlan.minAmount}`}
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        border: '2px solid #66b8d7',
+                        borderRadius: 10,
+                        fontSize: 18,
+                        fontWeight: 700,
+                        color: '#2d3b44',
+                        background: '#fff',
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    <input
+                      type="range"
+                      min={selectedPlan.minAmount}
+                      max={selectedPlan.maxAmount}
+                      step="1"
+                      value={modalInvestNum || selectedPlan.minAmount}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setInvestAmounts((prev) => ({ ...prev, [selectedPlan.id]: e.target.value }))}
+                      style={{ width: '100%', marginTop: 8, accentColor: '#0798cb' }}
+                    />
+                    {modalInvestNum > 0 && modalEffectivePercent > 0 ? (
+                      <div style={{ marginTop: 12, fontSize: 13, color: '#2f3f49', display: 'grid', gap: 6 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Lucro diário ({modalEffectivePercent}%):</span>
+                          <strong style={{ color: '#0798cb' }}>{formatBRL(modalDailyProfit)}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Lucro total ({modalTotalPercent}% em {selectedPlan.cycleDays} dias):</span>
+                          <strong style={{ color: '#16a34a' }}>{formatBRL(modalTotalProfit)}</strong>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #d0e8f0', paddingTop: 6 }}>
+                          <span>Retorno total ao final do ciclo:</span>
+                          <strong style={{ color: '#16a34a', fontSize: 15 }}>{formatBRL(modalTotalReturn)}</strong>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
+                    <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
+                    <div><strong>Lucro diário ({modalEffectivePercent}%):</strong> {formatBRL(modalDailyProfit)}</div>
+                    <div><strong>Lucro total ({modalTotalPercent}% em {selectedPlan.cycleDays} dias):</strong> {formatBRL(modalTotalProfit)}</div>
+                    <div><strong>Retorno total (investimento + lucro):</strong> <span style={{ color: '#16a34a', fontWeight: 700 }}>{formatBRL(modalTotalReturn)}</span></div>
+                    <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
+                    <div>
+                      <strong>Fim do ciclo (retorno):</strong>{' '}
+                      {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}
+                    </div>
+                    <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
+                    <div style={{
+                      marginTop: 6,
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      background: '#e9f9ff',
+                      border: '1px solid #5fb8d7',
+                      color: '#038fc2',
+                      fontSize: 12,
+                      fontWeight: 700,
+                    }}>
+                      O lucro + investimento será retornado ao final do ciclo.
+                    </div>
+                  </div>
+                </>
+              )
+            })()}
 
             {(selectedPlan.requireCommissionLevel1Count > 0 || selectedPlan.requireCommissionLevel2Count > 0 || selectedPlan.requireCommissionLevel3Count > 0) ? (
-              <div style={{ marginTop: 12, padding: '10px 12px', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', fontSize: 13 }}>
-                <strong style={{ display: 'block', marginBottom: 6, color: '#0f172a' }}>Requisitos de convite</strong>
+              <div style={{ marginTop: 14, padding: '10px 12px', borderRadius: 10, background: '#f4fdff', border: '1px solid #9ecde0', fontSize: 13 }}>
+                <strong style={{ display: 'block', marginBottom: 6, color: '#2d3b44' }}>Requisitos para se tornar funcionario</strong>
                 {selectedPlan.requireCommissionLevel1Count > 0 ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                     {userInviteCount !== null && userInviteCount.level1 >= selectedPlan.requireCommissionLevel1Count
@@ -570,17 +521,18 @@ export default function CycleProducts() {
               </div>
             ) : null}
 
-            <div style={{ marginTop: 14, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <div style={{ marginTop: 16, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button
                 type="button"
                 onClick={closePurchaseModal}
                 disabled={isBuying}
                 style={{
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid #9ecde0',
                   background: '#fff',
-                  color: '#334155',
+                  color: '#4b5a64',
                   borderRadius: 8,
-                  padding: '10px 14px',
+                  padding: '10px 16px',
+                  fontWeight: 600,
                   cursor: isBuying ? 'not-allowed' : 'pointer',
                 }}
               >
@@ -591,11 +543,11 @@ export default function CycleProducts() {
                 onClick={confirmBuyCycle}
                 disabled={isBuying}
                 style={{
-                  border: 'none',
-                  background: '#0b63ff',
+                  border: '1px solid #0074a1',
+                  background: 'linear-gradient(180deg, #0798cb 0%, #0b80b2 100%)',
                   color: '#fff',
                   borderRadius: 8,
-                  padding: '10px 14px',
+                  padding: '10px 16px',
                   fontWeight: 700,
                   cursor: isBuying ? 'not-allowed' : 'pointer',
                 }}

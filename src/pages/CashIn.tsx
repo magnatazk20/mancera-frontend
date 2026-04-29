@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './CashIn.css'
 
 type StorageUser = {
@@ -163,16 +163,6 @@ export default function CashIn() {
   return (
     <main className="cashin-page">
       <section className="cashin-card">
-        <header className="cashin-header">
-          <div>
-            <h1>Depositar saldo</h1>
-            <p>Ambiente seguro com confirmação via PIX em segundos.</p>
-          </div>
-          <Link to="/dashboard" className="cashin-back-link">
-            Voltar
-          </Link>
-        </header>
-
         <div className="cashin-layout">
           <form className="cashin-form" onSubmit={submitCashIn}>
             <div className="cashin-label-row">
@@ -205,10 +195,38 @@ export default function CashIn() {
               ))}
             </div>
 
-            <label>
-              Método de pagamento
-              <input type="text" value="PIX (instantâneo)" disabled />
-            </label>
+            <div className="cashin-method">
+              <span className="cashin-method__label">Método de pagamento</span>
+              <button
+                type="button"
+                className="cashin-method__btn is-active"
+                aria-pressed="true"
+                aria-label="Método de pagamento: PIX instantâneo"
+              >
+                <span className="cashin-method__icon" aria-hidden="true">
+                  <svg viewBox="0 0 48 48" width="28" height="28" fill="none">
+                    <path
+                      d="M11.8 16.2 16.2 11.8a4 4 0 0 1 5.7 0L24 13.9l2.1-2.1a4 4 0 0 1 5.7 0l4.4 4.4a4 4 0 0 1 0 5.7L24 34 11.8 21.9a4 4 0 0 1 0-5.7Z"
+                      fill="#32BCAD"
+                    />
+                    <path
+                      d="M24 34 11.8 21.9a4 4 0 0 0 0 5.7l4.4 4.4a4 4 0 0 0 5.7 0L24 29.9l2.1 2.1a4 4 0 0 0 5.7 0l4.4-4.4a4 4 0 0 0 0-5.7L24 34Z"
+                      fill="#32BCAD"
+                      opacity="0.85"
+                    />
+                    <circle cx="24" cy="24" r="2.4" fill="#ffffff" />
+                  </svg>
+                </span>
+                <span className="cashin-method__info">
+                  <strong>VQPAY</strong>
+                </span>
+                <span className="cashin-method__check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="5 12 10 17 19 8" />
+                  </svg>
+                </span>
+              </button>
+            </div>
 
             <button type="submit" className="cashin-submit" disabled={loading}>
               {loading ? 'Gerando cobrança...' : 'Gerar cobrança PIX'}
@@ -234,8 +252,7 @@ export default function CashIn() {
               </strong>
             </div>
             <div className="summary-row">
-              <span>Taxa</span>
-              <strong>R$ 0,00</strong>
+             
             </div>
             <div className="summary-row total">
               <span>Total a pagar</span>
@@ -244,11 +261,6 @@ export default function CashIn() {
               </strong>
             </div>
 
-            <div className="cashin-security">
-              <p>🔒 Transação protegida e criptografada</p>
-              <p>⚡ Compensação rápida via PIX</p>
-              <p>🏦 Checkout com QR Code e copia e cola</p>
-            </div>
           </aside>
         </div>
       </section>

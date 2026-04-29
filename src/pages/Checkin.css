@@ -1,341 +1,379 @@
-.checkin-page {
-  min-height: 100dvh;
-  padding: 12px 14px 24px;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(56, 189, 248, 0.22), transparent 30%),
-    radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.2), transparent 34%),
-    linear-gradient(170deg, #020617 0%, #0b1220 52%, #111827 100%);
-  color: #e5e7eb;
-}
+/* Check-in — layout básico */
 
-.checkin-topbar {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.checkin-topbar h1 {
-  margin: 0;
-  text-align: center;
-  font-size: 1.1rem;
-  letter-spacing: 0.2px;
-}
-
-.checkin-back,
-.checkin-back-spacer {
-  width: 36px;
-  height: 36px;
-}
-
-.checkin-back {
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(15, 23, 42, 0.72);
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  transition: transform 0.18s ease, border-color 0.18s ease;
-}
-
-.checkin-back:hover {
-  transform: translateX(-1px);
-  border-color: rgba(56, 189, 248, 0.65);
-}
-
-.checkin-card {
-  width: min(940px, 100%);
-  margin: 0 auto;
-  border-radius: 18px;
-  border: 1px solid rgba(56, 189, 248, 0.28);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.9));
-  box-shadow:
-    0 20px 55px rgba(2, 6, 23, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  padding: 16px;
-  backdrop-filter: blur(4px);
-}
-
-.checkin-hero {
+.ck-page {
+  min-height: 100vh;
+  background: #f7f7f7;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
+  flex-direction: column;
 }
 
-.checkin-calendar-icon-wrap {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid rgba(56, 189, 248, 0.5);
-  background: linear-gradient(145deg, rgba(14, 165, 233, 0.25), rgba(37, 99, 235, 0.25));
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-
-.checkin-calendar-icon {
-  width: 24px;
-  height: 24px;
-  color: #bae6fd;
-}
-
-.checkin-card h2 {
-  margin: 0;
-  font-size: 1.08rem;
-}
-
-.checkin-card p {
-  margin: 3px 0 0;
-  color: #9fb4c8;
-  font-size: 0.9rem;
-}
-
-.checkin-progress-overview {
-  border-radius: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(14, 116, 144, 0.12);
-  padding: 10px;
-  margin-bottom: 12px;
-}
-
-.checkin-progress-head {
+.ck-topbar {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.ck-topbar-back {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #333;
+}
+
+.ck-topbar-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.ck-topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.ck-scroll-box {
+  flex: 1;
+  background: #ffffff;
+}
+
+/* Section blocks */
+.ck-section {
+  background: #ffffff;
+  margin-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 14px 16px;
+}
+
+.ck-section-title {
+  font-size: 14px;
+  color: #323233;
+  margin: 0 0 10px;
+  font-weight: 600;
+}
+
+/* Progress */
+.ck-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
+  font-size: 14px;
+  color: #323233;
 }
 
-.checkin-progress-head strong {
-  font-size: 0.86rem;
-  color: #bae6fd;
-}
-
-.checkin-progress-head span {
-  font-size: 0.78rem;
-  color: #cbd5e1;
-}
-
-.checkin-progress-track {
-  height: 9px;
+.ck-progress-track {
+  height: 8px;
   border-radius: 999px;
-  background: rgba(30, 41, 59, 0.85);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: #f0f0f0;
   overflow: hidden;
 }
 
-.checkin-progress-fill {
+.ck-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #22c55e, #06b6d4);
-  transition: width 0.28s ease;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  transition: width 0.3s ease;
 }
 
-.checkin-progress-overview small {
+.ck-progress-percent {
   display: block;
   margin-top: 6px;
-  font-size: 0.75rem;
-  color: #93c5fd;
+  font-size: 12px;
+  color: #969799;
 }
 
-.checkin-meta {
+/* Status pills */
+.ck-status-row {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.checkin-meta-pill {
+.ck-pill {
+  font-size: 12px;
+  padding: 4px 10px;
   border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 0.78rem;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(15, 23, 42, 0.55);
-  color: #dbeafe;
+  background: #f5f5f5;
+  color: #323233;
 }
 
-.checkin-meta-pill.ok {
-  border-color: rgba(34, 197, 94, 0.45);
-  background: rgba(22, 163, 74, 0.16);
-  color: #86efac;
+.ck-pill--ok {
+  background: #fdf3e3;
+  color: #b15c00;
 }
 
-.checkin-meta-pill.blocked {
-  border-color: rgba(245, 158, 11, 0.45);
-  background: rgba(180, 83, 9, 0.16);
-  color: #fde68a;
+.ck-pill--warn {
+  background: #f5f5f5;
+  color: #969799;
 }
 
-.checkin-feedback {
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.checkin-feedback.success {
-  background: rgba(22, 163, 74, 0.16);
-  color: #86efac;
-  border: 1px solid rgba(34, 197, 94, 0.35);
-}
-
-.checkin-feedback.error {
-  background: rgba(127, 29, 29, 0.22);
-  color: #fecaca;
-  border: 1px solid rgba(248, 113, 113, 0.35);
-}
-
-.checkin-loading {
-  text-align: center;
-  color: #cbd5e1;
-  padding: 20px 0;
-}
-
-.checkin-grid {
+/* Days grid */
+.ck-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
 }
 
-.checkin-day {
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.65), rgba(15, 23, 42, 0.6));
+.ck-day {
+  border: 1px solid #ebedf0;
+  border-radius: 8px;
+  background: #ffffff;
   padding: 10px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  min-height: 92px;
 }
 
-.checkin-day-head {
+.ck-day-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.checkin-day-badge {
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.72rem;
-  background: rgba(148, 163, 184, 0.2);
-  color: #cbd5e1;
+.ck-day-badge {
+  font-size: 12px;
+  color: #969799;
 }
 
-.checkin-status {
-  font-size: 0.68rem;
-  border-radius: 999px;
-  padding: 3px 7px;
-  font-weight: 700;
+.ck-day-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-.checkin-status.done {
-  background: rgba(34, 197, 94, 0.2);
-  color: #86efac;
+.ck-day-status--done {
+  background: #e8f7ee;
+  color: #1f7a40;
 }
 
-.checkin-status.current {
-  background: rgba(56, 189, 248, 0.2);
-  color: #7dd3fc;
+.ck-day-status--current {
+  background: #fdf3e3;
+  color: #b15c00;
 }
 
-.checkin-day.current {
-  border-color: rgba(56, 189, 248, 0.78);
-  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.22);
+.ck-day-amount {
+  font-size: 15px;
+  font-weight: 600;
+  color: #323233;
 }
 
-.checkin-day.done {
-  border-color: rgba(34, 197, 94, 0.62);
-  background: linear-gradient(180deg, rgba(22, 163, 74, 0.22), rgba(21, 128, 61, 0.17));
+.ck-day-hint {
+  font-size: 12px;
+  color: #969799;
 }
 
-.checkin-day strong {
-  font-size: 1rem;
-  color: #f8fafc;
+.ck-day--current {
+  border-color: rgb(255, 138, 3);
 }
 
-.checkin-day small {
-  color: #cbd5e1;
-  font-size: 0.76rem;
+.ck-day--done {
+  border-color: #b6e0c4;
+  background: #f6fbf7;
 }
 
-.checkin-telegram-guide {
-  border-radius: 14px;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.72));
-  padding: 12px;
-}
-
-.checkin-telegram-guide h3 {
-  margin: 0 0 8px;
-  font-size: 0.98rem;
-  color: #e2e8f0;
-}
-
-.checkin-telegram-guide ol {
-  margin: 0 0 12px 18px;
+/* Steps */
+.ck-steps {
+  list-style: none;
+  margin: 0;
   padding: 0;
-  display: grid;
-  gap: 5px;
-  color: #cbd5e1;
-  font-size: 0.86rem;
-}
-
-.checkin-telegram-actions {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.checkin-telegram-btn {
-  min-height: 44px;
-  border-radius: 11px;
-  border: 1px solid transparent;
+.ck-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #323233;
+}
+
+.ck-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
   font-weight: 700;
-  font-size: 0.88rem;
+}
+
+/* Buttons */
+.ck-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ck-btn {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   text-decoration: none;
-  cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease, border-color 0.15s ease;
 }
 
-.checkin-telegram-btn.primary {
-  background: linear-gradient(90deg, #06b6d4, #2563eb);
-  color: #fff;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
+.ck-btn--primary {
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
 }
 
-.checkin-telegram-btn.secondary {
-  background: rgba(15, 23, 42, 0.7);
-  color: #dbeafe;
-  border-color: rgba(148, 163, 184, 0.36);
+.ck-btn--secondary {
+  color: #323233;
+  background: #f5f5f5;
+  border: 1px solid #ebedf0;
 }
 
-.checkin-telegram-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.04);
-}
-
-.checkin-telegram-btn:disabled {
-  opacity: 0.58;
+.ck-btn:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
-.checkin-telegram-note {
-  margin-top: 10px !important;
-  font-size: 0.8rem !important;
-  color: #93c5fd !important;
+.ck-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #969799;
+  text-align: center;
 }
 
-.checkin-telegram-note a {
-  color: #7dd3fc;
+.ck-note a {
+  color: rgb(255, 138, 3);
+  text-decoration: none;
 }
 
-@media (min-width: 700px) {
-  .checkin-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
+.ck-claim-btn {
+  width: 100%;
+  height: 44px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+.ck-claim-btn:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.ck-claim-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #d8d8d8;
+  color: #ffffff;
+}
+
+.ck-loading {
+  text-align: center;
+  color: #969799;
+  padding: 24px 16px;
+  font-size: 14px;
+}
+
+/* Modal */
+.ck-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: ck-fade-in 0.18s ease;
+}
+
+@keyframes ck-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ck-modal {
+  width: 100%;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 20px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: ck-pop-in 0.22s ease;
+}
+
+@keyframes ck-pop-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.ck-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.ck-modal-icon--success {
+  background: #22c55e;
+}
+
+.ck-modal-icon--error {
+  background: #ef4444;
+}
+
+.ck-modal-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.ck-modal-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #323233;
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
+
+.ck-modal-button {
+  width: 100%;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  font-family: inherit;
 }

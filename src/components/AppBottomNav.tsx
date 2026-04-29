@@ -5,7 +5,7 @@ function NavIcon({
   name,
   className = 'icon-sm',
 }: {
-  name: 'home' | 'deposit' | 'products' | 'invite' | 'user'
+  name: 'home' | 'vip' | 'products' | 'invite' | 'user'
   className?: string
 }) {
   switch (name) {
@@ -16,11 +16,11 @@ function NavIcon({
           <path d="M6 9.5V20h12V9.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       )
-    case 'deposit':
+    case 'vip':
       return (
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 4v16M6 10h12M6 15h12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.4" />
+          <path d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="12" cy="14" r="1.1" fill="currentColor" />
         </svg>
       )
     case 'products':
@@ -62,9 +62,9 @@ export default function AppBottomNav() {
         <NavIcon name="home" />
         <small>Início</small>
       </button>
-      <button className={isActive('/cashin') ? 'active' : ''} onClick={() => navigate('/cashin')}>
-        <NavIcon name="deposit" />
-        <small>Depositar</small>
+      <button className={isActive('/vip') ? 'active' : ''} onClick={() => navigate('/vip')}>
+        <NavIcon name="vip" />
+        <small>VIP</small>
       </button>
       <button className={isActive('/gift-vouchers') ? 'active' : ''} onClick={() => navigate('/gift-vouchers')}>
         <NavIcon name="products" />

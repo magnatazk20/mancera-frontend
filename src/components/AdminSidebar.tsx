@@ -111,6 +111,12 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Configuração de Comissão</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/monthly-salary'); setMenuOpen(false) }}>Salário Mensal</button>
 
+          <p className="dash-nav-group-title">VIP</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-levels'); setMenuOpen(false) }}>Gerenciar VIPs</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-refunds'); setMenuOpen(false) }}>Estornos VIP</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-photos'); setMenuOpen(false) }}>Fotos VIP</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/task-commissions'); setMenuOpen(false) }}>Comissões de Tarefas</button>
+
           <p className="dash-nav-group-title">Promoções</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>

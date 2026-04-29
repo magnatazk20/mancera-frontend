@@ -1,0 +1,263 @@
+/* Redeem Code — layout básico */
+
+.rc-page {
+  min-height: 100vh;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+}
+
+.rc-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.rc-topbar-back {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #333;
+}
+
+.rc-topbar-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.rc-topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.rc-scroll-box {
+  flex: 1;
+  background: #ffffff;
+}
+
+.rc-hero {
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+}
+
+.rc-hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  display: grid;
+  place-items: center;
+  margin-bottom: 10px;
+}
+
+.rc-hero-icon svg {
+  width: 32px;
+  height: 32px;
+  color: #ffffff;
+}
+
+.rc-hero-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rc-hero-text {
+  margin: 6px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+  max-width: 340px;
+}
+
+.rc-cell {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rc-cell-title {
+  flex: 0 0 110px;
+  font-size: 14px;
+  color: #323233;
+}
+
+.rc-cell-value {
+  flex: 1;
+}
+
+.rc-cell-input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+  color: #323233;
+  font-family: inherit;
+  padding: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.rc-cell-input::placeholder {
+  color: #c8c9cc;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.rc-submit-wrap {
+  padding: 16px;
+  background: #ffffff;
+}
+
+.rc-submit {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.rc-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.rc-info-section {
+  background: #ffffff;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.rc-info-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #323233;
+  margin: 0 0 10px;
+}
+
+.rc-info-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rc-info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: #646566;
+  line-height: 1.45;
+}
+
+.rc-info-list li svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  color: rgb(255, 138, 3);
+}
+
+/* Modal */
+.rc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: rc-fade-in 0.18s ease;
+}
+
+@keyframes rc-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rc-modal {
+  width: 100%;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 20px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: rc-pop-in 0.22s ease;
+}
+
+@keyframes rc-pop-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.rc-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.rc-modal-icon--success {
+  background: #22c55e;
+}
+
+.rc-modal-icon--error {
+  background: #ef4444;
+}
+
+.rc-modal-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.rc-modal-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #323233;
+  margin: 0 0 16px;
+  line-height: 1.45;
+}
+
+.rc-modal-button {
+  width: 100%;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  font-family: inherit;
+}

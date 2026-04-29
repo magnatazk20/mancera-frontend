@@ -8,29 +8,34 @@ import RoletaTestAutoSpin from './pages/RoletaTestAutoSpin'
 import Sinuca from './pages/Sinuca'
 import CashIn from './pages/CashIn'
 import CashInCheckout from './pages/CashInCheckout'
-/* import Tasks from './pages/Tasks'
+import Tasks from './pages/Tasks'
 import MiningTask from './pages/MiningTask'
-import Vip from './pages/Vip' */
+import Vip from './pages/Vip'
+import VipCheckout from './pages/VipCheckout'
 import Invite from './pages/Invite'
 import Profile from './pages/Profile'
 import InvestmentOrders from './pages/InvestmentOrders'
 import BankCards from './pages/BankCards'
 import TeamReport from './pages/TeamReport'
+import Position from './pages/Position'
 import Checkin from './pages/Checkin'
 import NotFound from './pages/NotFound'
 import Community from './pages/Community'
-import Earnings from './pages/Earnings'
 import TaxDeclaration from './pages/TaxDeclaration'
 import WithdrawPassword from './pages/WithdrawPassword'
 import ChangePassword from './pages/ChangePassword'
 import Withdraw from './pages/Withdraw'
 import WithdrawReceipt from './pages/WithdrawReceipt'
 import GiftVouchers from './pages/GiftVouchers'
+import RedeemCode from './pages/RedeemCode'
 import CaixasBox from './pages/CaixasBox'
 import CycleProducts from './pages/CycleProducts'
 import MiniTasks from './pages/MiniTasks'
 import VipRules from './pages/VipRules'
 import MonthlySalary from './pages/MonthlySalary'
+import RegistroDoDia from './pages/RegistroDoDia'
+import RegistrosTarefas from './pages/RegistrosTarefas'
+import TeamExpansion from './pages/TeamExpansion'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -56,6 +61,11 @@ import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
 import AdminCaixasBox from './pages/AdminCaixasBox'
 import AdminShopProducts from './pages/AdminShopProducts'
 import AdminCorrectionLogs from './pages/AdminCorrectionLogs'
+import AdminVipLevels from './pages/AdminVipLevels'
+import AdminTaskCommissions from './pages/AdminTaskCommissions'
+import AdminVipRefunds from './pages/AdminVipRefunds'
+import AdminVipPhotos from './pages/AdminVipPhotos'
+import Introduction from './pages/Introduction'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -113,9 +123,11 @@ export default function App() {
         <Route path="/sinuca" element={<Sinuca />} />
         <Route path="/cashin" element={<CashIn />} />
         <Route path="/cashin/checkout" element={<CashInCheckout />} />
-        {/* <Route path="/tasks" element={<Tasks />} />
+        <Route path="/tasks" element={<Tasks />} />
         <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
-        <Route path="/vip" element={<Vip />} /> */}
+        <Route path="/vip" element={<Vip />} />
+        <Route path="/vip/checkout/:id" element={<VipCheckout />} />
+        <Route path="/introducao" element={<Introduction />} />
         <Route path="/invite" element={<Invite />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mini-tasks" element={<MiniTasks />} />
@@ -129,11 +141,43 @@ export default function App() {
             </RequireAuth>
           )}
         />
+        <Route
+          path="/salario-mensal"
+          element={(
+            <RequireAuth>
+              <MonthlySalary />
+            </RequireAuth>
+          )}
+        />
         <Route path="/bank-cards" element={<BankCards />} />
+        <Route
+          path="/registro-do-dia"
+          element={(
+            <RequireAuth>
+              <RegistroDoDia />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/registros-tarefas"
+          element={(
+            <RequireAuth>
+              <RegistrosTarefas />
+            </RequireAuth>
+          )}
+        />
         <Route path="/team-report" element={<TeamReport />} />
+        <Route
+          path="/team-expansion"
+          element={(
+            <RequireAuth>
+              <TeamExpansion />
+            </RequireAuth>
+          )}
+        />
+        <Route path="/position" element={<Position />} />
         <Route path="/checkin" element={<Checkin />} />
         <Route path="/community" element={<Community />} />
-        <Route path="/earnings" element={<Earnings />} />
         <Route path="/tax-declaration" element={<TaxDeclaration />} />
         <Route path="/withdraw-password" element={<WithdrawPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
@@ -142,6 +186,14 @@ export default function App() {
           element={(
             <RequireAuth>
               <GiftVouchers />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/redeem-code"
+          element={(
+            <RequireAuth>
+              <RedeemCode />
             </RequireAuth>
           )}
         />
@@ -374,6 +426,38 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCorrectionLogs />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/vip-levels"
+          element={(
+            <RequireMaxAdmin>
+              <AdminVipLevels />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/task-commissions"
+          element={(
+            <RequireMaxAdmin>
+              <AdminTaskCommissions />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/vip-refunds"
+          element={(
+            <RequireMaxAdmin>
+              <AdminVipRefunds />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/vip-photos"
+          element={(
+            <RequireMaxAdmin>
+              <AdminVipPhotos />
             </RequireMaxAdmin>
           )}
         />

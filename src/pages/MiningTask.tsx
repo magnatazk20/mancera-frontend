@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
+import { YOUTUBE_IDS, fetchYouTubeTitle } from '../utils/miningVideos'
+import './Dashboard.css'
 import './Tasks.css'
 
 type StoredUser = {
@@ -15,39 +17,6 @@ const REQUIRED_SECONDS = 30
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-const VIDEO_LIST = [
-  'https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1',
-  'https://www.youtube.com/embed/aqz-KE-bpKQ?enablejsapi=1',
-  'https://www.youtube.com/embed/ysz5S6PUM-U?enablejsapi=1',
-  'https://www.youtube.com/embed/jNQXAC9IVRw?enablejsapi=1',
-  'https://www.youtube.com/embed/3JZ_D3ELwOQ?enablejsapi=1',
-  'https://www.youtube.com/embed/LXb3EKWsInQ?enablejsapi=1',
-  'https://www.youtube.com/embed/e-ORhEE9VVg?enablejsapi=1',
-  'https://www.youtube.com/embed/kXYiU_JCYtU?enablejsapi=1',
-  'https://www.youtube.com/embed/fJ9rUzIMcZQ?enablejsapi=1',
-  'https://www.youtube.com/embed/hT_nvWreIhg?enablejsapi=1',
-  'https://www.youtube.com/embed/09R8_2nJtjg?enablejsapi=1',
-  'https://www.youtube.com/embed/CevxZvSJLk8?enablejsapi=1',
-  'https://www.youtube.com/embed/pRpeEdMmmQ0?enablejsapi=1',
-  'https://www.youtube.com/embed/YVkUvmDQ3HY?enablejsapi=1',
-  'https://www.youtube.com/embed/SlPhMPnQ58k?enablejsapi=1',
-  'https://www.youtube.com/embed/JGwWNGJdvx8?enablejsapi=1',
-  'https://www.youtube.com/embed/2Vv-BfVoq4g?enablejsapi=1',
-  'https://www.youtube.com/embed/OPf0YbXqDm0?enablejsapi=1',
-  'https://www.youtube.com/embed/RgKAFK5djSk?enablejsapi=1',
-  'https://www.youtube.com/embed/7wtfhZwyrcc?enablejsapi=1',
-  'https://www.youtube.com/embed/60ItHLz5WEA?enablejsapi=1',
-  'https://www.youtube.com/embed/kJQP7kiw5Fk?enablejsapi=1',
-  'https://www.youtube.com/embed/3AtDnEC4zak?enablejsapi=1',
-  'https://www.youtube.com/embed/9bZkp7q19f0?enablejsapi=1',
-  'https://www.youtube.com/embed/rYEDA3JcQqw?enablejsapi=1',
-  'https://www.youtube.com/embed/uelHwf8o7_U?enablejsapi=1',
-  'https://www.youtube.com/embed/iS1g8G_njx8?enablejsapi=1',
-  'https://www.youtube.com/embed/tVj0ZTS4WF4?enablejsapi=1',
-  'https://www.youtube.com/embed/oRdxUFDoQe0?enablejsapi=1',
-  'https://www.youtube.com/embed/Pkh8UtuejGw?enablejsapi=1',
-]
-
 const formatTime = (totalSeconds: number) => {
   const m = Math.floor(totalSeconds / 60)
   const s = totalSeconds % 60
@@ -57,6 +26,9 @@ const formatTime = (totalSeconds: number) => {
 export default function MiningTask() {
   const navigate = useNavigate()
   const { taskId } = useParams()
+  const [searchParams] = useSearchParams()
+  const queryVideoId = searchParams.get('video') ?? ''
+  const [videoTitle, setVideoTitle] = useState('')
 
   const [loading, setLoading] = useState(false)
   const [checkingStatus, setCheckingStatus] = useState(true)
@@ -71,14 +43,28 @@ export default function MiningTask() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [videoStarted, setVideoStarted] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const playerWrapRef = useRef<HTMLDivElement | null>(null)
 
-  const selectedVideoUrl = useMemo(() => {
-    if (!taskId) return VIDEO_LIST[Math.floor(Math.random() * VIDEO_LIST.length)]
-    const taskSeed = Math.abs(Number(taskId))
-    const randomOffset = Math.floor(Math.random() * VIDEO_LIST.length)
-    const idx = (taskSeed + randomOffset) % VIDEO_LIST.length
-    return VIDEO_LIST[idx]
-  }, [taskId])
+  /* Vídeo vem da query string (?video=...). Fallback para um aleatório se ausente. */
+  const [selectedVideoId] = useState(() => {
+    const fromQuery = queryVideoId.trim()
+    if (fromQuery && (YOUTUBE_IDS as readonly string[]).includes(fromQuery)) {
+      return fromQuery
+    }
+    const idx = Math.floor(Math.random() * YOUTUBE_IDS.length)
+    return YOUTUBE_IDS[idx]
+  })
+
+  /* Busca o título do vídeo no oEmbed do YouTube para mostrar no banner */
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchYouTubeTitle(selectedVideoId, controller.signal).then((title) => {
+      if (title) setVideoTitle(title)
+    })
+    return () => controller.abort()
+  }, [selectedVideoId])
+
+  const embedUrl = `https://www.youtube.com/embed/${selectedVideoId}?enablejsapi=1&rel=0&modestbranding=1&showinfo=0&controls=0&disablekb=1&fs=0&iv_load_policy=3`
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -137,11 +123,44 @@ export default function MiningTask() {
     checkTaskStatus()
   }, [user?.id, taskId])
 
+  const percent = Math.min(100, (watchedSeconds / REQUIRED_SECONDS) * 100)
+  const remainingSeconds = Math.max(0, REQUIRED_SECONDS - watchedSeconds)
+  const podeConcluir = watchedSeconds >= REQUIRED_SECONDS
+
+  /* Envia comando para o iframe do YouTube */
+  const postYtCommand = (func: string) => {
+    const iframeWin = iframeRef.current?.contentWindow
+    if (iframeWin) {
+      iframeWin.postMessage(
+        JSON.stringify({ event: 'command', func, args: [] }),
+        '*',
+      )
+    }
+  }
+
+  const togglePlay = () => {
+    if (podeConcluir || alreadyCompletedToday) return
+    const next = !isPlaying
+    if (next && !videoStarted) setVideoStarted(true)
+    setIsPlaying(next)
+    postYtCommand(next ? 'playVideo' : 'pauseVideo')
+  }
+
+  const toggleMute = () => {
+    if (isPlaying) {
+      postYtCommand(isMuted ? 'unMute' : 'mute')
+    }
+    setIsMuted((prev) => !prev)
+  }
+
+  const [isMuted, setIsMuted] = useState(false)
+
   useEffect(() => {
     if (alreadyCompletedToday) return
     if (!isPlaying) return
     if (watchedSeconds >= REQUIRED_SECONDS) {
       setIsPlaying(false)
+      postYtCommand('pauseVideo')
       return
     }
 
@@ -150,11 +169,7 @@ export default function MiningTask() {
     }, 1000)
 
     return () => window.clearInterval(interval)
-  }, [isPlaying, watchedSeconds])
-
-  const percent = Math.min(100, (watchedSeconds / REQUIRED_SECONDS) * 100)
-  const remainingSeconds = Math.max(0, REQUIRED_SECONDS - watchedSeconds)
-  const podeConcluir = watchedSeconds >= REQUIRED_SECONDS
+  }, [isPlaying, watchedSeconds, alreadyCompletedToday])
 
   const concluirTarefaVideo = async () => {
     if (alreadyCompletedToday) {
@@ -167,7 +182,7 @@ export default function MiningTask() {
       return
     }
 
-    if (!ratingSent || rating < 1) {
+    if (rating < 1) {
       setMessage('Avalie a tarefa antes de receber a comissão.')
       return
     }
@@ -218,166 +233,311 @@ export default function MiningTask() {
   }, [reward])
 
   return (
-    <main className="tasks-page">
-      <AppSidebar />
-      <header className="tasks-header">
-        <div>
-          <p className="tasks-kicker">Tarefa</p>
-          <h1>Tarefa #{taskId}</h1>
-          <span className="tasks-subtitle">Assista ao vídeo por 30 segundos e avalie para receber a comissão</span>
-        </div>
-        <div className="tasks-header-actions">
-          <button className="btn ghost" onClick={() => navigate('/tasks')}>
-            Voltar
-          </button>
-        </div>
-      </header>
+    <main className="dash-app">
+      <section className="dash-main">
+        <AppSidebar />
 
-      <section className="progress-card">
-        <div className="progress-top">
-          <span>Vídeo da tarefa</span>
-          <strong>{isPlaying ? 'Assistindo...' : 'Pausado'}</strong>
-        </div>
+        <div className="dash-content">
+          {/* ── Banner ── */}
+          <div className="tasks-banner">
+            <div className="tasks-banner__bg" aria-hidden="true">
+              <div className="tasks-banner__glow tasks-banner__glow--1" />
+              <div className="tasks-banner__glow tasks-banner__glow--2" />
+              <svg className="tasks-banner__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+              </svg>
+            </div>
+            <p className="tasks-banner__kicker">Tarefa #{taskId}</p>
+            <h1 className="tasks-banner__title" title={videoTitle || `Tarefa #${taskId}`}>
+              {videoTitle || `Tarefa #${taskId}`}
+            </h1>
+            <span className="tasks-banner__subtitle">Assista ao vídeo por 30s e avalie para receber a comissão</span>
+            <div className="tasks-banner__actions">
+              <button className="tasks-btn tasks-btn--ghost" onClick={() => navigate('/tasks')}>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+                Voltar
+              </button>
+            </div>
+          </div>
 
-        <div
-          style={{ borderRadius: 12, overflow: 'hidden', marginBottom: 12, cursor: 'pointer' }}
-          onClick={() => {
-            if (podeConcluir) return
-            if (!videoStarted) {
-              setVideoStarted(true)
-            }
-            if (!isPlaying) {
-              setIsPlaying(true)
-            }
-          }}
-        >
-          <iframe
-            ref={iframeRef}
-            title="Vídeo da tarefa"
-            width="100%"
-            height="260"
-            src={selectedVideoUrl}
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-            style={{ border: 0, display: 'block' }}
-          />
-        </div>
+          {/* ── Checking status ── */}
+          {checkingStatus ? (
+            <div className="tasks-loading">
+              <div className="tasks-loading__spinner" />
+              <span>Verificando tarefa...</span>
+            </div>
+          ) : null}
 
-        <div className="progress-top" style={{ marginBottom: 6 }}>
-          <span>Tempo assistido</span>
-          <strong>{formatTime(watchedSeconds)} / 00:30</strong>
-        </div>
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: `${percent}%` }} />
-        </div>
+          {/* ── Card do vídeo ── */}
+          {!checkingStatus && (
+            <div className="mining-card">
+              <div className="mining-card__header">
+                <div className="mining-card__header-icon">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="23 7 16 12 23 17 23 7" />
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                  </svg>
+                </div>
+                <span className="mining-card__header-label">Vídeo da tarefa</span>
+                <span className={`mining-card__status ${isPlaying ? 'mining-card__status--playing' : podeConcluir ? 'mining-card__status--done' : ''}`}>
+                  <span className="mining-card__status-dot" />
+                  {alreadyCompletedToday
+                    ? 'Concluída'
+                    : isPlaying
+                      ? 'Assistindo...'
+                      : podeConcluir
+                        ? 'Concluído'
+                        : 'Pausado'}
+                </span>
+              </div>
 
-        <div className="task-footer" style={{ marginTop: 12 }}>
-          <button
-            className="btn ghost"
-            onClick={() => {
-              if (podeConcluir) return
-              const next = !isPlaying
-              if (next && !videoStarted) {
-                setVideoStarted(true)
-              }
-              setIsPlaying(next)
+              {/* Player customizado com YouTube */}
+              <div className="trk-player" ref={playerWrapRef}>
+                <div className="trk-player__screen">
+                  <iframe
+                    ref={iframeRef}
+                    title="Vídeo da tarefa"
+                    width="100%"
+                    height="100%"
+                    src={embedUrl}
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    className="trk-player__iframe"
+                  />
 
-              const iframeWin = iframeRef.current?.contentWindow
-              if (iframeWin) {
-                iframeWin.postMessage(
-                  JSON.stringify({
-                    event: 'command',
-                    func: next ? 'playVideo' : 'pauseVideo',
-                    args: [],
-                  }),
-                  '*',
-                )
-              }
-            }}
-            disabled={podeConcluir || alreadyCompletedToday || checkingStatus}
-          >
-            {alreadyCompletedToday
-              ? 'Tarefa já concluída hoje'
-              : podeConcluir
-                ? 'Tempo concluído'
-                : isPlaying
-                  ? 'Pausar vídeo'
-                  : 'Start vídeo'}
-          </button>
-          <strong>Faltam {formatTime(remainingSeconds)}</strong>
+                  {/* Overlay clicável por cima do iframe */}
+                  <div className="trk-player__overlay" onClick={togglePlay}>
+                    {/* Botão play grande no centro */}
+                    {!isPlaying && !podeConcluir && !alreadyCompletedToday && (
+                      <div className="trk-player__big-play">
+                        <svg viewBox="0 0 24 24" width="48" height="48" fill="rgba(255,255,255,0.95)" stroke="none">
+                          <polygon points="6 3 20 12 6 21 6 3" />
+                        </svg>
+                      </div>
+                    )}
+
+                    {/* Badge concluído */}
+                    {(podeConcluir || alreadyCompletedToday) && (
+                      <div className="trk-player__done-overlay">
+                        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        <span>{alreadyCompletedToday ? 'Concluída hoje' : 'Tempo concluído'}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Controles customizados */}
+                <div className="trk-player__controls">
+                  <button className="trk-player__btn" onClick={togglePlay} disabled={podeConcluir || alreadyCompletedToday}>
+                    {isPlaying ? (
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3" /></svg>
+                    )}
+                  </button>
+
+                  <span className="trk-player__time">
+                    {formatTime(watchedSeconds)} / {formatTime(REQUIRED_SECONDS)}
+                  </span>
+
+                  <div className="trk-player__volume-wrap">
+                    <button className="trk-player__btn" onClick={toggleMute}>
+                      {isMuted ? (
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" /></svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" /><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" /></svg>
+                      )}
+                    </button>
+                  </div>
+
+                  <span className="trk-player__badge-yt">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#ff0000"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.4 31.4 0 0 0 0 12a31.4 31.4 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.4 31.4 0 0 0 24 12a31.4 31.4 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z" /></svg>
+                  </span>
+                </div>
+              </div>
+
+              {/* Barra de progresso */}
+              <div className="mining-card__progress-info">
+                <span>Tempo assistido</span>
+                <strong>{formatTime(watchedSeconds)} / 00:30</strong>
+              </div>
+              <div className="mining-card__progress-track">
+                <div
+                  className="mining-card__progress-fill"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+
+              {/* Controles do vídeo */}
+              <div className="mining-card__controls">
+                <button
+                  className={`tasks-btn ${podeConcluir || alreadyCompletedToday ? 'tasks-btn--done' : isPlaying ? 'tasks-btn--pause' : 'tasks-btn--primary'}`}
+                  onClick={togglePlay}
+                  disabled={podeConcluir || alreadyCompletedToday || checkingStatus}
+                >
+                  {alreadyCompletedToday ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      Concluída hoje
+                    </>
+                  ) : podeConcluir ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                      Tempo concluído
+                    </>
+                  ) : isPlaying ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
+                      Pausar vídeo
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                      Iniciar vídeo
+                    </>
+                  )}
+                </button>
+                <span className="mining-card__remaining">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                  Faltam {formatTime(remainingSeconds)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* ── Card de avaliação ── */}
+          {!checkingStatus && (
+            <div className="mining-card">
+              <div className="mining-card__header">
+                <div className="mining-card__header-icon mining-card__header-icon--star">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </div>
+                <span className="mining-card__header-label">Avaliação da tarefa</span>
+                <span className="mining-card__status">
+                  {alreadyCompletedToday
+                    ? 'Concluída hoje'
+                    : ratingSent
+                      ? `Enviada (${rating}/5)`
+                      : 'Aguardando'}
+                </span>
+              </div>
+
+              {/* Estrelas */}
+              <div className="mining-card__stars">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    className={`mining-star ${rating >= n ? 'mining-star--active' : ''}`}
+                    disabled={alreadyCompletedToday || ratingSent || !podeConcluir}
+                    onClick={() => setRating(n)}
+                    aria-label={`${n} estrela${n > 1 ? 's' : ''}`}
+                  >
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill={rating >= n ? '#ff8a03' : 'none'} stroke={rating >= n ? '#ff8a03' : '#c9a96e'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </button>
+                ))}
+              </div>
+
+              {/* Botão enviar avaliação */}
+              <button
+                className={`tasks-btn ${ratingSent ? 'tasks-btn--done' : 'tasks-btn--primary'} mining-card__submit-btn`}
+                disabled={alreadyCompletedToday || ratingSent || !podeConcluir || rating < 1}
+                onClick={() => {
+                  if (!podeConcluir) {
+                    setMessage('Assista ao vídeo por 00:30 antes de avaliar.')
+                    return
+                  }
+                  if (rating < 1) {
+                    setMessage('Selecione uma nota de 1 a 5.')
+                    return
+                  }
+                  setRatingSent(true)
+                  setMessage(`Avaliação ${rating}/5 enviada! Agora clique em "Receber comissão".`)
+                }}
+              >
+                {ratingSent ? (
+                  <>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    Avaliação enviada
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>
+                    Enviar avaliação
+                  </>
+                )}
+              </button>
+
+              {/* Botão receber comissão — aparece após avaliar */}
+              {ratingSent && !alreadyCompletedToday && reward === null && (
+                <button
+                  className={`tasks-btn tasks-btn--primary mining-card__submit-btn`}
+                  disabled={loading}
+                  onClick={() => void concluirTarefaVideo()}
+                >
+                  {loading ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+                      Receber comissão
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Comissão recebida */}
+              {reward !== null && (
+                <button
+                  className="tasks-btn tasks-btn--done mining-card__submit-btn"
+                  disabled
+                >
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Comissão recebida: {formatBRL(reward)}
+                </button>
+              )}
+
+              {/* Status geral */}
+              <div className="mining-card__task-status">
+                <span className="mining-card__task-status-label">Status da tarefa</span>
+                <span className="mining-card__task-status-value">
+                  {alreadyCompletedToday ? (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--done" /> Concluída hoje</>
+                  ) : !podeConcluir ? (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--watching" /> Assistindo vídeo...</>
+                  ) : !ratingSent ? (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--waiting" /> Aguardando avaliação</>
+                  ) : loading ? (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--loading" /> Creditando comissão...</>
+                  ) : (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--done" /> Comissão processada</>
+                  )}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* ── Mensagem ── */}
+          {message ? (
+            <div className="mining-message">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+              {message}
+            </div>
+          ) : null}
+
+          {/* ── Toast ── */}
+          {toastMessage ? <div className="floating-toast">{toastMessage}</div> : null}
         </div>
       </section>
-
-      <section className="progress-card">
-        <div className="progress-top">
-          <span>Avaliação da tarefa</span>
-          <strong>
-            {alreadyCompletedToday
-              ? 'Tarefa já concluída hoje'
-              : ratingSent
-                ? `Avaliação enviada (${rating}/5)`
-                : 'Avalie para liberar a comissão'}
-          </strong>
-        </div>
-
-        <div className="task-footer" style={{ marginTop: 12, gap: 8 }}>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <button
-              key={n}
-              className="btn ghost"
-              disabled={alreadyCompletedToday || ratingSent || !podeConcluir}
-              onClick={() => setRating(n)}
-              style={{
-                minWidth: 42,
-                opacity: rating === n ? 1 : 0.75,
-                border: rating === n ? '2px solid #2563eb' : undefined,
-              }}
-            >
-              {n}★
-            </button>
-          ))}
-        </div>
-
-        <div className="task-footer" style={{ marginTop: 12 }}>
-          <button
-            className="btn ghost"
-            disabled={alreadyCompletedToday || ratingSent || !podeConcluir || rating < 1}
-            onClick={() => {
-              if (!podeConcluir) {
-                setMessage('Assista ao vídeo por 00:30 antes de avaliar.')
-                return
-              }
-              if (rating < 1) {
-                setMessage('Selecione uma nota de 1 a 5.')
-                return
-              }
-              setRatingSent(true)
-              setMessage(`Avaliação ${rating}/5 enviada. Processando comissão...`)
-              void concluirTarefaVideo()
-            }}
-          >
-            {ratingSent ? 'Avaliação enviada' : 'Enviar avaliação'}
-          </button>
-        </div>
-
-        <div className="progress-top" style={{ marginTop: 14 }}>
-          <span>Status da tarefa</span>
-          <strong>
-            {alreadyCompletedToday
-              ? 'Tarefa já concluída hoje'
-              : !podeConcluir
-                ? 'Assistindo vídeo...'
-                : !ratingSent
-                  ? 'Aguardando avaliação'
-                  : loading
-                    ? 'Creditando comissão...'
-                    : 'Comissão processada automaticamente após avaliação'}
-          </strong>
-        </div>
-      </section>
-
-      {message ? <div className="vip-inline-message">{message}</div> : null}
-      {toastMessage ? <div className="floating-toast">{toastMessage}</div> : null}
     </main>
   )
 }

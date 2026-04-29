@@ -1,72 +1,106 @@
+/* ═══════════════════════════════════════════════════════════════
+   CASHIN / RECARGA — tema laranja TRK
+═══════════════════════════════════════════════════════════════ */
+
 .cashin-page {
   min-height: 100vh;
   display: grid;
-  place-items: center;
-  padding: 28px 16px;
+  place-items: start center;
+  padding: 20px 14px 40px;
+  color: #5a3d1a;
   background:
-    radial-gradient(circle at 15% 10%, rgba(14, 116, 144, 0.18), transparent 32%),
-    radial-gradient(circle at 85% 20%, rgba(37, 99, 235, 0.2), transparent 36%),
-    linear-gradient(140deg, #020817 0%, #0b1220 45%, #111827 100%);
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  position: relative;
+  z-index: 2;
+}
+
+.cashin-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(#fff5eb, #fec075);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .cashin-card {
-  width: min(1040px, 100%);
-  background: rgba(10, 15, 27, 0.78);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 22px;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(14px);
-  padding: 26px;
-  color: #e5e7eb;
+  width: min(960px, 100%);
+  background: #ffffff;
+  border: 1px solid rgba(255, 138, 3, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(255, 138, 3, 0.22);
+  padding: 22px;
+  color: #5a3d1a;
+  position: relative;
+  overflow: hidden;
+}
+
+.cashin-card::before {
+  content: none;
 }
 
 .cashin-header {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
+  margin: 0 0 20px;
+  color: #ffffff;
 }
 
 .cashin-header h1 {
   margin: 0;
-  font-size: 1.45rem;
-  color: #f8fafc;
-  letter-spacing: 0.01em;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(180, 83, 9, 0.35);
 }
 
 .cashin-header p {
-  margin: 8px 0 0;
-  color: #94a3b8;
-  font-size: 0.95rem;
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.92rem;
+  max-width: 70%;
+  text-shadow: 0 1px 2px rgba(120, 53, 15, 0.25);
 }
 
 .cashin-back-link {
   text-decoration: none;
-  color: #93c5fd;
-  border: 1px solid rgba(147, 197, 253, 0.35);
-  border-radius: 10px;
-  padding: 8px 12px;
-  transition: 0.2s ease;
+  color: #ff8a03;
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  font-size: 0.82rem;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.25);
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .cashin-back-link:hover {
-  border-color: rgba(147, 197, 253, 0.6);
-  background: rgba(147, 197, 253, 0.1);
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .cashin-layout {
+  position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 1.2fr 0.9fr;
-  gap: 18px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 16px;
 }
 
 .cashin-form {
   display: grid;
   gap: 14px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #fff5eb;
+  border: 1px solid rgba(255, 138, 3, 0.2);
   border-radius: 16px;
   padding: 16px;
 }
@@ -76,38 +110,54 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  color: #cbd5e1;
+  color: #5a3d1a;
   font-size: 0.92rem;
+  font-weight: 700;
 }
 
 .cashin-label-row small {
-  color: #93c5fd;
+  color: #ff8a03;
   font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .cashin-form label {
   display: grid;
   gap: 8px;
-  font-size: 0.92rem;
-  color: #cbd5e1;
+  font-size: 0.88rem;
+  color: #8a5300;
+  font-weight: 600;
 }
 
 .cashin-form input,
 .cashin-form select {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(2, 6, 23, 0.72);
-  color: #f8fafc;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: #ffffff;
+  color: #5a3d1a;
   border-radius: 12px;
-  padding: 12px;
+  padding: 13px 14px;
+  font-size: 1rem;
+  font-weight: 600;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.cashin-form input::placeholder {
+  color: rgba(138, 107, 63, 0.6);
+  font-weight: 500;
+}
+
 .cashin-form input:focus,
 .cashin-form select:focus {
-  border-color: rgba(56, 189, 248, 0.85);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  border-color: #ff8a03;
+  box-shadow: 0 0 0 3px rgba(255, 138, 3, 0.2);
+}
+
+.cashin-form input:disabled {
+  background: #fff1de;
+  color: #8a6b3f;
+  cursor: not-allowed;
 }
 
 .cashin-quick-values {
@@ -116,71 +166,172 @@
   gap: 8px;
 }
 
-.quick-chip {
-  border: 1px solid rgba(59, 130, 246, 0.35);
-  background: rgba(30, 41, 59, 0.65);
-  color: #cbd5e1;
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.84rem;
+/* Método de pagamento — botão com ícone PIX */
+.cashin-method {
+  display: grid;
+  gap: 8px;
+}
+
+.cashin-method__label {
+  font-size: 0.88rem;
+  color: #8a5300;
+  font-weight: 600;
+}
+
+.cashin-method__btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 138, 3, 0.35);
+  background: #ffffff;
+  color: #5a3d1a;
   cursor: pointer;
-  transition: 0.2s ease;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.1);
+}
+
+.cashin-method__btn:hover {
+  transform: translateY(-1px);
+  border-color: #ff8a03;
+  box-shadow: 0 8px 20px rgba(255, 138, 3, 0.22);
+}
+
+.cashin-method__btn.is-active {
+  border-color: #ff8a03;
+  background: linear-gradient(135deg, #ffffff 0%, #fff5eb 100%);
+  box-shadow: 0 8px 20px rgba(255, 138, 3, 0.22);
+}
+
+.cashin-method__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #e6fffb;
+  border: 1px solid rgba(50, 188, 173, 0.3);
+  flex-shrink: 0;
+}
+
+.cashin-method__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cashin-method__info strong {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #5a3d1a;
+  letter-spacing: 0.5px;
+}
+
+.cashin-method__info small {
+  font-size: 0.8rem;
+  color: #8a6b3f;
+  font-weight: 500;
+}
+
+.cashin-method__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f7d981, #ff8a03);
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(255, 138, 3, 0.35);
+}
+
+.quick-chip {
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: #ffffff;
+  color: #8a5300;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s ease;
 }
 
 .quick-chip:hover {
-  border-color: rgba(59, 130, 246, 0.7);
+  border-color: #ff8a03;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.18);
 }
 
 .quick-chip.active {
-  background: linear-gradient(135deg, #22d3ee, #3b82f6);
-  color: #0b1020;
+  background: linear-gradient(135deg, #f7d981, #ff8a03);
+  color: #ffffff;
   border-color: transparent;
-  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(255, 138, 3, 0.35);
 }
 
 .cashin-submit,
 .cashin-dashboard-btn {
   border: none;
-  border-radius: 12px;
-  padding: 12px;
-  font-weight: 700;
+  border-radius: 14px;
+  padding: 14px;
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.2s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
 
 .cashin-submit {
-  background: linear-gradient(135deg, #22d3ee, #3b82f6);
-  color: #041225;
+  background: linear-gradient(90deg, #f7d981, #ff8a03);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(255, 138, 3, 0.4);
+  letter-spacing: 0.3px;
 }
 
-.cashin-dashboard-btn {
-  background: rgba(148, 163, 184, 0.16);
-  color: #e2e8f0;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-}
-
-.cashin-submit:hover,
-.cashin-dashboard-btn:hover {
+.cashin-submit:hover {
   transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .cashin-submit:disabled {
-  opacity: 0.68;
+  opacity: 0.7;
   cursor: wait;
+  transform: none;
+  filter: grayscale(0.15);
+}
+
+.cashin-dashboard-btn {
+  background: #ffffff;
+  color: #8a5300;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+}
+
+.cashin-dashboard-btn:hover {
+  transform: translateY(-1px);
+  background: #fff5eb;
 }
 
 .cashin-side-panel {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(56, 189, 248, 0.2);
+  background: #fff5eb;
+  border: 1px solid rgba(255, 138, 3, 0.2);
   border-radius: 16px;
   padding: 16px;
+  color: #5a3d1a;
 }
 
 .cashin-side-panel h2 {
-  margin: 0 0 12px;
-  color: #e2e8f0;
+  margin: 0 0 14px;
+  color: #ff8a03;
   font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: 0.3px;
 }
 
 .summary-row {
@@ -188,63 +339,84 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  color: #cbd5e1;
+  border-bottom: 1px dashed rgba(255, 138, 3, 0.3);
+  color: #8a5300;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .summary-row strong {
-  color: #f8fafc;
+  color: #5a3d1a;
+  font-weight: 700;
+}
+
+.summary-row.total {
+  border-bottom: 0;
+  padding-top: 14px;
+  font-size: 1rem;
 }
 
 .summary-row.total strong {
-  color: #67e8f9;
+  color: #ff8a03;
+  font-size: 1.15rem;
+  font-weight: 900;
 }
 
 .cashin-security {
   margin-top: 14px;
   display: grid;
   gap: 8px;
-  font-size: 0.88rem;
-  color: #bae6fd;
+  font-size: 0.85rem;
 }
 
 .cashin-security p {
   margin: 0;
-  background: rgba(2, 6, 23, 0.55);
-  border: 1px solid rgba(125, 211, 252, 0.14);
+  background: #ffffff;
+  border: 1px solid rgba(255, 138, 3, 0.2);
   border-radius: 10px;
-  padding: 9px 10px;
+  padding: 10px 12px;
+  color: #5a3d1a;
+  font-weight: 600;
 }
 
 .cashin-message {
-  margin: 4px 0 0;
-  font-size: 0.92rem;
+  margin: 0;
+  font-size: 0.9rem;
   padding: 10px 12px;
   border-radius: 10px;
+  font-weight: 600;
 }
 
 .cashin-message.success {
-  background: rgba(34, 197, 94, 0.16);
-  border: 1px solid rgba(34, 197, 94, 0.35);
-  color: #86efac;
+  background: rgba(255, 138, 3, 0.14);
+  border: 1px solid rgba(255, 138, 3, 0.45);
+  color: #8a5300;
 }
 
 .cashin-message.error {
-  background: rgba(248, 113, 113, 0.16);
-  border: 1px solid rgba(248, 113, 113, 0.35);
-  color: #fca5a5;
+  background: rgba(248, 113, 113, 0.14);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #b91c1c;
 }
 
 @media (max-width: 860px) {
   .cashin-layout {
     grid-template-columns: 1fr;
   }
+
+  .cashin-header p {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 560px) {
   .cashin-card {
     padding: 18px;
-    border-radius: 16px;
+    border-radius: 18px;
+  }
+
+  .cashin-card::before {
+    height: 128px;
   }
 
   .cashin-header {

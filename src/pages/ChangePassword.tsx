@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AppSidebar from '../components/AppSidebar'
-import './Tasks.css'
-import './WithdrawPassword.css'
+import './ChangePassword.css'
 
 type StoredUser = {
   id: number
@@ -52,7 +50,6 @@ export default function ChangePassword() {
     }
 
     setLoading(true)
-    setFeedback(null)
 
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
@@ -85,74 +82,113 @@ export default function ChangePassword() {
   }
 
   return (
-    <main className="tasks-page withdraw-password-page">
-      <AppSidebar />
-
-      <header className="tasks-header">
-        <div>
-          <p className="tasks-kicker">Segurança</p>
-          <h1>Alterar Senha</h1>
-          <span className="tasks-subtitle">Altere a senha da sua conta de usuário</span>
-        </div>
-        <div className="tasks-header-actions">
-          <button className="btn ghost" type="button" onClick={() => navigate('/profile')}>
-            Voltar
-          </button>
-        </div>
+    <main className="cp-page">
+      <header className="cp-topbar">
+        <button
+          type="button"
+          className="cp-topbar-back"
+          onClick={() => navigate('/profile')}
+          aria-label="Voltar"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </button>
+        <span className="cp-topbar-title">Alterar senha</span>
       </header>
 
-      <section className="withdraw-password-card">
-        <h2>Atualizar Senha de Login</h2>
-        <p className="withdraw-password-subtitle">
-          Informe sua senha atual e defina uma nova senha para acessar a conta.
-        </p>
-
-        <div className="withdraw-password-form">
-          <label>
-            Senha atual
+      <div className="cp-scroll-box">
+        <div className="cp-cell">
+          <div className="cp-cell-title">
+            <span>Senha atual</span>
+          </div>
+          <div className="cp-cell-value">
             <input
               type="password"
-              value={currentPassword}
+              className="cp-cell-input"
               placeholder="Digite sua senha atual"
+              value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
+              autoComplete="current-password"
             />
-          </label>
-
-          <label>
-            Nova senha
-            <input
-              type="password"
-              value={newPassword}
-              placeholder="Digite sua nova senha"
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Confirmar nova senha
-            <input
-              type="password"
-              value={confirmPassword}
-              placeholder="Confirme a nova senha"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </label>
-
-          <button type="button" className="withdraw-password-btn" onClick={saveNewPassword} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar nova senha'}
-          </button>
-
-          {feedback ? (
-            <div className={`withdraw-password-feedback ${feedback.type}`}>
-              {feedback.message}
-            </div>
-          ) : null}
+          </div>
         </div>
 
-        <p className="withdraw-password-note">
-          Após alterar a senha, use a nova senha no próximo login.
-        </p>
-      </section>
+        <div className="cp-cell">
+          <div className="cp-cell-title">
+            <span>Nova senha</span>
+          </div>
+          <div className="cp-cell-value">
+            <input
+              type="password"
+              className="cp-cell-input"
+              placeholder="Mínimo de 6 caracteres"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+        </div>
+
+        <div className="cp-cell">
+          <div className="cp-cell-title">
+            <span>Confirmar senha</span>
+          </div>
+          <div className="cp-cell-value">
+            <input
+              type="password"
+              className="cp-cell-input"
+              placeholder="Repita a nova senha"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+        </div>
+
+        <div className="cp-submit-wrap">
+          <button
+            type="button"
+            className="cp-submit"
+            onClick={saveNewPassword}
+            disabled={loading}
+          >
+            <span>{loading ? 'Enviando...' : 'Enviar'}</span>
+          </button>
+        </div>
+      </div>
+
+      {feedback ? (
+        <div
+          className="cp-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setFeedback(null)}
+        >
+          <div className="cp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className={`cp-modal-icon cp-modal-icon--${feedback.type}`}>
+              {feedback.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              )}
+            </div>
+            <p className="cp-modal-message">{feedback.message}</p>
+            <button
+              type="button"
+              className="cp-modal-button"
+              onClick={() => setFeedback(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

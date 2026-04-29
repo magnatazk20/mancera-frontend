@@ -30,7 +30,7 @@ const formatBRL = (value: number) =>
 export default function Checkin() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
-  const [updating, setUpdating] = useState(false)
+  const [claiming, setClaiming] = useState(false)
   const [canClaim, setCanClaim] = useState(false)
   const [currentDay, setCurrentDay] = useState(1)
   const [rewards, setRewards] = useState<number[]>([2, 2, 3, 3, 4, 4, 5, 5, 6, 10])
@@ -91,131 +91,167 @@ export default function Checkin() {
     run()
   }, [navigate, user?.id])
 
-  const handleRefreshStatus = async () => {
-    if (!user?.id || updating) return
-    setUpdating(true)
+  const handleClaim = async () => {
+    if (!user?.id || claiming || !canClaim) return
+
+    setClaiming(true)
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
-      await loadStatus()
+      const res = await fetch(`${API_URL}/api/checkin/claim`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ userId: user.id }),
+      })
+
+      const data = await res.json().catch(() => ({})) as {
+        ok?: boolean
+        error?: string
+        message?: string
+        claim?: { day?: number; rewardAmount?: number }
+      }
+
+      if (!res.ok || !data?.ok) {
+        setFeedback({ type: 'error', message: data?.error ?? 'Não foi possível resgatar o check-in.' })
+        return
+      }
+
+      const reward = Number(data?.claim?.rewardAmount ?? 0)
       setFeedback({
         type: 'success',
-        message: 'Status atualizado. Se você já enviou /checkin no grupo, seu progresso aparecerá aqui.',
+        message: data?.message ?? `Check-in resgatado! Você recebeu ${formatBRL(reward)}.`,
       })
+
+      await loadStatus()
     } catch {
-      setFeedback({ type: 'error', message: 'Falha ao atualizar status do check-in.' })
+      setFeedback({ type: 'error', message: 'Erro de conexão ao resgatar check-in.' })
     } finally {
-      setUpdating(false)
+      setClaiming(false)
     }
   }
 
   return (
-    <main className="checkin-page">
-      <header className="checkin-topbar">
-        <button type="button" className="checkin-back" onClick={() => navigate('/profile')}>
-          ←
+    <main className="ck-page">
+      <header className="ck-topbar">
+        <button
+          type="button"
+          className="ck-topbar-back"
+          onClick={() => navigate('/profile')}
+          aria-label="Voltar"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
         </button>
-        <h1>Check-in Diário</h1>
-        <div className="checkin-back-spacer" />
+        <span className="ck-topbar-title">Check-in Diário</span>
       </header>
 
-      <section className="checkin-card">
-        <div className="checkin-hero">
-          <div className="checkin-calendar-icon-wrap" aria-hidden="true">
-            <svg viewBox="0 0 24 24" className="checkin-calendar-icon">
-              <rect x="3.5" y="5.5" width="17" height="15" rx="3" fill="none" stroke="currentColor" strokeWidth="1.9" />
-              <path d="M7.5 3.5v4M16.5 3.5v4M3.5 9.5h17" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-              <circle cx="8" cy="13" r="1" fill="currentColor" />
-              <circle cx="12" cy="13" r="1" fill="currentColor" />
-              <circle cx="16" cy="13" r="1" fill="currentColor" />
-            </svg>
-          </div>
-
-          <div>
-            <h2>Ciclo de 10 dias</h2>
-            <p>O check-in diário agora é feito no bot do Telegram.</p>
-          </div>
-        </div>
-
-        <div className="checkin-progress-overview" aria-label="Status do progresso">
-          <div className="checkin-progress-head">
-            <strong>Status do progresso</strong>
-            <span>{historyDays.length}/10 dias concluídos</span>
-          </div>
-          <div className="checkin-progress-track">
-            <div className="checkin-progress-fill" style={{ width: `${progressPercent}%` }} />
-          </div>
-          <small>{Math.round(progressPercent)}% completo</small>
-        </div>
-
-        <div className="checkin-meta">
-          <span className="checkin-meta-pill">Dia atual: <strong>{currentDay}</strong>/10</span>
-          <span className={`checkin-meta-pill ${canClaim ? 'ok' : 'blocked'}`}>
-            {canClaim ? 'Disponível para resgatar' : 'Resgate de hoje concluído'}
-          </span>
-        </div>
-
-        {feedback ? (
-          <div className={`checkin-feedback ${feedback.type}`}>{feedback.message}</div>
-        ) : null}
-
+      <div className="ck-scroll-box">
         {loading ? (
-          <div className="checkin-loading">Carregando seu progresso...</div>
+          <div className="ck-loading">Carregando seu progresso...</div>
         ) : (
           <>
-            <div className="checkin-grid">
-              {Array.from({ length: 10 }).map((_, index) => {
-                const day = index + 1
-                const isDone = historyDays.includes(day)
-                const isCurrent = currentDay === day
-                return (
-                  <article
-                    key={day}
-                    className={`checkin-day ${isDone ? 'done' : ''} ${isCurrent ? 'current' : ''}`}
-                  >
-                    <div className="checkin-day-head">
-                      <span className="checkin-day-badge">Dia {day}</span>
-                      {isDone ? <span className="checkin-status done">✓</span> : isCurrent ? <span className="checkin-status current">Hoje</span> : null}
-                    </div>
-                    <strong>{formatBRL(Number(rewards[index] ?? 0))}</strong>
-                    <small>{isDone ? 'Resgatado' : isCurrent ? 'Disponível hoje' : 'Aguardando dia'}</small>
-                  </article>
-                )
-              })}
-            </div>
+            {/* Progress */}
+            <section className="ck-section">
+              <h3 className="ck-section-title">Status do progresso</h3>
+              <div className="ck-progress-row">
+                <span>Dias concluídos</span>
+                <span>{historyDays.length}/10</span>
+              </div>
+              <div className="ck-progress-track">
+                <div className="ck-progress-fill" style={{ width: `${progressPercent}%` }} />
+              </div>
+              <span className="ck-progress-percent">{Math.round(progressPercent)}% completo</span>
 
-            <section className="checkin-telegram-guide" aria-label="Tutorial de check-in no Telegram">
-              <h3>Como fazer seu check-in</h3>
-              <ol>
-                <li>Clique no botão abaixo para abrir o grupo oficial.</li>
-                <li>No grupo, envie o comando <strong>/checkin</strong>.</li>
-                <li>Volte para esta página e clique em <strong>Atualizar status</strong>.</li>
-              </ol>
-
-              <div className="checkin-telegram-actions">
-                <a
-                  className="checkin-telegram-btn primary"
-                  href="https://t.me/pglm001"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Ir para o grupo no Telegram
-                </a>
-                <button
-                  type="button"
-                  className="checkin-telegram-btn secondary"
-                  onClick={handleRefreshStatus}
-                  disabled={updating}
-                >
-                  {updating ? 'Atualizando...' : 'Já fiz no Telegram, atualizar status'}
-                </button>
+              <div className="ck-status-row">
+                <span className="ck-pill">Dia atual: {currentDay}/10</span>
+                <span className={`ck-pill ${canClaim ? 'ck-pill--ok' : 'ck-pill--warn'}`}>
+                  {canClaim ? 'Disponível para resgatar' : 'Resgate de hoje concluído'}
+                </span>
               </div>
 
-              <p className="checkin-telegram-note">
-                Grupo: <a href="https://t.me/pglm001" target="_blank" rel="noreferrer">https://t.me/pglm001</a> · Comando: <strong>/checkin</strong>
-              </p>
+              <button
+                type="button"
+                className="ck-claim-btn"
+                onClick={handleClaim}
+                disabled={!canClaim || claiming}
+              >
+                {claiming
+                  ? 'Resgatando...'
+                  : canClaim
+                    ? `Resgatar ${formatBRL(Number(rewards[currentDay - 1] ?? 0))}`
+                    : 'Resgate de hoje concluído'}
+              </button>
             </section>
+
+            {/* Days grid */}
+            <section className="ck-section">
+              <h3 className="ck-section-title">Recompensas dos 10 dias</h3>
+              <div className="ck-grid">
+                {Array.from({ length: 10 }).map((_, index) => {
+                  const day = index + 1
+                  const isDone = historyDays.includes(day)
+                  const isCurrent = currentDay === day && !isDone
+                  return (
+                    <article
+                      key={day}
+                      className={`ck-day ${isDone ? 'ck-day--done' : ''} ${isCurrent ? 'ck-day--current' : ''}`}
+                    >
+                      <div className="ck-day-head">
+                        <span className="ck-day-badge">Dia {day}</span>
+                        {isDone ? (
+                          <span className="ck-day-status ck-day-status--done">✓</span>
+                        ) : isCurrent ? (
+                          <span className="ck-day-status ck-day-status--current">Hoje</span>
+                        ) : null}
+                      </div>
+                      <span className="ck-day-amount">{formatBRL(Number(rewards[index] ?? 0))}</span>
+                      <span className="ck-day-hint">
+                        {isDone ? 'Resgatado' : isCurrent ? 'Disponível hoje' : 'Aguardando'}
+                      </span>
+                    </article>
+                  )
+                })}
+              </div>
+            </section>
+
           </>
         )}
-      </section>
+      </div>
+
+      {feedback ? (
+        <div
+          className="ck-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setFeedback(null)}
+        >
+          <div className="ck-modal" onClick={(e) => e.stopPropagation()}>
+            <div className={`ck-modal-icon ck-modal-icon--${feedback.type}`}>
+              {feedback.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              )}
+            </div>
+            <p className="ck-modal-message">{feedback.message}</p>
+            <button
+              type="button"
+              className="ck-modal-button"
+              onClick={() => setFeedback(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

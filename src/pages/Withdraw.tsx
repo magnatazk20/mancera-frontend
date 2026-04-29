@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AppSidebar from '../components/AppSidebar'
-import './Tasks.css'
 import './Withdraw.css'
+
+type WalletType = 'balance' | 'commission'
 
 type StoredUser = {
   id: number
@@ -18,17 +18,105 @@ type WithdrawConfigResponse = {
     withdrawFeePercent?: number
     minWithdrawAmount?: number
     maxWithdrawAmount?: number
-    withdrawAutoApprove?: boolean
     withdrawStartTime?: string
     withdrawEndTime?: string
     withdrawAllowedDays?: string
   }
 }
 
+type VipData = {
+  levelName: string
+  vipPrice: number
+  dailyTaskLimit: number
+  taskRewardAmount: number
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+const maskPixKey = (value: string) => {
+  const raw = (value ?? '').trim()
+  if (!raw) return ''
+  if (raw.includes('@')) {
+    const [user, domain] = raw.split('@')
+    if (!user) return `***@${domain}`
+    const visible = user.slice(0, 2)
+    return `${visible}${'*'.repeat(Math.max(3, user.length - 2))}@${domain}`
+  }
+  if (raw.length <= 4) return '*'.repeat(raw.length)
+  const start = raw.slice(0, 2)
+  const end = raw.slice(-2)
+  const middle = '*'.repeat(Math.max(3, raw.length - 4))
+  return `${start}${middle}${end}`
+}
+
+/**
+ * Valores fixos de saque por nivel VIP.
+ * T0 = bloqueado (sem opcoes).
+ */
+const WITHDRAW_OPTIONS_BY_LEVEL: Record<string, number[]> = {
+  T1: [200, 300, 500, 1000],
+  T2: [500, 700, 1000],
+  T3: [1000, 2000, 3000],
+  T4: [1000, 2000, 3000],
+  T5: [1000, 2000, 4000],
+}
+
+/**
+ * Identifica o nivel VIP pelo nome ou pelo preco.
+ * Tenta primeiro pelo nome (T1, T2...), depois por faixas de preco.
+ * VIP com price=0 e sempre T0 (bloqueado).
+ * Qualquer VIP pago sem match = fallback para T1.
+ */
+const resolveVipTier = (levelName: string, vipPrice: number): string | null => {
+  if (vipPrice <= 0) return null // T0
+
+  // Tenta extrair do nome (ex: "T1", "T3 Premium", "Nivel T2")
+  const nameMatch = String(levelName ?? '').toUpperCase().match(/T(\d+)/)
+  if (nameMatch) {
+    const key = `T${nameMatch[1]}`
+    if (WITHDRAW_OPTIONS_BY_LEVEL[key]) return key
+  }
+
+  // Tenta extrair um numero do nome (ex: "VIP 1" -> T1, "Nivel 3" -> T3)
+  const numMatch = String(levelName ?? '').match(/(\d+)/)
+  if (numMatch) {
+    const key = `T${numMatch[1]}`
+    if (WITHDRAW_OPTIONS_BY_LEVEL[key]) return key
+  }
+
+  // Fallback: qualquer VIP pago usa T1
+  return 'T1'
+}
+
+/**
+ * Retorna as opcoes de saque baseado no nivel VIP e saldo.
+ */
+const buildWithdrawOptions = (levelName: string, vipPrice: number, balance: number): number[] => {
+  if (vipPrice <= 0 || balance <= 0) return []
+
+  const tier = resolveVipTier(levelName, vipPrice)
+  if (!tier) return []
+
+  const options = WITHDRAW_OPTIONS_BY_LEVEL[tier] ?? WITHDRAW_OPTIONS_BY_LEVEL['T1']
+  return (options ?? []).filter((v) => v <= balance)
+}
+
+/**
+ * Retorna o valor minimo de saque do nivel VIP.
+ */
+const getMinWithdrawByVip = (levelName: string, vipPrice: number): number => {
+  if (vipPrice <= 0) return 0
+
+  const tier = resolveVipTier(levelName, vipPrice)
+  if (!tier) return 0
+
+  const options = WITHDRAW_OPTIONS_BY_LEVEL[tier] ?? WITHDRAW_OPTIONS_BY_LEVEL['T1']
+  if (!options || options.length === 0) return 0
+  return Math.min(...options)
+}
 
 export default function Withdraw() {
   const navigate = useNavigate()
@@ -47,7 +135,6 @@ export default function Withdraw() {
     }
   }, [])
 
-  const [amount, setAmount] = useState('')
   const [holderName, setHolderName] = useState('')
   const [holderCpf, setHolderCpf] = useState('')
   const [pixType, setPixType] = useState<PixType>('CHAVE_ALEATORIA')
@@ -56,76 +143,50 @@ export default function Withdraw() {
   const [loadingPixData, setLoadingPixData] = useState(false)
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [withdrawFeePercent, setWithdrawFeePercent] = useState(0)
   const [minWithdrawAmount, setMinWithdrawAmount] = useState(0)
   const [maxWithdrawAmount, setMaxWithdrawAmount] = useState(0)
   const [withdrawStartTime, setWithdrawStartTime] = useState('00:00')
   const [withdrawEndTime, setWithdrawEndTime] = useState('23:59')
   const [withdrawAllowedDays, setWithdrawAllowedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6])
-  const [withdrawAutoApprove, setWithdrawAutoApprove] = useState(false)
 
-  const [lastRequest, setLastRequest] = useState<{
-    amount: number
-    externalId?: string | null
-    receiptCode?: string
-    requestedAt: string
-  } | null>(null)
-  const [withdrawActivationToken, setWithdrawActivationToken] = useState('')
-  const [showActivationModal, setShowActivationModal] = useState(false)
-  const [copiedActivationMessage, setCopiedActivationMessage] = useState(false)
-  const [isWithdrawActivated, setIsWithdrawActivated] = useState(false)
-  const [withdrawActivationExpiresAt, setWithdrawActivationExpiresAt] = useState<string | null>(null)
-  const [groupUrl, setGroupUrl] = useState('')
   const [userBalance, setUserBalance] = useState<number | null>(null)
+  const [commissionBalance, setCommissionBalance] = useState<number | null>(null)
+  const [selectedWallet, setSelectedWallet] = useState<WalletType>('balance')
+  const [selectedAmount, setSelectedAmount] = useState<number | null>(null)
   const [hasWithdrawPassword, setHasWithdrawPassword] = useState<boolean | null>(null)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [passwordModalError, setPasswordModalError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  // ── Segurança: aceita apenas dígitos e vírgula/ponto para valor monetário ──
-  const sanitizeAmount = (value: string) =>
-    String(value ?? '').replace(/[^0-9.,]/g, '').slice(0, 12)
+  // VIP state
+  const [vipData, setVipData] = useState<VipData | null>(null)
+  const [vipLoaded, setVipLoaded] = useState(false)
 
-  const normalizeCpf = (value: string) => value.replace(/\D/g, '')
+  // T0 check: user is T0 if they have no VIP or VIP price is 0
+  const isT0 = vipLoaded && (vipData === null || vipData.vipPrice === 0)
 
-  const loadWithdrawActivationStatus = async () => {
-    if (!token || !user?.id) return { ok: false, isActivated: false as boolean }
+  // Balance da carteira selecionada
+  const activeBalance = selectedWallet === 'commission' ? commissionBalance : userBalance
+  const safeBalance = activeBalance !== null && activeBalance > 0 ? activeBalance : 0
 
-    try {
-      const res = await fetch(`${API_URL}/api/withdraw/activation-status/${user.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  // Minimo de saque do VIP do usuario
+  const vipMinAmount = getMinWithdrawByVip(vipData?.levelName ?? '', vipData?.vipPrice ?? 0)
 
-      const data = (await res.json()) as {
-        ok?: boolean
-        isActivated?: boolean
-        expiresAt?: string | null
-      }
+  // Opcoes de valor baseadas no VIP
+  const withdrawOptions = buildWithdrawOptions(vipData?.levelName ?? '', vipData?.vipPrice ?? 0, safeBalance)
 
-      if (res.status === 401 || res.status === 403) {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('user')
-        navigate('/')
-        return { ok: false, isActivated: false as boolean }
-      }
+  // Preview de valores
+  const withdrawAmount = selectedAmount ?? 0
+  const hasValidPreviewAmount = withdrawAmount > 0
+  const feeValuePreview = hasValidPreviewAmount ? (withdrawAmount * withdrawFeePercent) / 100 : 0
+  const netValuePreview = hasValidPreviewAmount ? withdrawAmount - feeValuePreview : 0
 
-      if (!res.ok || !data?.ok) {
-        return { ok: false, isActivated: false as boolean }
-      }
-
-      const activated = Boolean(data.isActivated)
-      setIsWithdrawActivated(activated)
-      setWithdrawActivationExpiresAt(data.expiresAt ?? null)
-      return { ok: true, isActivated: activated }
-    } catch {
-      setIsWithdrawActivated(false)
-      setWithdrawActivationExpiresAt(null)
-      return { ok: false, isActivated: false as boolean }
-    }
-  }
+  // Limpa a selecao de valor quando troca de carteira
+  useEffect(() => {
+    setSelectedAmount(null)
+  }, [selectedWallet])
 
   useEffect(() => {
     if (!token || !user?.id) {
@@ -139,13 +200,10 @@ export default function Withdraw() {
 
     const loadStoredPix = async () => {
       if (!user?.id || !token) return
-
       setLoadingPixData(true)
       try {
         const res = await fetch(`${API_URL}/api/user/pix-key/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         })
         const data = (await res.json()) as {
           ok?: boolean
@@ -157,7 +215,6 @@ export default function Withdraw() {
             pixKey?: string
           } | null
         }
-
         if (res.status === 401 || res.status === 403) {
           localStorage.removeItem('token')
           localStorage.removeItem('user')
@@ -166,15 +223,13 @@ export default function Withdraw() {
           navigate('/')
           return
         }
-
         if (!res.ok || !data?.ok || !data.hasPixKey || !data.pixKey) return
-
         setHolderName(String(data.pixKey.holderName ?? ''))
         setHolderCpf(String(data.pixKey.holderCpf ?? ''))
         setPixType((data.pixKey.pixKeyType as PixType) ?? 'CHAVE_ALEATORIA')
         setPixKey(String(data.pixKey.pixKey ?? ''))
       } catch {
-        // silencioso: usuário ainda pode preencher manualmente
+        // silencioso
       } finally {
         setLoadingPixData(false)
       }
@@ -185,11 +240,9 @@ export default function Withdraw() {
         const res = await fetch(`${API_URL}/api/admin/withdraw-config`)
         const data = (await res.json()) as WithdrawConfigResponse
         if (!res.ok || !data?.ok || !data.config) return
-
         setWithdrawFeePercent(Number(data.config.withdrawFeePercent ?? 0))
         setMinWithdrawAmount(Number(data.config.minWithdrawAmount ?? 0))
         setMaxWithdrawAmount(Number(data.config.maxWithdrawAmount ?? 0))
-        setWithdrawAutoApprove(Boolean(data.config.withdrawAutoApprove))
         setWithdrawStartTime(String(data.config.withdrawStartTime ?? '00:00'))
         setWithdrawEndTime(String(data.config.withdrawEndTime ?? '23:59'))
         const parsedDays = String(data.config.withdrawAllowedDays ?? '0,1,2,3,4,5,6')
@@ -198,18 +251,6 @@ export default function Withdraw() {
           .filter((day) => Number.isInteger(day) && day >= 0 && day <= 6)
         setWithdrawAllowedDays(parsedDays.length > 0 ? [...new Set(parsedDays)] : [0, 1, 2, 3, 4, 5, 6])
       } catch {
-        // fallback silencioso
-      }
-    }
-
-    const loadGroupUrl = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/community-links`)
-        const data = (await res.json()) as { ok?: boolean; links?: { whatsappGroupUrl?: string } }
-        if (data?.ok && data?.links?.whatsappGroupUrl) {
-          setGroupUrl(data.links.whatsappGroupUrl)
-        }
-      } catch {
         // silencioso
       }
     }
@@ -217,9 +258,14 @@ export default function Withdraw() {
     const loadBalance = async () => {
       try {
         const res = await fetch(`${API_URL}/api/user/summary/${user.id}`)
-        const data = (await res.json()) as { ok?: boolean; balance?: number }
+        const data = (await res.json()) as {
+          ok?: boolean
+          balance?: number
+          commissionBalance?: number
+        }
         if (res.ok && data?.balance !== undefined) {
           setUserBalance(Number(data.balance ?? 0))
+          setCommissionBalance(Number(data.commissionBalance ?? 0))
         }
       } catch {
         // silencioso
@@ -240,43 +286,53 @@ export default function Withdraw() {
       }
     }
 
+    const loadVipStatus = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/vip/user/${user.id}`)
+        const data = (await res.json()) as {
+          ok?: boolean
+          hasVip?: boolean
+          vip?: {
+            levelName?: string
+            vipPrice?: number
+            dailyTaskLimit?: number
+            taskRewardAmount?: number
+          } | null
+        }
+        if (res.ok && data?.ok) {
+          if (data.hasVip && data.vip) {
+            setVipData({
+              levelName: String(data.vip.levelName ?? ''),
+              vipPrice: Number(data.vip.vipPrice ?? 0),
+              dailyTaskLimit: Number(data.vip.dailyTaskLimit ?? 0),
+              taskRewardAmount: Number(data.vip.taskRewardAmount ?? 0),
+            })
+          } else {
+            setVipData(null)
+          }
+        }
+      } catch {
+        // silencioso
+      } finally {
+        setVipLoaded(true)
+      }
+    }
+
     loadStoredPix()
-    loadWithdrawActivationStatus()
     loadWithdrawConfig()
-    loadGroupUrl()
     loadBalance()
     loadWithdrawPasswordStatus()
+    loadVipStatus()
   }, [navigate, token, user?.id])
 
-  useEffect(() => {
-    if (!showActivationModal || !token || !user?.id) return
-
-    const interval = window.setInterval(async () => {
-      const status = await loadWithdrawActivationStatus()
-      if (status.ok && status.isActivated) {
-        setShowActivationModal(false)
-        setWithdrawActivationToken('')
-        setCopiedActivationMessage(false)
-        setError('')
-        setSuccess('Saque ativado com sucesso no Telegram. Você já pode solicitar novamente.')
-      }
-    }, 3000)
-
-    return () => window.clearInterval(interval)
-  }, [showActivationModal, token, user?.id])
-
-  const submitWithdraw = async () => {
-    setError('')
-    setSuccess('')
-    setWithdrawActivationToken('')
-
+  const openPasswordModal = () => {
     if (!token || !user?.id) {
-      setError('Usuário não autenticado.')
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      sessionStorage.removeItem('token')
-      sessionStorage.removeItem('user')
+      setFeedback({ type: 'error', message: 'Usuario nao autenticado.' })
       navigate('/')
+      return
+    }
+
+    if (isT0) {
       return
     }
 
@@ -285,114 +341,62 @@ export default function Withdraw() {
       return
     }
 
-    // ── Segurança: sanitiza e valida valor antes de qualquer lógica ──
-    const rawAmount = sanitizeAmount(amount)
-
-    // bloqueia valores com mais de 2 casas decimais (ex: 10,001)
-    const decimalMatch = rawAmount.replace(',', '.').match(/\.(\d+)/)
-    if (decimalMatch && decimalMatch[1].length > 2) {
-      setError('Informe um valor com no máximo 2 casas decimais (ex: 150,00).')
+    if (!selectedAmount || selectedAmount <= 0) {
+      setFeedback({ type: 'error', message: 'Selecione um valor de saque.' })
       return
     }
 
-    const parsedAmount = Number(rawAmount.replace(',', '.'))
-
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setError('Informe um valor de saque válido.')
+    if (selectedAmount < minWithdrawAmount && minWithdrawAmount > 0) {
+      setFeedback({ type: 'error', message: `O valor minimo de saque e ${formatBRL(minWithdrawAmount)}.` })
       return
     }
 
-    // limite absoluto de segurança no frontend (R$ 100.000)
-    if (parsedAmount > 100_000) {
-      setError('Valor de saque excede o limite permitido.')
+    if (maxWithdrawAmount > 0 && selectedAmount > maxWithdrawAmount) {
+      setFeedback({ type: 'error', message: `O valor maximo de saque e ${formatBRL(maxWithdrawAmount)}.` })
       return
     }
 
-    if (parsedAmount < minWithdrawAmount) {
-      setError(`O valor mínimo de saque é ${formatBRL(minWithdrawAmount)}.`)
-      return
-    }
-
-    if (maxWithdrawAmount > 0 && parsedAmount > maxWithdrawAmount) {
-      setError(`O valor máximo de saque é ${formatBRL(maxWithdrawAmount)}.`)
-      return
-    }
-
-    if (userBalance !== null && parsedAmount > userBalance) {
-      setError(`Saldo insuficiente. Seu saldo atual é ${formatBRL(userBalance)}.`)
+    if (activeBalance !== null && selectedAmount > activeBalance) {
+      setFeedback({ type: 'error', message: 'Saldo insuficiente para este valor.' })
       return
     }
 
     if (!isWithdrawWindowOpen) {
-      setError(withdrawWindowMessage)
-      return
-    }
-
-    if (!holderName.trim()) {
-      setError('Informe o nome do titular.')
-      return
-    }
-
-    const cpf = normalizeCpf(holderCpf)
-    if (cpf.length !== 11) {
-      setError('CPF do titular inválido.')
+      setFeedback({ type: 'error', message: withdrawWindowMessage })
       return
     }
 
     if (!pixKey.trim()) {
-      setError('Informe a chave PIX.')
+      setFeedback({ type: 'error', message: 'Cadastre um cartao bancario antes de sacar.' })
+      return
+    }
+
+    setWithdrawPassword('')
+    setShowPassword(false)
+    setPasswordModalError('')
+    setShowPasswordModal(true)
+  }
+
+  const submitWithdraw = async () => {
+    setPasswordModalError('')
+
+    if (!token || !user?.id) {
+      setPasswordModalError('Usuario nao autenticado.')
+      return
+    }
+
+    if (!selectedAmount || selectedAmount <= 0) {
+      setPasswordModalError('Valor de saque invalido.')
       return
     }
 
     if (!withdrawPassword || withdrawPassword.length < 6) {
-      setError('Informe a senha de saque (mínimo 6 caracteres).')
+      setPasswordModalError('Informe a senha de saque (minimo 6 caracteres).')
       return
     }
 
     setLoading(true)
     try {
-      if (!withdrawAutoApprove && !isWithdrawActivated) {
-        const activationRes = await fetch(`${API_URL}/api/withdraw/activation-token`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ userId: user.id }),
-        })
-
-        const activationData = (await activationRes.json()) as {
-          ok?: boolean
-          token?: string
-          error?: string
-        }
-
-        if (activationRes.status === 401 || activationRes.status === 403) {
-          localStorage.removeItem('token')
-          localStorage.removeItem('user')
-          sessionStorage.removeItem('token')
-          sessionStorage.removeItem('user')
-          navigate('/')
-          return
-        }
-
-        if (!activationRes.ok || !activationData?.ok || !activationData?.token) {
-          setError(activationData?.error || 'Não foi possível gerar o token de ativação de saque.')
-          return
-        }
-
-        setError('Saque temporariamente bloqueado.')
-        setWithdrawActivationToken(String(activationData.token))
-        setShowActivationModal(true)
-        setCopiedActivationMessage(false)
-        setLastRequest(null)
-        setSuccess('')
-        return
-      }
-
-      setError('')
-      setShowActivationModal(false)
-
       const requestRes = await fetch(`${API_URL}/api/withdraw/request`, {
         method: 'POST',
         headers: {
@@ -401,8 +405,9 @@ export default function Withdraw() {
         },
         body: JSON.stringify({
           userId: user.id,
-          amount: parsedAmount,
+          amount: selectedAmount,
           withdrawPassword,
+          walletType: selectedWallet,
         }),
       })
 
@@ -418,51 +423,45 @@ export default function Withdraw() {
       }
 
       if (!requestRes.ok || !requestData?.ok || !requestData.withdraw) {
-        setError(requestData?.error || 'Não foi possível solicitar o saque.')
+        setPasswordModalError(requestData?.error || 'Nao foi possivel solicitar o saque.')
         return
       }
 
-      setSuccess(requestData.message ?? 'Solicitação de saque enviada com sucesso.')
+      setShowPasswordModal(false)
+      setWithdrawPassword('')
+
       const requestedAt = new Date().toISOString()
       const externalId = requestData.withdraw.externalId ?? null
       const fallbackCode = `WD-REC-${Date.now()}-${user.id}`
-      const receiptPayload = {
-        amount: Number(requestData.withdraw.amount ?? parsedAmount),
-        externalId,
-        receiptCode: externalId || fallbackCode,
-        requestedAt,
-      }
 
-      setLastRequest(receiptPayload)
-      navigate('/saque/comprovante', { state: receiptPayload })
+      navigate('/saque/comprovante', {
+        state: {
+          amount: Number(requestData.withdraw.amount ?? selectedAmount),
+          externalId,
+          receiptCode: externalId || fallbackCode,
+          requestedAt,
+          walletType: selectedWallet,
+          pixKey,
+          pixType,
+          holderCpf,
+        },
+      })
     } catch {
-      setError('Erro ao processar solicitação de saque.')
+      setPasswordModalError('Erro ao processar solicitacao de saque.')
     } finally {
       setLoading(false)
     }
   }
 
-  const activationMessage = withdrawActivationToken
-    ? `Ative o saque para mim: ${withdrawActivationToken}`
-    : ''
-
-  const copyActivationMessage = async () => {
-    if (!activationMessage) return
-    try {
-      await navigator.clipboard.writeText(activationMessage)
-      setCopiedActivationMessage(true)
-      window.setTimeout(() => setCopiedActivationMessage(false), 1800)
-    } catch {
-      setCopiedActivationMessage(false)
-    }
+  const closePasswordModal = () => {
+    if (loading) return
+    setShowPasswordModal(false)
+    setWithdrawPassword('')
+    setShowPassword(false)
+    setPasswordModalError('')
   }
 
-  const parsedAmountPreview = Number(String(amount).replace(',', '.'))
-  const hasValidPreviewAmount = Number.isFinite(parsedAmountPreview) && parsedAmountPreview > 0
-  const feeValuePreview = hasValidPreviewAmount ? (parsedAmountPreview * withdrawFeePercent) / 100 : 0
-  const netValuePreview = hasValidPreviewAmount ? parsedAmountPreview - feeValuePreview : 0
-
-  const weekdayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+  const weekdayNames = ['Domingo', 'Segunda', 'Terca', 'Quarta', 'Quinta', 'Sexta', 'Sabado']
 
   const parseTimeToMinutes = (timeValue: string) => {
     const [hh, mm] = String(timeValue ?? '').split(':').map((v) => Number(v))
@@ -486,328 +485,272 @@ export default function Withdraw() {
       : false
 
   const isWithdrawWindowOpen = isDayAllowed && isTimeAllowed
-  const allowedDaysLabel =
-    withdrawAllowedDays.length > 0
-      ? withdrawAllowedDays
-          .slice()
-          .sort((a, b) => a - b)
-          .map((day) => weekdayNames[day] ?? String(day))
-          .join(', ')
-      : 'Nenhum'
+  const buildAllowedDaysLabel = (days: number[]): string => {
+    if (days.length === 0) return 'Nenhum'
+    if (days.length === 7) return 'Todos os dias'
+    const sorted = days.slice().sort((a, b) => a - b)
+    const ranges: { start: number; end: number }[] = []
+    let rangeStart = sorted[0]
+    let prev = sorted[0]
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] === prev + 1) {
+        prev = sorted[i]
+      } else {
+        ranges.push({ start: rangeStart, end: prev })
+        rangeStart = sorted[i]
+        prev = sorted[i]
+      }
+    }
+    ranges.push({ start: rangeStart, end: prev })
+    return ranges
+      .map((r) =>
+        r.start === r.end
+          ? weekdayNames[r.start]
+          : `${weekdayNames[r.start]} a ${weekdayNames[r.end]}`
+      )
+      .join(', ')
+  }
+
+  const allowedDaysLabel = buildAllowedDaysLabel(withdrawAllowedDays)
 
   const withdrawWindowMessage = !isDayAllowed
-    ? `Saque indisponível hoje. Dias permitidos: ${allowedDaysLabel}.`
+    ? `Saque indisponivel hoje. Dias permitidos: ${allowedDaysLabel}.`
     : !isTimeAllowed
-      ? `Saque indisponível neste horário. Permitido entre ${withdrawStartTime} e ${withdrawEndTime} (horário de São Paulo).`
-      : 'Saque disponível agora.'
+      ? `Saque indisponivel neste horario. Permitido entre ${withdrawStartTime} e ${withdrawEndTime}.`
+      : 'Saque disponivel agora.'
 
   return (
-    <main className="tasks-page withdraw-page">
-      <AppSidebar />
-
-      <header className="tasks-header">
-        <div>
-          <p className="tasks-kicker">Financeiro</p>
-          <h1>Saque</h1>
-          <span className="tasks-subtitle">Solicite seu saque PIX e acompanhe o processamento pelo webhook.</span>
-        </div>
-        <div className="tasks-header-actions">
-          <button className="btn ghost" type="button" onClick={() => navigate('/dashboard')}>
-            Voltar
-          </button>
-        </div>
+    <main className="wd-page">
+      {/* ── Topbar ── */}
+      <header className="wd-topbar">
+        <button type="button" className="wd-topbar-back" onClick={() => navigate('/dashboard')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6l6 6" /></svg>
+        </button>
+        <span className="wd-topbar-title">Saque</span>
       </header>
 
-      {showActivationModal ? (
-        <div className="withdraw-activation-modal-backdrop" role="presentation">
-          <div className="withdraw-activation-modal" role="dialog" aria-modal="true" aria-labelledby="withdraw-activation-title">
-            <h3 id="withdraw-activation-title">⚠️ Ativação de saque necessária</h3>
+      <div className="wd-scroll-box">
+        {/* ── Wallet selector ── */}
+        <div className="wd-section-label">Carteira</div>
+        <div className="wd-wallet-row">
+          <button
+            type="button"
+            className={`wd-wallet-opt${selectedWallet === 'balance' ? ' wd-wallet-opt--active' : ''}`}
+            onClick={() => setSelectedWallet('balance')}
+            disabled={isT0}
+          >
+            <span className="wd-wallet-opt__name">Saldo</span>
+            <strong className="wd-wallet-opt__val">{userBalance !== null ? formatBRL(userBalance) : '--'}</strong>
+          </button>
+          <button
+            type="button"
+            className={`wd-wallet-opt${selectedWallet === 'commission' ? ' wd-wallet-opt--active' : ''}`}
+            onClick={() => setSelectedWallet('commission')}
+            disabled={isT0}
+          >
+            <span className="wd-wallet-opt__name">Comissao</span>
+            <strong className="wd-wallet-opt__val">{commissionBalance !== null ? formatBRL(commissionBalance) : '--'}</strong>
+          </button>
+        </div>
 
-            <div className="withdraw-activation-steps">
-              <div className="withdraw-activation-step">
-                <span className="withdraw-activation-step-num">1</span>
-                <span>Copie a mensagem abaixo</span>
-              </div>
-              <div className="withdraw-activation-step">
-                <span className="withdraw-activation-step-num">2</span>
-                <span>Acesse o grupo oficial da PGLM</span>
-              </div>
-              <div className="withdraw-activation-step">
-                <span className="withdraw-activation-step-num">3</span>
-                <span>Cole e envie a mensagem no grupo</span>
-              </div>
-              <div className="withdraw-activation-step">
-                <span className="withdraw-activation-step-num">4</span>
-                <span>Aguarde a ativação automática</span>
-              </div>
-            </div>
+        {/* ── Nivel VIP ── */}
+        <div className="wd-cell">
+          <div className="wd-cell-title">Nivel VIP</div>
+          <div className="wd-cell-value">
+            <span className={`wd-cell-text ${isT0 ? 'wd-cell-text--red' : 'wd-cell-text--green'}`}>
+              {!vipLoaded ? 'Carregando...' : (vipData?.levelName || 'Estagiario (T0)')}
+            </span>
+          </div>
+        </div>
 
-            <p className="withdraw-activation-label">Mensagem para enviar:</p>
-            <pre className="withdraw-activation-code">{activationMessage}</pre>
-
-            {groupUrl ? (
-              <a
-                href={groupUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="withdraw-activation-group-link"
+        {/* ── Selecionar valor ── */}
+        <div className="wd-section-label">Selecione o valor</div>
+        {isT0 ? (
+          <div className="wd-amount-empty">
+            Disponivel a partir do nivel T1
+          </div>
+        ) : withdrawOptions.length === 0 ? (
+          <div className="wd-amount-empty">
+            {safeBalance <= 0 ? 'Saldo insuficiente' : `Saldo inferior ao minimo do seu VIP (${formatBRL(vipMinAmount)})`}
+          </div>
+        ) : (
+          <div className="wd-amount-grid">
+            {withdrawOptions.map((val) => (
+              <button
+                key={val}
+                type="button"
+                className={`wd-amount-btn${selectedAmount === val ? ' wd-amount-btn--active' : ''}`}
+                onClick={() => setSelectedAmount(val)}
               >
-                📲 Ir para o Grupo Oficial da PGLM
-              </a>
-            ) : (
-              <p className="withdraw-activation-no-link">
-                Acesse o grupo oficial da PGLM e envie a mensagem acima para ativar seu saque.
-              </p>
-            )}
+                {formatBRL(val)}
+              </button>
+            ))}
+          </div>
+        )}
 
-            <div className="withdraw-activation-actions">
-              <button type="button" className="withdraw-activation-copy" onClick={copyActivationMessage}>
-                {copiedActivationMessage ? '✅ Copiado!' : 'Copiar mensagem'}
-              </button>
-              <button type="button" className="withdraw-activation-close" onClick={() => setShowActivationModal(false)}>
-                Fechar
-              </button>
+        {/* ── Cartao bancario ── */}
+        <div className="wd-cell">
+          <div className="wd-cell-title">Cartao bancario</div>
+          <div className="wd-cell-value">
+            <input
+              type="text"
+              className="wd-cell-input"
+              value={loadingPixData ? 'Carregando...' : (pixKey ? maskPixKey(pixKey) : 'Nenhum cadastrado')}
+              readOnly
+              disabled
+            />
+          </div>
+        </div>
+
+        {/* ── Info rows ── */}
+        <div className="wd-cell">
+          <div className="wd-cell-title">Saque minimo</div>
+          <div className="wd-cell-value">
+            <span className="wd-cell-text">{vipMinAmount > 0 ? formatBRL(vipMinAmount) : '--'}</span>
+          </div>
+        </div>
+
+        <div className="wd-cell">
+          <div className="wd-cell-title">Taxa</div>
+          <div className="wd-cell-value">
+            <span className="wd-cell-text">{withdrawFeePercent}%</span>
+          </div>
+        </div>
+
+        <div className="wd-cell">
+          <div className="wd-cell-title">Valor liquido</div>
+          <div className="wd-cell-value">
+            <span className="wd-cell-text">{hasValidPreviewAmount ? formatBRL(netValuePreview) : '--'}</span>
+          </div>
+        </div>
+
+        <div className="wd-cell">
+          <div className="wd-cell-title">Horario de saque</div>
+          <div className="wd-cell-value">
+            <span className={`wd-cell-text ${isWithdrawWindowOpen ? 'wd-cell-text--green' : 'wd-cell-text--red'}`}>
+              {isWithdrawWindowOpen ? 'Disponivel' : 'Indisponivel'} ({withdrawStartTime} - {withdrawEndTime})
+            </span>
+          </div>
+        </div>
+
+        {/* ── Alterar cartao ── */}
+        <div className="wd-link-wrap">
+          <button type="button" className="wd-link-btn" onClick={() => navigate('/bank-cards')}>
+            Alterar cartao bancario
+          </button>
+        </div>
+
+        {/* ── Submit ── */}
+        <div className="wd-submit-wrap">
+          <button
+            type="button"
+            className="wd-submit"
+            disabled={loading || !isWithdrawWindowOpen || hasWithdrawPassword === false || isT0 || !selectedAmount}
+            onClick={openPasswordModal}
+          >
+            <span>
+              {loading
+                ? 'Enviando...'
+                : isT0
+                  ? 'VIP necessario para sacar'
+                  : !selectedAmount
+                    ? 'Selecione um valor'
+                    : `Sacar ${formatBRL(selectedAmount)}`}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── Modal: usuario T0 (estagiario) ── */}
+      {isT0 ? (
+        <div className="wd-modal-overlay" onClick={() => navigate('/dashboard')}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="wd-modal-icon wd-modal-icon--error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
             </div>
+            <p className="wd-modal-message">Voce ainda e <strong>Estagiario (T0)</strong>. Para realizar saques, e necessario ter pelo menos o nivel <strong>T1</strong> ou superior.</p>
+            <button type="button" className="wd-modal-button" onClick={() => navigate('/vip')}>Ver planos VIP</button>
+            <button type="button" className="wd-modal-button wd-modal-button--ghost" onClick={() => navigate('/dashboard')}>Voltar ao inicio</button>
           </div>
         </div>
       ) : null}
 
-      <section className="withdraw-card">
-        <h2>Solicitação de Saque PIX</h2>
-
-        <div className="withdraw-balance-display">
-          <span className="withdraw-balance-label">Saldo disponível</span>
-          <strong className="withdraw-balance-value">
-            {userBalance !== null ? formatBRL(userBalance) : '—'}
-          </strong>
-        </div>
-
-        {hasWithdrawPassword === false ? (
-          <div className="withdraw-no-pwd-backdrop" role="presentation">
-            <div className="withdraw-no-pwd-modal" role="dialog" aria-modal="true" aria-labelledby="no-pwd-title">
-              <div className="withdraw-no-pwd-icon-wrap">
-                <svg className="withdraw-no-pwd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="5" y="10" width="14" height="10" rx="2.2" />
-                  <path d="M8 10V7.7a4 4 0 0 1 8 0V10" />
-                </svg>
-              </div>
-              <h3 id="no-pwd-title" className="withdraw-no-pwd-title">Senha de saque necessária</h3>
-              <p className="withdraw-no-pwd-desc">
-                Você ainda não cadastrou uma senha de saque.<br />
-                É necessário criar uma senha antes de solicitar qualquer saque na plataforma.
-              </p>
-              <div className="withdraw-no-pwd-actions">
-                <button
-                  type="button"
-                  className="withdraw-no-pwd-btn-primary"
-                  onClick={() => navigate('/withdraw-password')}
-                >
-                  Criar senha de saque
-                </button>
-                <button
-                  type="button"
-                  className="withdraw-no-pwd-btn-secondary"
-                  onClick={() => navigate('/dashboard')}
-                >
-                  Voltar ao início
-                </button>
-              </div>
+      {/* ── Modal: sem senha cadastrada ── */}
+      {!isT0 && hasWithdrawPassword === false ? (
+        <div className="wd-modal-overlay" onClick={() => navigate('/dashboard')}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="wd-modal-icon wd-modal-icon--error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.2" /><path d="M8 10V7.7a4 4 0 0 1 8 0V10" /></svg>
             </div>
+            <p className="wd-modal-message">Voce ainda nao cadastrou uma senha de saque. Crie uma antes de solicitar.</p>
+            <button type="button" className="wd-modal-button" onClick={() => navigate('/withdraw-password')}>Criar senha de saque</button>
+            <button type="button" className="wd-modal-button wd-modal-button--ghost" onClick={() => navigate('/dashboard')}>Voltar ao inicio</button>
           </div>
-        ) : null}
+        </div>
+      ) : null}
 
-        <p className="withdraw-help">
-          Seus dados PIX são carregados automaticamente e ficam bloqueados aqui.
-          Para alterar a chave PIX, use o botão abaixo.
-        </p>
-
-        {isWithdrawActivated ? (
-          <div className="withdraw-feedback success">
-            <p>
-              Saque já ativado para sua conta.
-              {withdrawActivationExpiresAt
-                ? ` Válido até ${new Date(withdrawActivationExpiresAt).toLocaleString('pt-BR')}.`
-                : ''}
+      {/* ── Modal: confirmar senha ── */}
+      {showPasswordModal ? (
+        <div className="wd-modal-overlay" onClick={closePasswordModal}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="wd-modal-icon wd-modal-icon--success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="10" width="14" height="10" rx="2.2" /><path d="M8 10V7.7a4 4 0 0 1 8 0V10" /></svg>
+            </div>
+            <p className="wd-modal-message">
+              Digite sua senha de saque para confirmar <strong>{formatBRL(selectedAmount ?? 0)}</strong>.
             </p>
-          </div>
-        ) : null}
-
-        <div className={`withdraw-feedback withdraw-window-status ${isWithdrawWindowOpen ? 'success' : 'error'}`}>
-          <p>{withdrawWindowMessage}</p>
-          <small>
-            Janela configurada: {withdrawStartTime} até {withdrawEndTime} • Dias: {allowedDaysLabel}
-          </small>
-        </div>
-
-<div className="withdraw-feedback withdraw-highlight withdraw-fee-highlight">
-          <span className="withdraw-highlight-label">Taxa de saque</span>
-          <strong className="withdraw-highlight-value">{withdrawFeePercent}%</strong>
-        </div>
-
-        {hasValidPreviewAmount ? (
-          <div className="withdraw-feedback withdraw-highlight withdraw-net-highlight">
-            <span className="withdraw-highlight-label">Valor líquido estimado</span>
-            <strong className="withdraw-highlight-value">{formatBRL(netValuePreview)}</strong>
-            <small className="withdraw-highlight-note">Taxa aplicada: {formatBRL(feeValuePreview)}</small>
-          </div>
-        ) : null}
-
-        <div className="withdraw-grid">
-          <label>
-            Valor do saque (R$)
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="0,00"
-              value={amount}
-              maxLength={12}
-              autoComplete="off"
-              onChange={(e) => setAmount(sanitizeAmount(e.target.value))}
-              onPaste={(e) => {
-                e.preventDefault()
-                const pasted = e.clipboardData.getData('text')
-                setAmount(sanitizeAmount(pasted))
-              }}
-            />
-          </label>
-
-          <label>
-            Nome do titular
-            <input
-              type="text"
-              placeholder="Nome completo"
-              value={holderName}
-              onChange={(e) => setHolderName(e.target.value)}
-              disabled
-            />
-          </label>
-
-          <label>
-            CPF do titular
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="Somente números"
-              value={holderCpf}
-              onChange={(e) => setHolderCpf(e.target.value)}
-              disabled
-            />
-          </label>
-
-          <label>
-            Tipo da chave PIX
-            <select value={pixType} onChange={(e) => setPixType(e.target.value as PixType)} disabled>
-              <option value="CPF">CPF</option>
-              <option value="CNPJ">CNPJ</option>
-              <option value="EMAIL">E-mail</option>
-              <option value="TELEFONE">Telefone</option>
-              <option value="CHAVE_ALEATORIA">Chave aleatória</option>
-            </select>
-          </label>
-
-          <label className="withdraw-full">
-            Chave PIX
-            <input
-              type="text"
-              placeholder="Digite sua chave PIX"
-              value={pixKey}
-              onChange={(e) => setPixKey(e.target.value)}
-              disabled
-            />
-          </label>
-
-          <label className="withdraw-full">
-            Senha de saque
-            <input
-              type="password"
-              placeholder="Senha de saque cadastrada"
-              value={withdrawPassword}
-              maxLength={72}
-              autoComplete="current-password"
-              onChange={(e) => setWithdrawPassword(
-                String(e.target.value).replace(/[\x00-\x1F\x7F]/g, '').slice(0, 72)
-              )}
-            />
-          </label>
-        </div>
-
-        {loadingPixData ? <div className="withdraw-feedback">Carregando chave PIX salva...</div> : null}
-
-        <div className="withdraw-bankcards-link-wrap">
-          <button type="button" className="withdraw-bankcards-link" onClick={() => navigate('/bank-cards')}>
-            Alterar chave PIX
-          </button>
-        </div>
-
-        <div className="withdraw-actions">
-          <button
-            type="button"
-            className="withdraw-submit"
-            disabled={loading || !isWithdrawWindowOpen || hasWithdrawPassword === false}
-            onClick={submitWithdraw}
-          >
-            {loading ? 'Enviando...' : 'Solicitar saque'}
-          </button>
-        </div>
-
-        {error ? (
-          <div className="withdraw-feedback error">
-            <p>{error}</p>
-          </div>
-        ) : null}
-        {success ? (
-          <div className="withdraw-feedback success">
-            <p>{success}</p>
-          </div>
-        ) : null}
-
-        {lastRequest ? (
-          <section className="withdraw-paper-receipt" aria-label="Comprovante de solicitação de saque">
-            <header className="withdraw-paper-header">
-              <div>
-                <h3>PGLM</h3>
-                <p>Comprovante de Solicitação de Saque</p>
-              </div>
-              <span className="withdraw-paper-badge">VIA DO CLIENTE</span>
-            </header>
-
-            <div className="withdraw-paper-cut" />
-
-            <div className="withdraw-paper-body">
-              <p className="withdraw-paper-success">Solicitação de saque enviada com sucesso.</p>
-
-              <div className="withdraw-paper-row">
-                <span>Situação</span>
-                <strong>Solicitação recebida com sucesso</strong>
-              </div>
-
-              <div className="withdraw-paper-row">
-                <span>Valor solicitado</span>
-                <strong>{formatBRL(lastRequest.amount)}</strong>
-              </div>
-
-              <div className="withdraw-paper-row">
-                <span>Data e hora</span>
-                <strong>{new Date(lastRequest.requestedAt).toLocaleString('pt-BR')}</strong>
-              </div>
-
-              <div className="withdraw-paper-row">
-                <span>Comprovante</span>
-                <strong>{lastRequest.receiptCode ?? lastRequest.externalId ?? '-'}</strong>
-              </div>
-
-              <div className="withdraw-paper-row">
-                <span>CNPJ PGLM</span>
-                <strong>12.345.678/0001-99</strong>
-              </div>
+            <div className="wd-modal-field">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="wd-cell-input"
+                placeholder="Senha de saque"
+                value={withdrawPassword}
+                maxLength={72}
+                autoComplete="current-password"
+                autoFocus
+                onChange={(e) =>
+                  setWithdrawPassword(
+                    String(e.target.value).replace(/[\x00-\x1F\x7F]/g, '').slice(0, 72)
+                  )
+                }
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !loading) submitWithdraw()
+                }}
+              />
+              <button type="button" className="wd-modal-eye" onClick={() => setShowPassword((s) => !s)}>
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
             </div>
+            {passwordModalError ? <p className="wd-modal-error">{passwordModalError}</p> : null}
+            <button type="button" className="wd-modal-button" onClick={submitWithdraw} disabled={loading}>
+              {loading ? 'Processando...' : 'Confirmar saque'}
+            </button>
+            <button type="button" className="wd-modal-button wd-modal-button--ghost" onClick={closePasswordModal} disabled={loading}>
+              Cancelar
+            </button>
+            <button type="button" className="wd-modal-forgot" onClick={() => { setShowPasswordModal(false); navigate('/withdraw-password') }}>
+              Esqueci minha senha de saque
+            </button>
+          </div>
+        </div>
+      ) : null}
 
-            <footer className="withdraw-paper-footer">
-              <small>Documento gerado automaticamente pelo sistema PGLM.</small>
-            </footer>
-          </section>
-        ) : null}
-      </section>
+      {/* ── Modal: erro / sucesso ── */}
+      {feedback ? (
+        <div className="wd-modal-overlay" onClick={() => setFeedback(null)}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className={`wd-modal-icon wd-modal-icon--${feedback.type}`}>
+              {feedback.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+              )}
+            </div>
+            <p className="wd-modal-message">{feedback.message}</p>
+            <button type="button" className="wd-modal-button" onClick={() => setFeedback(null)}>OK</button>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

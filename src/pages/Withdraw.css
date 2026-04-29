@@ -1,515 +1,428 @@
-.withdraw-page .withdraw-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 16px;
-  margin-top: 12px;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+/* Withdraw — layout basico (estilo withdraw-password) */
+
+.wd-page {
+  min-height: 100vh;
+  background: #f7f7f7;
+  display: flex;
+  flex-direction: column;
 }
 
-.withdraw-page .withdraw-card h2 {
-  margin: 0;
-  color: #0f172a;
+/* ── Topbar ───────────────────────────────────── */
+.wd-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
 }
 
-.withdraw-no-pwd-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.65);
+.wd-topbar-back {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #333;
+}
+
+.wd-topbar-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.wd-topbar-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ── Scroll box ───────────────────────────────── */
+.wd-scroll-box {
+  flex: 1;
+  background: #ffffff;
+}
+
+/* ── Section label ────────────────────────────── */
+.wd-section-label {
+  padding: 12px 16px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #ffffff;
+}
+
+/* ── Wallet row ───────────────────────────────── */
+.wd-wallet-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px 16px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.wd-wallet-opt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 2px solid #eaeaea;
+  border-radius: 12px;
+  background: #fafafa;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.wd-wallet-opt:hover {
+  border-color: #ccc;
+}
+
+.wd-wallet-opt--active {
+  border-color: #ff8a03;
+  background: #fffaf0;
+}
+
+.wd-wallet-opt__name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wd-wallet-opt--active .wd-wallet-opt__name {
+  color: #ff8a03;
+}
+
+.wd-wallet-opt__val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #323233;
+}
+
+/* ── Cell row ─────────────────────────────────── */
+.wd-cell {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.wd-cell-title {
+  flex: 0 0 140px;
+  font-size: 14px;
+  color: #323233;
+}
+
+.wd-cell-value {
+  flex: 1;
+  text-align: right;
+}
+
+.wd-cell-input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 14px;
+  color: #323233;
+  font-family: inherit;
+  padding: 0;
+  text-align: right;
+}
+
+.wd-cell-input::placeholder {
+  color: #c8c9cc;
+}
+
+.wd-cell-input:disabled {
+  color: #999;
+}
+
+.wd-cell-text {
+  font-size: 14px;
+  color: #323233;
+  font-weight: 500;
+}
+
+.wd-cell-text--green {
+  color: #22c55e;
+}
+
+.wd-cell-text--red {
+  color: #ef4444;
+}
+
+/* ── Amount grid (botoes de valor) ────────────── */
+.wd-amount-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px 16px 14px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.wd-amount-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  z-index: 1300;
+  padding: 12px 6px;
+  border: 2px solid #eaeaea;
+  border-radius: 10px;
+  background: #fafafa;
+  font-size: 14px;
+  font-weight: 600;
+  color: #323233;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.withdraw-no-pwd-modal {
-  width: min(440px, 100%);
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 28px 24px 24px;
-  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.4);
+.wd-amount-btn:hover {
+  border-color: #ccc;
+}
+
+.wd-amount-btn--active {
+  border-color: #ff8a03;
+  background: #fffaf0;
+  color: #ff8a03;
+}
+
+.wd-amount-empty {
+  padding: 20px 16px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.withdraw-no-pwd-icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #dbeafe, #eff6ff);
-  border: 1.5px solid #93c5fd;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-
-.withdraw-no-pwd-icon {
-  width: 30px;
-  height: 30px;
-  color: #1d4ed8;
-}
-
-.withdraw-no-pwd-title {
-  margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
-  font-weight: 800;
-}
-
-.withdraw-no-pwd-desc {
-  margin: 0;
-  color: #475569;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.withdraw-no-pwd-actions {
-  display: grid;
-  gap: 8px;
-  width: 100%;
-  margin-top: 4px;
-}
-
-.withdraw-no-pwd-btn-primary {
-  width: 100%;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #0b63ff, #2563eb);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95rem;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: filter 0.2s;
-}
-
-.withdraw-no-pwd-btn-primary:hover {
-  filter: brightness(1.08);
-}
-
-.withdraw-no-pwd-btn-secondary {
-  width: 100%;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background: #f8fafc;
-  color: #475569;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 10px 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.withdraw-no-pwd-btn-secondary:hover {
-  background: #f1f5f9;
-}
-
-.withdraw-balance-display {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(135deg, #f0fdf4, #eff6ff);
-  border: 1.5px solid #86efac;
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin: 12px 0;
-}
-
-.withdraw-balance-label {
-  color: #166534;
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.withdraw-balance-value {
-  color: #15803d;
-  font-size: 1.25rem;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-}
-
-.withdraw-help {
-  margin: 8px 0 14px;
-  color: #64748b;
-}
-
-.withdraw-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.withdraw-grid label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #1e293b;
-  font-weight: 600;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  color: #999;
   font-size: 14px;
+  font-weight: 500;
 }
 
-.withdraw-grid input,
-.withdraw-grid select {
-  border: 1px solid #dbe2ea;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 14px;
-  color: #0f172a;
-  background: #fff;
+/* ── Link button ──────────────────────────────── */
+.wd-link-wrap {
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.withdraw-grid input:focus,
-.withdraw-grid select:focus {
-  border-color: #2563eb;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.withdraw-grid input:disabled,
-.withdraw-grid select:disabled {
-  background: #f1f5f9;
-  color: #475569;
-  cursor: not-allowed;
-}
-
-.withdraw-full {
-  grid-column: 1 / -1;
-}
-
-.withdraw-bankcards-link-wrap {
-  margin-top: 12px;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.withdraw-bankcards-link {
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  background: #fff;
-  color: #0b63ff;
-  font-weight: 600;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.withdraw-actions {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.withdraw-submit {
+.wd-link-btn {
+  background: none;
   border: none;
-  border-radius: 10px;
-  background: #0b63ff;
-  color: #fff;
-  font-weight: 700;
-  padding: 10px 16px;
+  padding: 0;
+  color: #ff8a03;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
-.withdraw-submit:disabled {
+.wd-link-btn:hover {
+  color: #e67a00;
+}
+
+/* ── Submit ────────────────────────────────────── */
+.wd-submit-wrap {
+  padding: 20px 16px;
+  background: #ffffff;
+}
+
+.wd-submit {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.wd-submit:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-.withdraw-feedback {
-  margin-top: 12px;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 600;
+/* ── Modal overlay ────────────────────────────── */
+.wd-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: wd-fade-in 0.18s ease;
 }
 
-.withdraw-highlight {
+@keyframes wd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Modal card ───────────────────────────────── */
+.wd-modal {
+  width: 100%;
+  max-width: 320px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 20px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  border: 1px solid;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  align-items: center;
+  text-align: center;
+  animation: wd-pop-in 0.22s ease;
 }
 
-.withdraw-fee-highlight {
-  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-  border-color: #93c5fd;
-  color: #1e3a8a;
+@keyframes wd-pop-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-.withdraw-net-highlight {
-  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
-  border-color: #86efac;
-  color: #14532d;
+/* ── Modal icon ───────────────────────────────── */
+.wd-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: 12px;
+  color: #ffffff;
 }
 
-.withdraw-highlight-label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
-  opacity: 0.9;
+.wd-modal-icon svg {
+  width: 30px;
+  height: 30px;
 }
 
-.withdraw-highlight-value {
-  font-size: 24px;
-  line-height: 1.1;
-  font-weight: 800;
+.wd-modal-icon--success {
+  background: #22c55e;
 }
 
-.withdraw-highlight-note {
-  margin-top: 2px;
-  font-size: 13px;
-  font-weight: 600;
-  opacity: 0.9;
+.wd-modal-icon--error {
+  background: #ef4444;
 }
 
-.withdraw-feedback.error {
-  background: #fee2e2;
-  color: #b91c1c;
+/* ── Modal text ───────────────────────────────── */
+.wd-modal-message {
+  font-size: 15px;
+  font-weight: 500;
+  color: #323233;
+  margin: 0 0 16px;
+  line-height: 1.45;
 }
 
-.withdraw-feedback.success {
-  background: #dcfce7;
-  color: #166534;
+.wd-modal-message strong {
+  color: #ff8a03;
 }
 
-.withdraw-window-status p {
-  margin: 0;
-  font-weight: 700;
-}
-
-.withdraw-window-status small {
-  display: block;
-  margin-top: 6px;
-  font-weight: 600;
-  opacity: 0.9;
-}
-
-.withdraw-paper-receipt {
-  margin-top: 16px;
-  background: #fffefb;
-  border: 1px solid #e5e7eb;
-  border-radius: 14px;
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+/* ── Modal field (password input) ─────────────── */
+.wd-modal-field {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  background: #fafafa;
+  margin-bottom: 10px;
   overflow: hidden;
 }
 
-.withdraw-paper-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px 10px;
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-}
-
-.withdraw-paper-header h3 {
-  margin: 0;
-  font-size: 22px;
-  letter-spacing: 1px;
-  color: #0f172a;
-}
-
-.withdraw-paper-header p {
-  margin: 2px 0 0;
-  color: #334155;
-  font-weight: 600;
-}
-
-.withdraw-paper-badge {
-  border: 1px solid #16a34a;
-  color: #166534;
-  background: #dcfce7;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 6px 10px;
-  border-radius: 999px;
-  letter-spacing: 0.4px;
-}
-
-.withdraw-paper-cut {
-  border-top: 2px dashed #cbd5e1;
-}
-
-.withdraw-paper-body {
-  padding: 14px 16px 10px;
-}
-
-.withdraw-paper-success {
-  margin: 0 0 12px;
-  color: #166534;
-  font-weight: 800;
-}
-
-.withdraw-paper-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px dashed #e2e8f0;
-}
-
-.withdraw-paper-row span {
-  color: #475569;
-  font-weight: 600;
-}
-
-.withdraw-paper-row strong {
-  color: #0f172a;
-  text-align: right;
-  font-family: 'Courier New', Courier, monospace;
-}
-
-.withdraw-paper-footer {
-  padding: 10px 16px 14px;
-  color: #64748b;
-  background: #f8fafc;
-}
-
-.withdraw-activation-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(2, 6, 23, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 1200;
-}
-
-.withdraw-activation-modal {
-  width: min(560px, 100%);
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 18px 50px rgba(2, 6, 23, 0.35);
-}
-
-.withdraw-activation-modal h3 {
-  margin: 0 0 8px;
-  color: #0f172a;
-}
-
-.withdraw-activation-modal p {
-  margin: 0;
-  color: #334155;
-}
-
-.withdraw-activation-code {
-  margin: 12px 0 0;
+.wd-modal-field .wd-cell-input {
+  flex: 1;
   padding: 10px 12px;
-  border-radius: 10px;
-  background: #0f172a;
-  color: #e2e8f0;
-  font-weight: 700;
-  white-space: pre-wrap;
-  word-break: break-word;
+  text-align: left;
+  font-size: 15px;
 }
 
-.withdraw-activation-steps {
-  display: grid;
-  gap: 8px;
-  margin: 12px 0;
-}
-
-.withdraw-activation-step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  color: #334155;
-}
-
-.withdraw-activation-step-num {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #0b63ff;
-  color: #fff;
-  font-size: 0.78rem;
-  font-weight: 800;
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-}
-
-.withdraw-activation-label {
-  margin: 12px 0 0;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.withdraw-activation-group-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 14px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #25d366, #128c7e);
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.95rem;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: filter 0.2s;
-}
-
-.withdraw-activation-group-link:hover {
-  filter: brightness(1.08);
-}
-
-.withdraw-activation-no-link {
-  margin-top: 12px;
-  padding: 10px 12px;
-  background: #fef9c3;
-  border: 1px solid #fde68a;
-  border-radius: 8px;
-  color: #92400e;
-  font-size: 0.88rem;
-}
-
-.withdraw-activation-actions {
-  margin-top: 14px;
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
-.withdraw-activation-copy,
-.withdraw-activation-close {
+.wd-modal-eye {
+  background: none;
   border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-weight: 700;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ff8a03;
   cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
 }
 
-.withdraw-activation-copy {
-  background: #0b63ff;
-  color: #fff;
+.wd-modal-eye:hover {
+  color: #e67a00;
 }
 
-.withdraw-activation-close {
-  background: #e2e8f0;
-  color: #0f172a;
+/* ── Modal error ──────────────────────────────── */
+.wd-modal-error {
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
 }
 
-@media (max-width: 760px) {
-  .withdraw-grid {
-    grid-template-columns: 1fr;
-  }
+/* ── Modal buttons ────────────────────────────── */
+.wd-modal-button {
+  width: 100%;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 8px;
+}
 
-  .withdraw-full {
-    grid-column: auto;
-  }
+.wd-modal-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
 
-  .withdraw-actions {
-    justify-content: stretch;
-  }
+.wd-modal-button--ghost {
+  background: none;
+  border: 1px solid #eaeaea;
+  color: #666;
+}
 
-  .withdraw-submit {
-    width: 100%;
-  }
+.wd-modal-button--ghost:hover {
+  background: #f5f5f5;
+}
+
+/* ── Forgot link ──────────────────────────────── */
+.wd-modal-forgot {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 4px;
+  padding: 0;
+}
+
+.wd-modal-forgot:hover {
+  color: #666;
 }

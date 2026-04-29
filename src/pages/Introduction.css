@@ -1,0 +1,340 @@
+.intro-page {
+  min-height: 100vh;
+  padding: 24px 16px 80px;
+  background: linear-gradient(180deg, #fff7ec 0%, #ffffff 40%);
+  color: #22262d;
+}
+
+.intro-shell {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.intro-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #ffd7a6;
+  color: #b35c00;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 0.88rem;
+  margin-bottom: 18px;
+  transition: all 0.15s ease;
+}
+
+.intro-back:hover {
+  background: #fff1dc;
+}
+
+.intro-hero {
+  background: linear-gradient(135deg, #ff8a03 0%, #ff5f03 100%);
+  color: #fff;
+  border-radius: 22px;
+  padding: 28px 22px;
+  box-shadow: 0 18px 40px -18px rgba(255, 138, 3, 0.65);
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-hero::after {
+  content: '';
+  position: absolute;
+  inset: -30% -20% auto auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.28), transparent 70%);
+  pointer-events: none;
+}
+
+.intro-hero__kicker {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.intro-hero__title {
+  margin: 0 0 6px;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.intro-hero__subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.intro-section {
+  background: #fff;
+  border: 1px solid #f1e1c9;
+  border-radius: 18px;
+  padding: 20px 20px 6px;
+  margin-top: 18px;
+  box-shadow: 0 6px 22px -16px rgba(0, 0, 0, 0.22);
+}
+
+.intro-section h2 {
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  color: #b35c00;
+  font-weight: 800;
+}
+
+.intro-section p {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #2e333d;
+  text-align: justify;
+}
+
+.intro-section strong {
+  color: #b35c00;
+}
+
+.intro-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.intro-list__item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff7ec;
+  border: 1px solid #ffe1b8;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.intro-list__item h3 {
+  margin: 0 0 4px;
+  font-size: 0.98rem;
+  color: #b35c00;
+  font-weight: 800;
+}
+
+.intro-list__item p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #3b424d;
+  text-align: left;
+}
+
+.intro-list__number {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #ff8a03, #ff5f03);
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.88rem;
+  box-shadow: 0 4px 10px -4px rgba(255, 95, 3, 0.6);
+}
+
+.intro-brands {
+  display: inline;
+  margin: 0 0 14px;
+}
+
+.intro-brands span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #b35c00;
+}
+
+.intro-brands span:not(:last-child)::after {
+  content: ', ';
+  color: #2e333d;
+  font-weight: 400;
+}
+
+/* ─────────── Certificado de incorporação ─────────── */
+.intro-certificate {
+  margin: 26px 0 10px;
+  background: #fdfaf2;
+  border: 1px solid #c9b984;
+  border-radius: 10px;
+  padding: 34px 32px 30px;
+  position: relative;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  color: #2a2a2a;
+  box-shadow:
+    0 2px 0 #c9b984 inset,
+    0 -2px 0 #c9b984 inset,
+    0 12px 30px -18px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.intro-certificate::before,
+.intro-certificate::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    #8a6f22 0 6px,
+    transparent 6px 12px
+  );
+  opacity: 0.6;
+}
+
+.intro-certificate::before { top: 10px; }
+.intro-certificate::after  { bottom: 10px; }
+
+.intro-certificate__stamp {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #a02c2c;
+  border: 2px solid #a02c2c;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 2px;
+  transform: rotate(-6deg);
+  opacity: 0.85;
+}
+
+.intro-certificate__header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.intro-certificate__crown {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 8px;
+  display: block;
+  color: #6d4c0f;
+}
+
+.intro-certificate__office {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #6d4c0f;
+  text-transform: uppercase;
+  margin: 2px 0 0;
+}
+
+.intro-certificate__main-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+  margin: 18px 0 6px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.intro-certificate__subtitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #3a3a3a;
+  letter-spacing: 2px;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0 0 22px;
+}
+
+.intro-certificate__number {
+  font-size: 0.85rem;
+  text-align: center;
+  color: #2a2a2a;
+  margin: 0 0 18px;
+}
+
+.intro-certificate__number strong {
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.intro-certificate__body {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  text-align: center;
+  margin: 0 0 6px;
+  color: #2a2a2a;
+}
+
+.intro-certificate__company-name {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 14px 0;
+  color: #1a1a1a;
+  text-transform: uppercase;
+}
+
+.intro-certificate__issued {
+  text-align: center;
+  margin: 22px 0 20px;
+  font-size: 0.88rem;
+  color: #2a2a2a;
+  font-style: italic;
+}
+
+.intro-certificate__footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding-top: 18px;
+  margin-top: 12px;
+  border-top: 1px solid #c9b984;
+}
+
+.intro-certificate__seal {
+  width: 56px;
+  height: 56px;
+  border: 2px solid #6d4c0f;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #6d4c0f;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 1.1;
+  transform: rotate(-8deg);
+}
+
+.intro-certificate__signature {
+  font-family: 'Brush Script MT', 'Segoe Script', cursive;
+  font-size: 1.25rem;
+  color: #1a1a1a;
+}
+
+.intro-certificate__entity {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  color: #6d4c0f;
+  font-weight: 700;
+  text-transform: uppercase;
+}

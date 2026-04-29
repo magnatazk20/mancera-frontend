@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import AppSidebar from '../components/AppSidebar'
-import './Tasks.css'
 import './WithdrawPassword.css'
 
 type StoredUser = {
@@ -17,8 +15,6 @@ export default function WithdrawPassword() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [statusLoading, setStatusLoading] = useState(true)
-  const [hasWithdrawPassword, setHasWithdrawPassword] = useState<boolean | null>(null)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const user = useMemo(() => {
@@ -30,32 +26,6 @@ export default function WithdrawPassword() {
       return null
     }
   }, [])
-
-  useEffect(() => {
-    const loadStatus = async () => {
-      if (!user?.id) {
-        setStatusLoading(false)
-        return
-      }
-
-      try {
-        const res = await fetch(`${API_URL}/api/user/withdraw-password/status/${user.id}`)
-        const data = await res.json() as { ok?: boolean; hasWithdrawPassword?: boolean }
-
-        if (res.ok && data?.ok) {
-          setHasWithdrawPassword(Boolean(data.hasWithdrawPassword))
-        } else {
-          setHasWithdrawPassword(null)
-        }
-      } catch {
-        setHasWithdrawPassword(null)
-      } finally {
-        setStatusLoading(false)
-      }
-    }
-
-    loadStatus()
-  }, [user?.id])
 
   const saveWithdrawPassword = async () => {
     if (!user?.id) {
@@ -93,7 +63,6 @@ export default function WithdrawPassword() {
 
       setPassword('')
       setConfirmPassword('')
-      setHasWithdrawPassword(true)
       setFeedback({ type: 'success', message: data?.message ?? 'Senha de saque salva com sucesso.' })
     } catch {
       setFeedback({ type: 'error', message: 'Erro de conexão ao salvar senha.' })
@@ -103,72 +72,97 @@ export default function WithdrawPassword() {
   }
 
   return (
-    <main className="tasks-page withdraw-password-page">
-      <AppSidebar />
-
-      <header className="tasks-header">
-        <div>
-          <p className="tasks-kicker">Segurança</p>
-          <h1>Senha de Saque</h1>
-          <span className="tasks-subtitle">Defina a senha usada para confirmar saques</span>
-        </div>
-        <div className="tasks-header-actions">
-          <button className="btn ghost" type="button" onClick={() => navigate('/profile')}>
-            Voltar
-          </button>
-        </div>
+    <main className="wp-page">
+      <header className="wp-topbar">
+        <button
+          type="button"
+          className="wp-topbar-back"
+          onClick={() => navigate('/profile')}
+          aria-label="Voltar"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </button>
+        <span className="wp-topbar-title">Senha de retirada</span>
       </header>
 
-      <section className="withdraw-password-card">
-        <h2>Definir Senha do Fundo</h2>
-        <p className="withdraw-password-subtitle">
-          Essa senha será solicitada para autorizar saques da sua conta.
-        </p>
-
-        <div className={`withdraw-password-status ${hasWithdrawPassword ? 'ok' : 'warn'}`}>
-          {statusLoading
-            ? 'Verificando status da senha de saque...'
-            : hasWithdrawPassword
-              ? 'Senha de saque já cadastrada.'
-              : 'Senha de saque ainda não cadastrada.'}
-        </div>
-
-        <div className="withdraw-password-form">
-          <label>
-            Nova senha de saque
+      <div className="wp-scroll-box">
+        <div className="wp-cell">
+          <div className="wp-cell-title">
+            <span>Configurar senha de retirada</span>
+          </div>
+          <div className="wp-cell-value">
             <input
               type="password"
+              className="wp-cell-input"
+              placeholder="Digite a nova senha de retirada"
               value={password}
-              placeholder="Digite sua nova senha"
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
             />
-          </label>
-
-          <label>
-            Confirmar senha de saque
-            <input
-              type="password"
-              value={confirmPassword}
-              placeholder="Confirme sua senha"
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </label>
-
-          <button type="button" className="withdraw-password-btn" onClick={saveWithdrawPassword} disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar senha de saque'}
-          </button>
-
-          {feedback ? (
-            <div className={`withdraw-password-feedback ${feedback.type}`}>
-              {feedback.message}
-            </div>
-          ) : null}
+          </div>
         </div>
 
-        <p className="withdraw-password-note">
-          A senha de saque é usada para confirmar e proteger retiradas de saldo da sua conta.
-        </p>
-      </section>
+        <div className="wp-cell">
+          <div className="wp-cell-title">
+            <span>Confirmar senha</span>
+          </div>
+          <div className="wp-cell-value">
+            <input
+              type="password"
+              className="wp-cell-input"
+              placeholder="Confirme a nova senha de retirada"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
+        </div>
+
+        <div className="wp-submit-wrap">
+          <button
+            type="button"
+            className="wp-submit"
+            onClick={saveWithdrawPassword}
+            disabled={loading}
+          >
+            <span>{loading ? 'Enviando...' : 'Enviar'}</span>
+          </button>
+        </div>
+      </div>
+
+      {feedback ? (
+        <div
+          className="wp-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setFeedback(null)}
+        >
+          <div className="wp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className={`wp-modal-icon wp-modal-icon--${feedback.type}`}>
+              {feedback.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              )}
+            </div>
+            <p className="wp-modal-message">{feedback.message}</p>
+            <button
+              type="button"
+              className="wp-modal-button"
+              onClick={() => setFeedback(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      ) : null}
     </main>
   )
 }

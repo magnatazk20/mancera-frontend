@@ -1,150 +1,471 @@
-.monthly-salary-page {
-  min-height: 100vh;
-  width: 100%;
-  padding: 20px 20px 120px;
-  box-sizing: border-box;
-  color: #fff;
+/* ═══════════════════════════════════════════════════════════════
+   Salario Mensal — mesmo tema escuro do Dashboard
+═══════════════════════════════════════════════════════════════ */
+
+/* ── Banner header ─────────────────────────────────── */
+.ms-banner {
+  position: relative;
+  border-radius: 16px;
+  padding: 22px 20px;
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  border: none;
+  overflow: hidden;
+  color: #ffffff;
 }
 
-.monthly-salary-header {
-  margin-left: 72px;
-  margin-bottom: 20px;
+.ms-banner__bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ms-banner__glow {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.ms-banner__glow--1 {
+  width: 200px;
+  height: 200px;
+  top: -80px;
+  right: -50px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.20), transparent 70%);
+}
+
+.ms-banner__glow--2 {
+  width: 150px;
+  height: 150px;
+  bottom: -60px;
+  left: -40px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent 70%);
+}
+
+.ms-banner__content {
+  position: relative;
+  z-index: 1;
+}
+
+.ms-banner__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.15s ease;
+}
+
+.ms-banner__back:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.ms-banner__title {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ms-banner__desc {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 520px;
+}
+
+/* ── Modal de feedback ─────────────────────────────── */
+.ms-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
+  padding: 20px;
+  animation: ms-overlay-in 0.2s ease;
 }
 
-.monthly-salary-kicker {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.75;
+@keyframes ms-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.monthly-salary-header h1 {
-  margin: 4px 0;
-  font-size: 28px;
-  line-height: 1.1;
-}
-
-.monthly-salary-subtitle {
-  font-size: 14px;
-  opacity: 0.82;
-}
-
-.monthly-salary-content {
-  margin-left: 72px;
-}
-
-.monthly-salary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 14px;
-}
-
-.monthly-salary-card {
-  background: rgba(24, 26, 39, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 16px;
-  backdrop-filter: blur(6px);
-}
-
-.monthly-salary-card-image-wrap {
+.ms-modal {
+  background: var(--dash-card, #121a2b);
+  border: 1px solid var(--dash-border, rgba(148, 163, 184, 0.22));
+  border-radius: 18px;
+  padding: 28px 24px;
+  max-width: 400px;
   width: 100%;
-  height: 170px;
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: ms-modal-in 0.25s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.monthly-salary-card-image {
+@keyframes ms-modal-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.ms-modal__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.ms-modal--error .ms-modal__icon {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.ms-modal--success .ms-modal__icon {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.ms-modal__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.ms-modal--error .ms-modal__title {
+  color: #f87171;
+}
+
+.ms-modal--success .ms-modal__title {
+  color: #34d399;
+}
+
+.ms-modal__message {
+  margin: 0;
+  color: var(--dash-text, #e5e7eb);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.ms-modal__btn {
+  margin-top: 6px;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.ms-modal--error .ms-modal__btn {
+  background: rgba(248, 113, 113, 0.18);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  color: #fca5a5;
+}
+
+.ms-modal--error .ms-modal__btn:hover {
+  filter: brightness(1.15);
+}
+
+.ms-modal--success .ms-modal__btn {
+  background: rgba(52, 211, 153, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  color: #6ee7b7;
+}
+
+.ms-modal--success .ms-modal__btn:hover {
+  filter: brightness(1.15);
+}
+
+/* ── Empty / loading card ──────────────────────────── */
+.ms-empty-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--dash-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ── Grid de planos ──────────────────────────────── */
+.ms-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+/* ── Card ────────────────────────────────────────── */
+.ms-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.ms-card:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Card image ── */
+.ms-card__img-wrap {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: var(--dash-card-2);
+}
+
+.ms-card__img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.monthly-salary-card-image-placeholder {
+.ms-card__img-placeholder {
   width: 100%;
   height: 100%;
   display: grid;
   place-items: center;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--dash-muted);
+  opacity: 0.5;
 }
 
-.monthly-salary-card-header {
+.ms-card__tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(56, 189, 248, 0.85);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+.ms-card__salary-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(52, 211, 153, 0.85);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  backdrop-filter: blur(4px);
+}
+
+.ms-card__salary-badge small {
+  font-size: 0.6rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* ── Card body ── */
+.ms-card__body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.ms-card__price {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.ms-card__price small {
+  color: var(--dash-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ms-card__price strong {
+  color: var(--dash-green);
+  font-size: 1.45rem;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+}
+
+/* ── Info rows ── */
+.ms-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ms-card__info-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.monthly-salary-card-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.monthly-salary-card-header span {
-  font-size: 13px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(57, 214, 179, 0.18);
-  border: 1px solid rgba(57, 214, 179, 0.5);
-  color: #7df8d5;
-  white-space: nowrap;
-}
-
-.monthly-salary-card-body p {
-  margin: 8px 0;
-  font-size: 14px;
-  color: rgba(245, 247, 255, 0.93);
-  line-height: 1.35;
-}
-
-.monthly-salary-card-actions {
-  margin-top: 14px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.monthly-salary-get-btn {
-  border: 1px solid rgba(57, 214, 179, 0.55);
-  background: linear-gradient(180deg, rgba(57, 214, 179, 0.25), rgba(57, 214, 179, 0.12));
-  color: #cffff3;
+  gap: 8px;
+  padding: 8px 10px;
   border-radius: 10px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
+  background: var(--dash-card-2);
+  border: 1px solid var(--dash-border);
+  font-size: 0.82rem;
+  color: var(--dash-text);
+  font-weight: 500;
 }
 
-.monthly-salary-get-btn:hover {
+.ms-card__info-row svg {
+  color: var(--dash-blue);
+  flex-shrink: 0;
+}
+
+.ms-card__info-row strong {
+  font-weight: 800;
+  color: var(--dash-text);
+}
+
+.ms-card__info-row--highlight {
+  background: rgba(56, 189, 248, 0.08);
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+.ms-card__info-row--highlight strong {
+  color: var(--dash-blue);
+}
+
+/* ── Requirements ── */
+.ms-requirements {
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(124, 58, 237, 0.22);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.ms-requirements__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dash-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ms-requirements__title svg {
+  color: rgba(167, 139, 250, 0.8);
+  flex-shrink: 0;
+}
+
+.ms-requirements__list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ms-requirements__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 60px;
+  background: rgba(124, 58, 237, 0.10);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  border-radius: 10px;
+  padding: 8px 6px;
+}
+
+.ms-requirements__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--dash-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ms-requirements__item strong {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #a78bfa;
+}
+
+.ms-requirements__sub {
+  font-size: 0.62rem;
+  color: var(--dash-muted);
+  font-weight: 500;
+}
+
+/* ── CTA Button ── */
+.ms-btn {
+  margin-top: auto;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--dash-blue), #7c3aed);
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.20);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.ms-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
   filter: brightness(1.08);
 }
 
-.monthly-salary-empty {
-  padding: 28px 16px;
-  border-radius: 12px;
-  text-align: center;
-  background: rgba(24, 26, 39, 0.7);
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.85);
+.ms-btn:disabled {
+  background: var(--dash-card-2);
+  color: var(--dash-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  border: 1px solid var(--dash-border);
 }
 
-@media (max-width: 900px) {
-  .monthly-salary-header,
-  .monthly-salary-content {
-    margin-left: 0;
+/* ── Responsividade ──────────────────────────────── */
+@media (min-width: 600px) {
+  .ms-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 960px) {
+  .ms-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .monthly-salary-page {
-    padding: 16px 14px 110px;
+  .ms-card__img-wrap {
+    height: 180px;
   }
 }

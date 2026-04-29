@@ -134,6 +134,7 @@ export default function AdminUserHistory() {
   const [error, setError] = useState('')
   const [user, setUser] = useState<UserDetailsResponse['user'] | null>(null)
   const [showLogs, setShowLogs] = useState(false)
+  const [showTaskLogs, setShowTaskLogs] = useState(false)
   const [showVipPurchases, setShowVipPurchases] = useState(false)
   const [showCyclePurchases, setShowCyclePurchases] = useState(false)
   const [showGiftCodeRedemptions, setShowGiftCodeRedemptions] = useState(false)
@@ -524,6 +525,51 @@ export default function AdminUserHistory() {
               ) : (
                 <p className='admin-log-hint'>Clique em Mostrar roleta para visualizar os giros e saldo.</p>
               )}
+            </section>
+
+            <section className='admin-panel admin-user-list-panel'>
+              <div className='admin-log-header'>
+                <h3>📋 Logs de tarefas de mineração</h3>
+                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowTaskLogs((prev) => !prev)}>
+                  {showTaskLogs ? 'Ocultar logs de tarefas' : 'Mostrar logs de tarefas'}
+                </button>
+              </div>
+              {showTaskLogs ? (
+                (() => {
+                  const taskLogs = (user.accountLogs ?? []).filter(
+                    (log) => String(log.action ?? '').toLowerCase() === 'mining_task_complete'
+                  )
+                  return taskLogs.length ? (
+                    <div className='admin-user-list'>
+                      {taskLogs.map((log) => {
+                        let taskInfo = ''
+                        try {
+                          if (log.metadata) {
+                            const meta = JSON.parse(log.metadata)
+                            taskInfo = `Tarefa #${meta.taskId ?? '-'}${meta.vipName ? ` · ${meta.vipName}` : ''}`
+                          }
+                        } catch {
+                          taskInfo = ''
+                        }
+                        return (
+                          <article key={`tasklog-${log.id}`} className='admin-user-log-item'>
+                            <div>
+                              <strong style={{ color: '#22c55e' }}>✅ Tarefa concluída</strong>
+                              {taskInfo ? <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{taskInfo}</p> : null}
+                              <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
+                              <small>
+                                anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo:{' '}
+                                {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor:{' '}
+                                {log.amount == null ? '-' : formatBRL(log.amount)}
+                              </small>
+                            </div>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  ) : <p>Nenhum log de tarefa encontrado.</p>
+                })()
+              ) : <p className='admin-log-hint'>Clique em Mostrar logs de tarefas para visualizar as tarefas concluídas pelo usuário.</p>}
             </section>
 
             <section className='admin-panel admin-user-list-panel'>

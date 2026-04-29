@@ -28,9 +28,8 @@ export default function Roleta() {
   const [isSpinning, setIsSpinning] = useState(false)
   const [rotation, setRotation] = useState(0)
   const [winner, setWinner] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'winners' | 'mine'>('winners')
-  const [myWins, setMyWins] = useState<Array<{ amount: string; at: string }>>([])
-  const [liveWinners, setLiveWinners] = useState(WINNERS_SEED)
+  const [, setMyWins] = useState<Array<{ amount: string; at: string }>>([])
+  const [, setLiveWinners] = useState(WINNERS_SEED)
   const [remainingSpins, setRemainingSpins] = useState(0)
   const [redeemModal, setRedeemModal] = useState<RedeemModal>(null)
   const [celebration, setCelebration] = useState<{ amount: string } | null>(null)
@@ -199,9 +198,9 @@ export default function Roleta() {
 
   const wheelStyle = useMemo(() => {
     const colors = [
-      '#0ea5e9', '#0284c7', '#06b6d4', '#0891b2',
-      '#2563eb', '#1d4ed8', '#7c3aed', '#0369a1',
-      '#0ea5e9', '#0284c7', '#06b6d4', '#0891b2',
+      '#ff8a03', '#ffd38a', '#ffb347', '#fff0d6',
+      '#f59e0b', '#ffe1b8', '#ff6f00', '#fed7aa',
+      '#ff8a03', '#ffd38a', '#ffb347', '#fff0d6',
     ]
     const stops = prizes.map((_, i) => {
       const start = i * segmentAngle
@@ -359,13 +358,35 @@ export default function Roleta() {
       <div className="roleta-wrap">
         <header className="roleta-head">
           <button className="roleta-back-btn" onClick={() => navigate('/dashboard')} type="button">←</button>
-          <h1>Roda da Sorte</h1>
+          <h1 className="lucky-title">
+            <span className="lucky-title__text">LUCKY WHEEL</span>
+          </h1>
           <div className="roleta-head-spacer" />
         </header>
 
         <section className="wheel-stage">
           <div className="wheel-pointer" />
           <div className="wheel-ring" />
+          <div className="wheel-lights" aria-hidden="true">
+            {Array.from({ length: 16 }).map((_, i) => {
+              const angle = i * (360 / 16)
+              const rad = (angle * Math.PI) / 180
+              const r = 48 // % do raio do container das luzes
+              const left = 50 + r * Math.sin(rad)
+              const top = 50 - r * Math.cos(rad)
+              return (
+                <span
+                  key={`light-${i}`}
+                  className="wheel-light"
+                  style={{
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    animationDelay: `${(i % 4) * 0.15}s`,
+                  }}
+                />
+              )
+            })}
+          </div>
           <div className="wheel-disc" style={wheelStyle}>
             {prizes.map((text, i) => {
               const angle = i * segmentAngle + segmentAngle / 2
@@ -394,10 +415,6 @@ export default function Roleta() {
           </div>
 
           <button className="wheel-center-btn" disabled>IR</button>
-
-          <div className="spins-badge">
-            Giros Restantes: <strong>{remainingSpins}</strong>
-          </div>
         </section>
 
         <section className="spin-cta">
@@ -412,41 +429,64 @@ export default function Roleta() {
           {winner ? <p className="winner-text">Resultado: {winner}</p> : null}
         </section>
 
-        <section className="records-card">
-          <div className="records-tabs">
-            <button className={activeTab === 'winners' ? 'active' : ''} onClick={() => setActiveTab('winners')} type="button">
-              Registros de Ganhadores
-            </button>
-            <button className={activeTab === 'mine' ? 'active' : ''} onClick={() => setActiveTab('mine')} type="button">
-              Minhas Vitórias
-            </button>
+        <section className="rules-card" aria-label="Regras da roleta">
+          <h2 className="rules-card__title">Regras da Roleta</h2>
+
+          <div className="spins-token" role="status" aria-live="polite">
+            <div className="spins-token__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M15.09 8.91a1 1 0 0 0-1.41 0L12 10.59l-1.68-1.68a1 1 0 0 0-1.41 1.41L10.59 12l-1.68 1.68a1 1 0 1 0 1.41 1.41L12 13.41l1.68 1.68a1 1 0 0 0 1.41-1.41L13.41 12l1.68-1.68a1 1 0 0 0 0-1.41Z"
+                  fill="currentColor"
+                  opacity="0"
+                />
+                <path
+                  d="M12 6.5a1 1 0 0 0-1 1v4a1 1 0 0 0 .29.71l2.5 2.5a1 1 0 0 0 1.42-1.42L13 11.09V7.5a1 1 0 0 0-1-1Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <div className="spins-token__info">
+              <span className="spins-token__label">Giros disponíveis</span>
+              <span className="spins-token__count">{remainingSpins}</span>
+            </div>
           </div>
 
-          <div className="records-list">
-            {activeTab === 'winners' ? (
-              liveWinners.map((item, idx) => (
-                <article className="record-row" key={`${item.phone}-${idx}`}>
-                  <div>
-                    <small>Parabéns</small>
-                    <p>{item.phone}</p>
-                  </div>
-                  <strong>+{item.amount}</strong>
-                </article>
-              ))
-            ) : myWins.length === 0 ? (
-              <div className="empty-state">Você ainda não possui vitórias.</div>
-            ) : (
-              myWins.map((item, idx) => (
-                <article className="record-row" key={`${item.at}-${idx}`}>
-                  <div>
-                    <small>Você ganhou</small>
-                    <p>{item.at}</p>
-                  </div>
-                  <strong>+{item.amount}</strong>
-                </article>
-              ))
-            )}
-          </div>
+          <ol className="rules-card__list">
+            <li>
+              <strong>Como ganhar giros:</strong> a cada usuário que se torna
+              funcionário através do seu link de convite, você ganha 1 giro
+              gratuito para usar na roleta.
+            </li>
+            <li>
+              <strong>1 giro por vez:</strong> cada clique no botão central consome 1 giro.
+              Aguarde a roda parar antes de girar novamente.
+            </li>
+            <li>
+              <strong>Prêmios:</strong> o valor sorteado é creditado automaticamente no seu
+              saldo assim que a roda para.
+            </li>
+            <li>
+              <strong>Códigos promocionais:</strong> códigos de resgate podem conceder giros
+              extras ou bônus em dinheiro. Cada código só pode ser usado uma vez por conta.
+            </li>
+            <li>
+              <strong>Resultado final:</strong> o resultado é gerado pelo servidor e é
+              definitivo — não é possível repetir ou reverter um giro.
+            </li>
+            <li>
+              <strong>Uso justo:</strong> contas com comportamento fraudulento, múltiplos
+              cadastros ou uso de automação serão bloqueadas e perderão os prêmios.
+            </li>
+            <li>
+              <strong>Saques:</strong> os ganhos da roleta seguem as mesmas regras de saque
+              da plataforma (saldo mínimo e horário de processamento).
+            </li>
+          </ol>
         </section>
       </div>
     </main>

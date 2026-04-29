@@ -19,6 +19,9 @@ type CycleProduct = {
   expiresAt: string | null
   isActive: boolean
   createdAt: string | null
+  minAmount: number
+  maxAmount: number
+  profitPercent: number
 }
 
 type CommissionLevel = {
@@ -44,6 +47,9 @@ type FormState = {
   maxPurchasesPerUser: string
   expiresAt: string
   isActive: boolean
+  minAmount: string
+  maxAmount: string
+  profitPercent: string
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -66,6 +72,9 @@ const emptyForm: FormState = {
   maxPurchasesPerUser: '0',
   expiresAt: '',
   isActive: true,
+  minAmount: '0',
+  maxAmount: '0',
+  profitPercent: '0',
 }
 
 export default function AdminCycleProducts() {
@@ -184,6 +193,9 @@ export default function AdminCycleProducts() {
             expiresAt: item.expiresAt ?? null,
             isActive: Boolean(item.isActive),
             createdAt: item.createdAt ?? null,
+            minAmount: Number((item as any).minAmount ?? 0),
+            maxAmount: Number((item as any).maxAmount ?? 0),
+            profitPercent: Number((item as any).profitPercent ?? 0),
           }))
         : []
 
@@ -218,6 +230,9 @@ export default function AdminCycleProducts() {
       maxPurchasesPerUser: String(product.maxPurchasesPerUser ?? 0),
       expiresAt: product.expiresAt ? String(product.expiresAt).slice(0, 16) : '',
       isActive: product.isActive,
+      minAmount: String(product.minAmount ?? 0),
+      maxAmount: String(product.maxAmount ?? 0),
+      profitPercent: String(product.profitPercent ?? 0),
     })
     setFeedback(null)
   }
@@ -234,6 +249,9 @@ export default function AdminCycleProducts() {
     const numericRequireLevel3 = Number(form.requireCommissionLevel3Count.replace(',', '.'))
     const numericStockQuantity = Number(form.stockQuantity.replace(',', '.'))
     const numericMaxPurchasesPerUser = Number(form.maxPurchasesPerUser.replace(',', '.'))
+    const numericMinAmount = Number(form.minAmount.replace(',', '.'))
+    const numericMaxAmount = Number(form.maxAmount.replace(',', '.'))
+    const numericProfitPercent = Number(form.profitPercent.replace(',', '.'))
 
     if (!token) {
       setFeedback({ type: 'error', text: 'Token não encontrado. Faça login novamente.' })
@@ -321,6 +339,9 @@ export default function AdminCycleProducts() {
           maxPurchasesPerUser: numericMaxPurchasesPerUser,
           expiresAt: form.planType === 'vip_day' ? (form.expiresAt || null) : null,
           isActive: form.isActive,
+          minAmount: Number.isFinite(numericMinAmount) ? numericMinAmount : 0,
+          maxAmount: Number.isFinite(numericMaxAmount) ? numericMaxAmount : 0,
+          profitPercent: Number.isFinite(numericProfitPercent) ? numericProfitPercent : 0,
         }),
       })
 
@@ -413,12 +434,32 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
-              <label>Ganho no resgate (R$)</label>
+              <label>Porcentagem de lucro diário (%) <small style={{ color: '#94a3b8', fontWeight: 400 }}>(lucro = montante × % × dias do ciclo)</small></label>
               <input
                 type="text"
-                value={form.redeemRewardValue}
-                onChange={(e) => setForm((prev) => ({ ...prev, redeemRewardValue: e.target.value }))}
-                placeholder="Ex.: 5.00"
+                value={form.profitPercent}
+                onChange={(e) => setForm((prev) => ({ ...prev, profitPercent: e.target.value }))}
+                placeholder="Ex.: 5"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Investimento Mínimo (R$)</label>
+              <input
+                type="text"
+                value={form.minAmount}
+                onChange={(e) => setForm((prev) => ({ ...prev, minAmount: e.target.value }))}
+                placeholder="Ex.: 10"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
+              <label>Investimento Máximo (R$)</label>
+              <input
+                type="text"
+                value={form.maxAmount}
+                onChange={(e) => setForm((prev) => ({ ...prev, maxAmount: e.target.value }))}
+                placeholder="Ex.: 1000"
               />
             </div>
 
@@ -603,6 +644,11 @@ export default function AdminCycleProducts() {
                       <p className="admin-cycle-item-meta secondary">
                         Estoque: {product.stockQuantity} • Limite por usuário: {product.maxPurchasesPerUser === 0 ? 'Ilimitado' : `${product.maxPurchasesPerUser}x`}
                       </p>
+                      {(product.minAmount > 0 && product.maxAmount > 0 && product.profitPercent > 0) ? (
+                        <p className="admin-cycle-item-meta secondary" style={{ color: '#60a5fa' }}>
+                          Investimento flexível: {formatBRL(product.minAmount)} ~ {formatBRL(product.maxAmount)} • Lucro: {product.profitPercent}%
+                        </p>
+                      ) : null}
                     </div>
                     <div className="admin-cycle-item-actions">
                       <button type="button" className="btn ghost" onClick={() => fillEditForm(product)}>

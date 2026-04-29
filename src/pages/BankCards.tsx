@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AppSidebar from '../components/AppSidebar'
+import './Dashboard.css'
 import './BankCards.css'
 
 type StoredUser = {
@@ -25,20 +27,32 @@ type PixKeyResponse = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
+const PIX_TYPE_OPTIONS: Array<{ value: PixKeyType; label: string; placeholder: string; disabled?: boolean }> = [
+  { value: 'CPF', label: 'CPF', placeholder: 'Apenas números' },
+  { value: 'CNPJ', label: 'CNPJ', placeholder: 'Apenas números' },
+  { value: 'EMAIL', label: 'E-mail', placeholder: 'voce@exemplo.com' },
+  { value: 'TELEFONE', label: 'Telefone', placeholder: '(DDD) 9XXXX-XXXX', disabled: true },
+  { value: 'CHAVE_ALEATORIA', label: 'Chave Aleatória', placeholder: 'Chave gerada pelo banco' },
+]
+
+const maskCardPreview = (value: string) => {
+  const clean = String(value ?? '').trim()
+  if (!clean) return '•••• •••• •••• ••••'
+  if (clean.length <= 4) return clean
+  const visible = clean.slice(-4)
+  return `•••• •••• •••• ${visible}`
+}
+
 export default function BankCards() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error'; message: string }>({
-    show: false,
-    type: 'success',
-    message: '',
-  })
+  const [hasExistingKey, setHasExistingKey] = useState(false)
+  const [msg, setMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
   const [holderName, setHolderName] = useState('')
   const [holderCpf, setHolderCpf] = useState('')
   const [pixKeyType, setPixKeyType] = useState<PixKeyType>('CPF')
   const [pixKey, setPixKey] = useState('')
-  const [isDefaultCard, setIsDefaultCard] = useState(true)
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -49,6 +63,11 @@ export default function BankCards() {
       return null
     }
   }, [])
+
+  const selectedTypeMeta = useMemo(
+    () => PIX_TYPE_OPTIONS.find((opt) => opt.value === pixKeyType) ?? PIX_TYPE_OPTIONS[0],
+    [pixKeyType]
+  )
 
   useEffect(() => {
     const loadPixData = async () => {
@@ -63,8 +82,7 @@ export default function BankCards() {
         const data = (await res.json()) as PixKeyResponse
 
         if (!res.ok || !data?.ok) {
-          setToast({ show: true, type: 'error', message: data?.error ?? 'Erro ao carregar dados PIX.' })
-          setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2200)
+          setMsg({ text: data?.error ?? 'Erro ao carregar dados PIX.', type: 'error' })
           return
         }
 
@@ -73,10 +91,12 @@ export default function BankCards() {
           setHolderCpf(String(data.pixKey.holderCpf ?? ''))
           setPixKeyType((data.pixKey.pixKeyType as PixKeyType) ?? 'CPF')
           setPixKey(String(data.pixKey.pixKey ?? ''))
+          setHasExistingKey(true)
+        } else {
+          setHasExistingKey(false)
         }
       } catch {
-        setToast({ show: true, type: 'error', message: 'Erro de conexão ao carregar chave PIX.' })
-        setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2200)
+        setMsg({ text: 'Erro de conexão ao carregar chave PIX.', type: 'error' })
       } finally {
         setLoading(false)
       }
@@ -98,12 +118,12 @@ export default function BankCards() {
     }
 
     if (!payload.holderName || !payload.holderCpf || !payload.pixKey) {
-      setToast({ show: true, type: 'error', message: 'Preencha todos os campos obrigatórios.' })
-      setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2200)
+      setMsg({ text: 'Preencha todos os campos obrigatórios.', type: 'error' })
       return
     }
 
     setSaving(true)
+    setMsg(null)
 
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
@@ -116,135 +136,142 @@ export default function BankCards() {
       const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
 
       if (!res.ok || !data?.ok) {
-        const msg = data?.error ?? 'Erro ao salvar chave PIX.'
-        setToast({ show: true, type: 'error', message: msg })
-        setTimeout(() => {
-          setToast((prev) => ({ ...prev, show: false }))
-        }, 2200)
+        setMsg({ text: data?.error ?? 'Erro ao salvar chave PIX.', type: 'error' })
         return
       }
 
-      const msg = data?.message ?? 'Chave PIX salva com sucesso.'
-      setToast({ show: true, type: 'success', message: msg })
-      setTimeout(() => {
-        setToast((prev) => ({ ...prev, show: false }))
-      }, 2200)
+      setHasExistingKey(true)
+      setMsg({ text: data?.message ?? 'Chave PIX salva com sucesso!', type: 'success' })
     } catch {
-      const msg = 'Erro de conexão ao salvar chave PIX.'
-      setToast({ show: true, type: 'error', message: msg })
-      setTimeout(() => {
-        setToast((prev) => ({ ...prev, show: false }))
-      }, 2200)
+      setMsg({ text: 'Erro de conexão ao salvar chave PIX.', type: 'error' })
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <main className="bankcards-page">
-      {toast.show ? (
-        <div className={`bankcards-toast ${toast.type}`} role="status" aria-live="polite">
-          {toast.message}
-        </div>
-      ) : null}
-      <header className="bankcards-topbar">
-        <button className="bankcards-back" type="button" onClick={() => navigate('/profile')} aria-label="Voltar">
-          ←
-        </button>
-        <h1>Cartões Bancários</h1>
-        <span />
-      </header>
+    <main className="dash-app bankcards-page">
+      <section className="dash-main">
+        <AppSidebar />
 
-      <div className="bankcards-wrap">
-        <div className="bankcards-type-section">
-          <label className="bankcards-label">Tipo de Cartão</label>
-          <div className="bankcards-type-grid">
-            <button type="button" className="bankcards-type-btn active">
+        <div className="dash-content">
+          {/* Header */}
+          <div className="bc-header">
+            <button type="button" className="bc-back-btn" onClick={() => navigate('/profile')} aria-label="Voltar">
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                <path d="M3 10l18 0" />
-                <path d="M7 15l.01 0" />
-                <path d="M11 15l2 0" />
+                <path d="M15 6l-6 6l6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span>Cartão Bancário</span>
             </button>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="bankcards-loading">Carregando dados...</div>
-        ) : (
-          <form className="bankcards-form" onSubmit={onSave}>
             <div>
-              <label className="bankcards-label">Tipo PIX <span>*</span></label>
-              <div className="bankcards-select-wrap">
-                <select
-                  className="bankcards-select"
-                  value={pixKeyType}
-                  onChange={(e) => setPixKeyType(e.target.value as PixKeyType)}
-                >
-                  <option value="CPF">CPF</option>
-                  <option value="CNPJ">CNPJ</option>
-                  <option value="EMAIL">EMAIL</option>
-                  <option value="TELEFONE">TELEFONE</option>
-                  <option value="CHAVE_ALEATORIA">CHAVE ALEATÓRIA</option>
-                </select>
+              <h2 className="bc-title">Chave PIX</h2>
+              <p className="bc-subtitle">Cadastre ou atualize sua chave PIX para saques</p>
+            </div>
+          </div>
+
+          {/* Card preview */}
+          <section className="bc-card-preview">
+            <div className="bc-card-preview__bg">
+              <span className="bc-card-glow bc-card-glow--1" />
+              <span className="bc-card-glow bc-card-glow--2" />
+            </div>
+            <div className="bc-card-preview__content">
+              <div className="bc-card-row-top">
+                <span className="bc-card-chip" />
+                <span className="bc-card-brand">PIX</span>
+              </div>
+              <p className="bc-card-number">{maskCardPreview(pixKey)}</p>
+              <div className="bc-card-row-bottom">
+                <div>
+                  <span className="bc-card-label">Titular</span>
+                  <strong className="bc-card-value">
+                    {holderName ? holderName.toUpperCase() : 'NOME DO TITULAR'}
+                  </strong>
+                </div>
+                <div className="bc-card-type-pill">{selectedTypeMeta.label}</div>
               </div>
             </div>
+          </section>
 
-            <div>
-              <label className="bankcards-label">Nome da Conta <span>*</span></label>
-              <input
-                className="bankcards-input"
-                placeholder="Informe o nome do titular da conta"
-                value={holderName}
-                onChange={(e) => setHolderName(e.target.value)}
-              />
+          {/* Mensagem */}
+          {msg && (
+            <div className={`bc-msg ${msg.type}`}>
+              {msg.text}
             </div>
+          )}
 
-            <div>
-              <label className="bankcards-label">Número do Cartão <span>*</span></label>
-              <input
-                className="bankcards-input mono"
-                placeholder="CPF/CNPJ/Email/Chave PIX"
-                value={pixKey}
-                onChange={(e) => setPixKey(e.target.value)}
-              />
+          {loading ? (
+            <div className="bc-loading">Carregando dados...</div>
+          ) : (
+            <div className="bc-form-panel">
+              <form className="bc-form" onSubmit={onSave}>
+                {/* Tipo de chave */}
+                <div className="bc-section">
+                  <label className="bc-label">Tipo de chave PIX</label>
+                  <select
+                    className="bc-select"
+                    value={pixKeyType}
+                    onChange={(e) => setPixKeyType(e.target.value as PixKeyType)}
+                  >
+                    {PIX_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                        {opt.label}{opt.disabled ? ' (indisponível)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Nome do titular */}
+                <div className="bc-section">
+                  <label className="bc-label">Nome do titular <span className="bc-required">*</span></label>
+                  <input
+                    className="bc-input"
+                    placeholder="Nome completo"
+                    value={holderName}
+                    onChange={(e) => setHolderName(e.target.value)}
+                  />
+                </div>
+
+                {/* CPF do titular */}
+                <div className="bc-section">
+                  <label className="bc-label">CPF do titular <span className="bc-required">*</span></label>
+                  <input
+                    className="bc-input"
+                    placeholder="000.000.000-00"
+                    value={holderCpf}
+                    onChange={(e) => setHolderCpf(e.target.value)}
+                    inputMode="numeric"
+                  />
+                </div>
+
+                {/* Chave PIX */}
+                <div className="bc-section">
+                  <label className="bc-label">Chave PIX <span className="bc-required">*</span></label>
+                  <input
+                    className="bc-input"
+                    placeholder={selectedTypeMeta.placeholder}
+                    value={pixKey}
+                    onChange={(e) => setPixKey(e.target.value)}
+                  />
+                  <span className="bc-hint">
+                    {selectedTypeMeta.label === 'CPF' || selectedTypeMeta.label === 'CNPJ'
+                      ? 'Apenas números, sem pontos ou traços.'
+                      : `Informe sua chave do tipo ${selectedTypeMeta.label}.`}
+                  </span>
+                </div>
+
+                {/* Botão salvar */}
+                <button type="submit" className="bc-submit-btn" disabled={saving}>
+                  {saving
+                    ? 'Salvando...'
+                    : hasExistingKey
+                      ? 'Atualizar chave PIX'
+                      : 'Salvar chave PIX'}
+                </button>
+              </form>
             </div>
-
-            <div>
-              <label className="bankcards-label">CPF do titular <span>*</span></label>
-              <input
-                className="bankcards-input"
-                placeholder="Digite o CPF do titular"
-                value={holderCpf}
-                onChange={(e) => setHolderCpf(e.target.value)}
-              />
-            </div>
-
-            <button type="button" className="bankcards-toggle-row" onClick={() => setIsDefaultCard((v) => !v)}>
-              <span>Definir como Cartão Padrão</span>
-              <span className={`toggle ${isDefaultCard ? 'on' : ''}`}>
-                <span className="dot" />
-              </span>
-            </button>
-
-            <button type="submit" className="bankcards-submit" disabled={saving}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z" />
-                <path d="M3 10l18 0" />
-                <path d="M7 15l.01 0" />
-                <path d="M11 15l2 0" />
-              </svg>
-              <span>{saving ? 'Salvando...' : 'Adicionar Cartão Bancário'}</span>
-            </button>
-          </form>
-        )}
-
-        <div className="bankcards-security-box">
-          <p>Suas informações de cartão bancário serão criptografadas com segurança</p>
+          )}
         </div>
-      </div>
+      </section>
     </main>
   )
 }
