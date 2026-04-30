@@ -360,11 +360,8 @@ export default function Dashboard() {
   if (!user) return null
 
   return (
-    <main className="dash-app">
-      <section className="dash-main">
-        <AppSidebar />
-
-        <div className="dash-content">
+    <main className="vip-page">
+      <div className="vip-shell">
           <section className="trk-banner" aria-label="Banner TRK">
             <div className="trk-banner__bg" aria-hidden="true">
               <span className="trk-banner__glow trk-banner__glow--1" />
@@ -392,10 +389,17 @@ export default function Dashboard() {
                 </svg>
                 <span className="trk-banner__notif-dot" />
               </button>
-              <span className="trk-banner__badge">
-                <BadgeShield badge={badge} className="trk-banner__badge-icon" />
-                {badge}
-              </span>
+              <div className="trk-banner__header-row">
+                <span className="trk-banner__badge">
+                  <BadgeShield badge={badge} className="trk-banner__badge-icon" />
+                  <span className="trk-banner__badge-text">{badge}</span>
+                </span>
+                <div className="trk-banner__balance">
+                  <span className="trk-banner__balance-icon">R$</span>
+                  <span className="trk-banner__balance-value">{formatBRL(balance)}</span>
+                  <span className="trk-banner__balance-label">saldo</span>
+                </div>
+              </div>
               <h2 className="trk-banner__logo">TRK</h2>
               <p className="trk-banner__tagline">
                 Sua rotina de tarefas que vira dinheiro
@@ -406,6 +410,8 @@ export default function Dashboard() {
               </p>
             </div>
           </section>
+
+          <AppSidebar />
 
           <section className="home-actions-row" aria-label="Ações principais">
             <button
@@ -655,7 +661,6 @@ export default function Dashboard() {
             </p>
           </section>
         </div>
-      </section>
 
       {selectedPlan ? (
         <div className="cycle-modal-backdrop" onClick={closePurchaseModal}>
