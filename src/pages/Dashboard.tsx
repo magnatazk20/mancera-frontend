@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
+import VipHeader from '../components/VipHeader'
 import ceoImage from '../assets/ceo.jpg'
 import './Dashboard.css'
 
