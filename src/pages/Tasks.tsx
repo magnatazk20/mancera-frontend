@@ -140,9 +140,12 @@ export default function Tasks() {
     const userIdNum = Number(user?.id ?? 0)
     const total = limit > 0 ? limit : tasks.length
 
+    // IMPORTANTE: mostra apenas as tasks que existem NO BANCO, sem repetir.
+    // Cada task aparece só uma vez na ordem do banco. Ignora limite diário.
+    // Se tem 3 tasks no banco, mostra 3 slots (não repete as tasks).
     const result: Slot[] = []
-    for (let i = 0; i < total; i += 1) {
-      const base = tasks[i % tasks.length]
+    for (let i = 0; i < Math.min(total, tasks.length); i += 1) {
+      const base = tasks[i] // SEM módulo — cada slot é uma task diferente
       result.push({
         ...base,
         slotIndex: i,
