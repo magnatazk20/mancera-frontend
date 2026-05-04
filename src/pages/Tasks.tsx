@@ -103,11 +103,15 @@ export default function Tasks() {
       void loadTasks()
     }
     const onTaskCompleted = () => void loadTasks()
+    // popstate = botão Voltar/Avançar do navegador (mesma aba)
+    const onPopState = () => void loadTasks()
     window.addEventListener('focus', onFocus)
     window.addEventListener('mining-task-completed', onTaskCompleted)
+    window.addEventListener('popstate', onPopState)
     return () => {
       window.removeEventListener('focus', onFocus)
       window.removeEventListener('mining-task-completed', onTaskCompleted)
+      window.removeEventListener('popstate', onPopState)
     }
   }, [])
 
