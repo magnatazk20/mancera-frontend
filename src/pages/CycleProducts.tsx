@@ -173,6 +173,12 @@ export default function CycleProducts() {
   const formatBRL = (value: number) =>
     Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
+  const formatDateTime = (date: Date) =>
+    date.toLocaleString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+
   const closePurchaseModal = () => {
     if (isBuying) return
     setSelectedPlan(null)
@@ -437,6 +443,9 @@ export default function CycleProducts() {
 
                   <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
                     <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
+                    <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
+                    <div><strong>Fim do ciclo:</strong> {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}</div>
+                    <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
                     <div style={{
                       marginTop: 6,
                       padding: '8px 12px',
