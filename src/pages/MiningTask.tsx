@@ -38,6 +38,7 @@ export default function MiningTask() {
   const [toastMessage, setToastMessage] = useState('')
   const [rating, setRating] = useState<number>(0)
   const [ratingSent, setRatingSent] = useState(false)
+  const [remainingToday, setRemainingToday] = useState<number | null>(null)
 
   const [watchedSeconds, setWatchedSeconds] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -108,6 +109,10 @@ export default function MiningTask() {
         const done = Number(currentTask?.completedToday ?? 0) > 0
         setAlreadyCompletedToday(done)
 
+        if (typeof data.remainingByVip === 'number') {
+          setRemainingToday(data.remainingByVip)
+        }
+
         if (done) {
           setIsPlaying(false)
           setWatchedSeconds(REQUIRED_SECONDS)
@@ -124,7 +129,8 @@ export default function MiningTask() {
   }, [user?.id, taskId])
 
   const percent = Math.min(100, (watchedSeconds / REQUIRED_SECONDS) * 100)
-  const remainingSeconds = Math.max(0, REQUIRED_SECONDS - watchedSeconds)
+  const dailyLimitReached = remainingToday !== null && remainingToday <= 0
+  const remainingSeconds = dailyLimitReached ? 0 : Math.max(0, REQUIRED_SECONDS - watchedSeconds)
   const podeConcluir = watchedSeconds >= REQUIRED_SECONDS
 
   /* Envia comando para o iframe do YouTube */
@@ -139,7 +145,7 @@ export default function MiningTask() {
   }
 
   const togglePlay = () => {
-    if (podeConcluir || alreadyCompletedToday) return
+    if (podeConcluir || alreadyCompletedToday || dailyLimitReached) return
     const next = !isPlaying
     if (next && !videoStarted) setVideoStarted(true)
     setIsPlaying(next)
@@ -158,6 +164,7 @@ export default function MiningTask() {
   useEffect(() => {
     if (alreadyCompletedToday) return
     if (!isPlaying) return
+    if (dailyLimitReached) return
     if (watchedSeconds >= REQUIRED_SECONDS) {
       setIsPlaying(false)
       postYtCommand('pauseVideo')
@@ -169,11 +176,16 @@ export default function MiningTask() {
     }, 1000)
 
     return () => window.clearInterval(interval)
-  }, [isPlaying, watchedSeconds, alreadyCompletedToday])
+  }, [isPlaying, watchedSeconds, alreadyCompletedToday, dailyLimitReached])
 
   const concluirTarefaVideo = async () => {
     if (alreadyCompletedToday) {
       setMessage('Você já concluiu esta tarefa hoje. Disponível novamente às 00:00.')
+      return
+    }
+
+    if (dailyLimitReached) {
+      setMessage('Limite diário de tarefas atingido. Tente novamente amanhã.')
       return
     }
 
@@ -206,11 +218,27 @@ export default function MiningTask() {
         body: JSON.stringify({ userId: user.id, taskId: Number(taskId) }),
       })
 
-      const data = await response.json()
+      let data: any
+      try {
+        data = await response.json()
+      } catch {
+        setMessage('Resposta inválida do servidor. Tente novamente.')
+        return
+      }
 
       if (!response.ok || !data?.ok) {
-        setMessage(data?.error ?? 'Falha ao concluir tarefa de vídeo.')
+        if (data?.code === 'TASK_ALREADY_COMPLETED_TODAY') {
+          setAlreadyCompletedToday(true)
+          setMessage('Limite diário atingido — esta tarefa já foi concluída hoje.')
+        } else {
+          setMessage(data?.error ?? 'Falha ao concluir tarefa de vídeo.')
+        }
         return
+      }
+
+      // Atualiza remainingToday com valor enviado pelo backend
+      if (typeof data.remainingToday === 'number') {
+        setRemainingToday(data.remainingToday)
       }
 
       setReward(Number(data.rewardAmount ?? 0))
@@ -280,15 +308,17 @@ export default function MiningTask() {
                   </svg>
                 </div>
                 <span className="mining-card__header-label">Vídeo da tarefa</span>
-                <span className={`mining-card__status ${isPlaying ? 'mining-card__status--playing' : podeConcluir ? 'mining-card__status--done' : ''}`}>
+                <span className={`mining-card__status ${isPlaying ? 'mining-card__status--playing' : podeConcluir || dailyLimitReached || alreadyCompletedToday ? 'mining-card__status--done' : ''}`}>
                   <span className="mining-card__status-dot" />
                   {alreadyCompletedToday
                     ? 'Concluída'
-                    : isPlaying
-                      ? 'Assistindo...'
-                      : podeConcluir
-                        ? 'Concluído'
-                        : 'Pausado'}
+                    : dailyLimitReached
+                      ? 'Limite atingido'
+                      : isPlaying
+                        ? 'Assistindo...'
+                        : podeConcluir
+                          ? 'Concluído'
+                          : 'Pausado'}
                 </span>
               </div>
 
@@ -309,7 +339,7 @@ export default function MiningTask() {
                   {/* Overlay clicável por cima do iframe */}
                   <div className="trk-player__overlay" onClick={togglePlay}>
                     {/* Botão play grande no centro */}
-                    {!isPlaying && !podeConcluir && !alreadyCompletedToday && (
+                    {!isPlaying && !podeConcluir && !alreadyCompletedToday && !dailyLimitReached && (
                       <div className="trk-player__big-play">
                         <svg viewBox="0 0 24 24" width="48" height="48" fill="rgba(255,255,255,0.95)" stroke="none">
                           <polygon points="6 3 20 12 6 21 6 3" />
@@ -318,12 +348,16 @@ export default function MiningTask() {
                     )}
 
                     {/* Badge concluído */}
-                    {(podeConcluir || alreadyCompletedToday) && (
+                    {(podeConcluir || alreadyCompletedToday || dailyLimitReached) && (
                       <div className="trk-player__done-overlay">
                         <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="20 6 9 17 4 12" />
+                          {dailyLimitReached ? (
+                            <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+                          ) : (
+                            <polyline points="20 6 9 17 4 12" />
+                          )}
                         </svg>
-                        <span>{alreadyCompletedToday ? 'Concluída hoje' : 'Tempo concluído'}</span>
+                        <span>{alreadyCompletedToday ? 'Concluída hoje' : dailyLimitReached ? 'Limite diário atingido' : 'Tempo concluído'}</span>
                       </div>
                     )}
                   </div>
@@ -331,7 +365,7 @@ export default function MiningTask() {
 
                 {/* Controles customizados */}
                 <div className="trk-player__controls">
-                  <button className="trk-player__btn" onClick={togglePlay} disabled={podeConcluir || alreadyCompletedToday}>
+                  <button className="trk-player__btn" onClick={togglePlay} disabled={podeConcluir || alreadyCompletedToday || dailyLimitReached}>
                     {isPlaying ? (
                       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" /></svg>
                     ) : (
@@ -374,14 +408,19 @@ export default function MiningTask() {
               {/* Controles do vídeo */}
               <div className="mining-card__controls">
                 <button
-                  className={`tasks-btn ${podeConcluir || alreadyCompletedToday ? 'tasks-btn--done' : isPlaying ? 'tasks-btn--pause' : 'tasks-btn--primary'}`}
+                  className={`tasks-btn ${podeConcluir || alreadyCompletedToday || dailyLimitReached ? 'tasks-btn--done' : isPlaying ? 'tasks-btn--pause' : 'tasks-btn--primary'}`}
                   onClick={togglePlay}
-                  disabled={podeConcluir || alreadyCompletedToday || checkingStatus}
+                  disabled={podeConcluir || alreadyCompletedToday || dailyLimitReached || checkingStatus}
                 >
                   {alreadyCompletedToday ? (
                     <>
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                       Concluída hoje
+                    </>
+                  ) : dailyLimitReached ? (
+                    <>
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                      Limite diário atingido
                     </>
                   ) : podeConcluir ? (
                     <>
@@ -402,7 +441,7 @@ export default function MiningTask() {
                 </button>
                 <span className="mining-card__remaining">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                  Faltam {formatTime(remainingSeconds)}
+                  {dailyLimitReached ? 'Limite diário atingido' : `Faltam ${formatTime(remainingSeconds)}`}
                 </span>
               </div>
             </div>
@@ -421,9 +460,11 @@ export default function MiningTask() {
                 <span className="mining-card__status">
                   {alreadyCompletedToday
                     ? 'Concluída hoje'
-                    : ratingSent
-                      ? `Enviada (${rating}/5)`
-                      : 'Aguardando'}
+                    : dailyLimitReached
+                      ? 'Limite atingido'
+                      : ratingSent
+                        ? `Enviada (${rating}/5)`
+                        : 'Aguardando'}
                 </span>
               </div>
 
@@ -433,7 +474,7 @@ export default function MiningTask() {
                   <button
                     key={n}
                     className={`mining-star ${rating >= n ? 'mining-star--active' : ''}`}
-                    disabled={alreadyCompletedToday || ratingSent || !podeConcluir}
+                    disabled={alreadyCompletedToday || ratingSent || !podeConcluir || dailyLimitReached}
                     onClick={() => setRating(n)}
                     aria-label={`${n} estrela${n > 1 ? 's' : ''}`}
                   >
@@ -447,8 +488,12 @@ export default function MiningTask() {
               {/* Botão enviar avaliação */}
               <button
                 className={`tasks-btn ${ratingSent ? 'tasks-btn--done' : 'tasks-btn--primary'} mining-card__submit-btn`}
-                disabled={alreadyCompletedToday || ratingSent || !podeConcluir || rating < 1}
+                disabled={alreadyCompletedToday || ratingSent || !podeConcluir || rating < 1 || dailyLimitReached}
                 onClick={() => {
+                  if (dailyLimitReached) {
+                    setMessage('Limite diário de tarefas atingido.')
+                    return
+                  }
                   if (!podeConcluir) {
                     setMessage('Assista ao vídeo por 00:30 antes de avaliar.')
                     return
@@ -475,7 +520,7 @@ export default function MiningTask() {
               </button>
 
               {/* Botão receber comissão — aparece após avaliar */}
-              {ratingSent && !alreadyCompletedToday && reward === null && (
+              {ratingSent && !alreadyCompletedToday && !dailyLimitReached && reward === null && (
                 <button
                   className={`tasks-btn tasks-btn--primary mining-card__submit-btn`}
                   disabled={loading}
@@ -512,6 +557,8 @@ export default function MiningTask() {
                 <span className="mining-card__task-status-value">
                   {alreadyCompletedToday ? (
                     <><span className="mining-card__task-status-dot mining-card__task-status-dot--done" /> Concluída hoje</>
+                  ) : dailyLimitReached ? (
+                    <><span className="mining-card__task-status-dot mining-card__task-status-dot--done" /> Limite diário atingido</>
                   ) : !podeConcluir ? (
                     <><span className="mining-card__task-status-dot mining-card__task-status-dot--watching" /> Assistindo vídeo...</>
                   ) : !ratingSent ? (
