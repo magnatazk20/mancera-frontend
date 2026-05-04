@@ -245,6 +245,9 @@ export default function MiningTask() {
 
       setReward(Number(data.rewardAmount ?? 0))
       setMessage(data?.message ?? 'Tarefa concluída com sucesso.')
+
+      // Notifica a página /tasks para recarregar os dados
+      window.dispatchEvent(new CustomEvent('mining-task-completed'))
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
     } finally {

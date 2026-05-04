@@ -102,8 +102,13 @@ export default function Tasks() {
       // Sempre recarrega ao focar, mesmo que já tenha dados em tela
       void loadTasks()
     }
+    const onTaskCompleted = () => void loadTasks()
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    window.addEventListener('mining-task-completed', onTaskCompleted)
+    return () => {
+      window.removeEventListener('focus', onFocus)
+      window.removeEventListener('mining-task-completed', onTaskCompleted)
+    }
   }, [])
 
   // Mostrar a quantidade exata de slots de tarefas equivalente ao limite diário do VIP.
