@@ -223,6 +223,7 @@ export default function MiningTask() {
         data = await response.json()
       } catch {
         setMessage('Resposta inválida do servidor. Tente novamente.')
+        setLoading(false)
         return
       }
 
@@ -233,6 +234,7 @@ export default function MiningTask() {
         } else {
           setMessage(data?.error ?? 'Falha ao concluir tarefa de vídeo.')
         }
+        setLoading(false)
         return
       }
 

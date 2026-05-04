@@ -96,6 +96,16 @@ export default function Tasks() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
+  // Recarrega tarefas sempre que o usuário voltar para esta aba (volta da página de mineração, etc.)
+  useEffect(() => {
+    const onFocus = () => {
+      // Sempre recarrega ao focar, mesmo que já tenha dados em tela
+      void loadTasks()
+    }
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
+
   // Mostrar a quantidade exata de slots de tarefas equivalente ao limite diário do VIP.
   // Cada slot recebe um vídeo do YouTube determinístico (não muda entre re-renders).
   // O título e a imagem do card vêm do próprio vídeo (thumbnail + oEmbed).
