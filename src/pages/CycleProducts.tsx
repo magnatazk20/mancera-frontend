@@ -461,13 +461,6 @@ export default function CycleProducts() {
                     <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
                     <div><strong>Lucro diário ({modalEffectivePercent}%):</strong> {formatBRL(modalDailyProfit)}</div>
                     <div><strong>Lucro total ({modalTotalPercent}% em {selectedPlan.cycleDays} dias):</strong> {formatBRL(modalTotalProfit)}</div>
-                    <div><strong>Retorno total (investimento + lucro):</strong> <span style={{ color: '#16a34a', fontWeight: 700 }}>{formatBRL(modalTotalReturn)}</span></div>
-                    <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
-                    <div>
-                      <strong>Fim do ciclo (retorno):</strong>{' '}
-                      {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}
-                    </div>
-                    <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
                     <div style={{
                       marginTop: 6,
                       padding: '8px 12px',
