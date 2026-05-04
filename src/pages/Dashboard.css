@@ -1594,11 +1594,11 @@
 /* ── Botão flutuante de suporte ── */
 .support-float-btn {
   position: fixed;
-  bottom: 24px;
+  bottom: 90px;
   right: 24px;
   width: 52px;
   height: 52px;
-  background: #25d366;
+  background: #ff8a03;
   border-radius: 50%;
   display: flex;
   align-items: center;
