@@ -33,12 +33,12 @@ export default function Register() {
     setError('')
 
     if (password !== confirm) {
-      setError('Passwords do not match.')
+      setError('As senhas não coincidem.')
       return
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.')
+      setError('A senha deve ter no mínimo 6 caracteres.')
       return
     }
 
@@ -59,14 +59,14 @@ export default function Register() {
       const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
-        setError(data.error ?? 'Unable to create account.')
+        setError(data.error ?? 'Falha ao criar conta.')
         return
       }
 
       localStorage.setItem('token', data.token ?? '')
       localStorage.setItem('user', JSON.stringify(data.user ?? {}))
 
-      setMessage(data.message ?? 'Account created successfully!')
+      setMessage(data.message ?? 'Conta criada com sucesso!')
 
       setTimeout(() => navigate('/dashboard'), 800)
     } catch {
@@ -81,12 +81,12 @@ export default function Register() {
       <div className="login-orange__hero">
         <div className="login-orange__hero-logo" aria-hidden="true">
           <span className="login-orange__hero-mark">TRK</span>
-          <span className="login-orange__hero-sub">Your rewards are waiting for you.</span>
+          <span className="login-orange__hero-sub">Suas recompensas estão esperando por você.</span>
         </div>
       </div>
 
       <h1 id="register-title" className="login-orange__title">
-        Sign Up
+        Registrar
       </h1>
 
       <form className="login-orange__form" onSubmit={onSubmit}>
@@ -101,7 +101,7 @@ export default function Register() {
           <input
             id="name"
             type="text"
-            placeholder="Please enter your name"
+            placeholder="Por favor, digite seu nome"
             value={name}
             onChange={(e) => setName(e.target.value)}
             autoComplete="name"
@@ -123,7 +123,7 @@ export default function Register() {
           <input
             id="phone"
             type="tel"
-            placeholder="Please enter your phone number"
+            placeholder="Por favor, digite seu número de telefone"
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/[^\d+()\s-]/g, ''))}
             inputMode="numeric"
@@ -144,7 +144,7 @@ export default function Register() {
           <input
             id="password"
             type={showPassword ? 'text' : 'password'}
-            placeholder="Please enter a password (min. 6 characters)"
+            placeholder="Por favor, digite a senha (mínimo 6 caracteres)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
@@ -153,7 +153,7 @@ export default function Register() {
           <button
             type="button"
             className="lo-field__right-icon"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
             onClick={() => setShowPassword((v) => !v)}
           >
             {showPassword ? (
@@ -183,7 +183,7 @@ export default function Register() {
           <input
             id="confirm"
             type={showConfirm ? 'text' : 'password'}
-            placeholder="Please confirm your password"
+            placeholder="Por favor, confirme a senha"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             autoComplete="new-password"
@@ -192,7 +192,7 @@ export default function Register() {
           <button
             type="button"
             className="lo-field__right-icon"
-            aria-label={showConfirm ? 'Hide password' : 'Show password'}
+            aria-label={showConfirm ? 'Ocultar senha' : 'Mostrar senha'}
             onClick={() => setShowConfirm((v) => !v)}
           >
             {showConfirm ? (
