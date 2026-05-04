@@ -135,7 +135,7 @@ export default function Withdraw() {
     }
   }, [])
 
-  const [holderName, setHolderName] = useState('')
+  const [_holderName, setHolderName] = useState('')
   const [holderCpf, setHolderCpf] = useState('')
   const [pixType, setPixType] = useState<PixType>('CHAVE_ALEATORIA')
   const [pixKey, setPixKey] = useState('')

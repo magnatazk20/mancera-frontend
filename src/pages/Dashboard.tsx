@@ -3,22 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useBalanceSocket } from '../hooks/useBalanceSocket'
 import AppSidebar from '../components/AppSidebar'
 
-const formatVipExpiry = (raw: string | null): { label: string; status: 'active' | 'expired' | 'none' } => {
-  if (!raw) return { label: 'Sem VIP ativo', status: 'none' }
-  const date = new Date(raw)
-  if (Number.isNaN(date.getTime())) return { label: 'Sem VIP ativo', status: 'none' }
-
-  const now = new Date()
-  const expired = date.getTime() &lt; now.getTime()
-  const formatted = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-
-  if (expired) return { label: `Expirou em ${formatted}`, status: 'expired' }
-
-  const diffMs = date.getTime() - now.getTime()
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-  const suffix = diffDays === 1 ? '1 dia restante' : `${diffDays} dias restantes`
-  return { label: `${formatted} • ${suffix}`, status: 'active' }
-}
 import './Dashboard.css'
 
 interface User {
@@ -57,11 +41,7 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [balance, setBalance] = useState(0)
-  const [totalDeposits, setTotalDeposits] = useState(0)
-  const [currentVip, setCurrentVip] = useState<{ levelId: number; name: string } | null>(null)
-  const [teamCounts, setTeamCounts] = useState<Record<string, number>>({ t0: 0, t1: 0, t2: 0, t3: 0, t4: 0, t5: 0 })
-  const [cyclePlans, setCyclePlans] = useState<CycleProduct[]>([])
-  const [initialStock, setInitialStock] = useState<Record<number, number>>({})
+  const [currentVip, setCurrentVip] = useState<{ vipLevelId: number; name: string } | null>(null)
   const [selectedPlan, setSelectedPlan] = useState<CycleProduct | null>(null)
   const [isBuying, setIsBuying] = useState(false)
   const [showWelcomeModal, setShowWelcomeModal] = useState(true)
@@ -145,12 +125,9 @@ export default function Dashboard() {
         const response = await fetch(`${API_URL}/api/user/summary/${user.id}`)
         console.log('[Dashboard] /api/user/summary status:', response.status)
         if (!response.ok) return
-        const data = (await response.json()) as { balance?: number; totalDeposits?: number; currentVip?: { vipLevelId: number; name: string } | null; teamCounts?: Record<string, number> }
-        console.log('[Dashboard] summary data:', JSON.stringify(data))
+        const data = (await response.json()) as { balance?: number; currentVip?: { vipLevelId: number; name: string } | null }
         setBalance(Number(data.balance ?? 0))
-        setTotalDeposits(Number(data.totalDeposits ?? 0))
         setCurrentVip(data.currentVip ?? null)
-        if (data.teamCounts) setTeamCounts(data.teamCounts)
       } catch {/* silencioso */}
     }
 
@@ -160,10 +137,7 @@ export default function Dashboard() {
         if (!response.ok) return
         const data = (await response.json()) as { ok?: boolean; products?: CycleProduct[] }
         if (!data?.ok || !Array.isArray(data.products)) return
-        setCyclePlans(data.products)
-        const stockMap: Record<number, number> = {}
-        data.products.forEach((p) => { stockMap[p.id] = Number(p.stockQuantity ?? 0) })
-        setInitialStock(stockMap)
+        setSelectedPlan(data.products[0] ?? null)
       } catch {/* silencioso */}
     }
 
@@ -197,8 +171,6 @@ export default function Dashboard() {
     }
   }, [showWelcomeModal, commissionLevels.length])
 
-  const handleBuyCycle = (plan: CycleProduct) => setSelectedPlan(plan)
-
   const closePurchaseModal = () => {
     if (isBuying) return
     setSelectedPlan(null)
@@ -227,13 +199,6 @@ export default function Dashboard() {
         return
       }
       setBalance(Number(data.balanceAfter ?? balance))
-      setCyclePlans((prev) =>
-        prev.map((p) =>
-          p.id === selectedPlan.id
-            ? { ...p, stockQuantity: Math.max(0, Number(p.stockQuantity ?? 0) - 1) }
-            : p
-        )
-      )
       alert(data?.message ?? 'Ciclo adquirido com sucesso.')
       setSelectedPlan(null)
     } catch {

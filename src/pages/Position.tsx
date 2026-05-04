@@ -109,16 +109,16 @@ export default function Position() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [teamLevel, setTeamLevel] = useState<1 | 2 | 3>(1)
-  const [teamSize, setTeamSize] = useState(0)
-  const [depositedMembers, setDepositedMembers] = useState(0)
-  const [teamRecharge, setTeamRecharge] = useState(0)
-  const [teamWithdraw, setTeamWithdraw] = useState(0)
-  const [levels, setLevels] = useState<Array<{ level: number; totalMembers: number; depositedMembers: number; rechargedAmount: number }>>([
+  const [_teamSize, setTeamSize] = useState(0)
+  const [_depositedMembers, setDepositedMembers] = useState(0)
+  const [_teamRecharge, setTeamRecharge] = useState(0)
+  const [_teamWithdraw, setTeamWithdraw] = useState(0)
+  const [_levels, setLevels] = useState<Array<{ level: number; totalMembers: number; depositedMembers: number; rechargedAmount: number }>>([
     { level: 1, totalMembers: 0, depositedMembers: 0, rechargedAmount: 0 },
     { level: 2, totalMembers: 0, depositedMembers: 0, rechargedAmount: 0 },
     { level: 3, totalMembers: 0, depositedMembers: 0, rechargedAmount: 0 },
   ])
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
+  const [_teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [vipMembers, setVipMembers] = useState<VipMember[]>([])
   const [taskCommissionMembers, setTaskCommissionMembers] = useState<TaskCommissionMember[]>([])
   const [taskCommissionSummary, setTaskCommissionSummary] = useState<TaskCommissionSummary[]>([])

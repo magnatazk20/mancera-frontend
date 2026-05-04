@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
@@ -28,11 +28,6 @@ export default function AdminVipPhotos() {
   const [errorMsg, setErrorMsg] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const uploadTargetId = useRef<number | null>(null)
-
-  const token = useMemo(
-    () => getToken(),
-    []
-  )
 
   const loadLevels = async () => {
     setLoading(true)
@@ -210,7 +205,7 @@ export default function AdminVipPhotos() {
       </section>
 
       {toast ? (
-        <FloatingToast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+        <FloatingToast open message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       ) : null}
     </main>
   )

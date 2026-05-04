@@ -33,26 +33,6 @@ const WALLET_COLORS: Record<string, string> = {
   recharge_balance: '#7c3aed',
 }
 
-const WALLET_ICONS: Record<string, React.ReactNode> = {
-  balance: (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-      <line x1="1" y1="10" x2="23" y2="10" />
-    </svg>
-  ),
-  commission_balance: (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
-  ),
-  recharge_balance: (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  ),
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -107,9 +87,9 @@ export default function VipCheckout() {
         if (userVipRes?.ok) {
           const vipJson = await userVipRes.json().catch(() => ({})) as { balance?: number; commission_balance?: number; recharge_balance?: number; ok?: boolean; hasVip?: boolean; vip?: { levelName?: string } }
           const walletOpts: WalletOption[] = [
-            { key: 'balance', label: 'Saldo Geral', value: Number(vipJson?.balance ?? 0) },
-            { key: 'commission_balance', label: 'Carteira de Comissão', value: Number(vipJson?.commission_balance ?? 0) },
-            { key: 'recharge_balance', label: 'Carteira de Recarga', value: Number(vipJson?.recharge_balance ?? 0) },
+            { key: 'balance' as WalletKey, label: 'Saldo Geral', value: Number(vipJson?.balance ?? 0) },
+            { key: 'commission_balance' as WalletKey, label: 'Carteira de Comissão', value: Number(vipJson?.commission_balance ?? 0) },
+            { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(vipJson?.recharge_balance ?? 0) },
           ].filter(w => w.value > 0)
           setWallets(walletOpts)
           // Default to first wallet with balance
@@ -123,9 +103,9 @@ export default function VipCheckout() {
         } else if (user) {
           // Fallback from localStorage user object
           const walletOpts: WalletOption[] = [
-            { key: 'balance', label: 'Saldo Geral', value: Number(user.balance ?? 0) },
-            { key: 'commission_balance', label: 'Carteira de Comissão', value: Number(user.commission_balance ?? 0) },
-            { key: 'recharge_balance', label: 'Carteira de Recarga', value: Number(user.recharge_balance ?? 0) },
+            { key: 'balance' as WalletKey, label: 'Saldo Geral', value: Number(user.balance ?? 0) },
+            { key: 'commission_balance' as WalletKey, label: 'Carteira de Comissão', value: Number(user.commission_balance ?? 0) },
+            { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(user.recharge_balance ?? 0) },
           ].filter(w => w.value > 0)
           setWallets(walletOpts)
           if (walletOpts.length > 0) {
@@ -136,7 +116,7 @@ export default function VipCheckout() {
         const levelsJson = await levelsRes?.json().catch(() => ({})) ?? {}
         const commJson = await commRes?.json().catch(() => ({})) ?? {}
 
-        if (levelsRes.ok && levelsJson?.ok && Array.isArray(levelsJson.levels)) {
+        if (levelsRes?.ok && levelsJson?.ok && Array.isArray(levelsJson.levels)) {
           const found = levelsJson.levels.find(
             (l: any) => Number(l.id) === Number(id)
           )
@@ -157,7 +137,7 @@ export default function VipCheckout() {
           setMessage({ text: 'Erro ao carregar planos VIP.', type: 'error' })
         }
 
-        if (commRes.ok && commJson?.ok && Array.isArray(commJson.levels)) {
+        if (commRes?.ok && commJson?.ok && Array.isArray(commJson.levels)) {
           setCommissions(
             commJson.levels.map((row: any) => ({
               id: Number(row.id),

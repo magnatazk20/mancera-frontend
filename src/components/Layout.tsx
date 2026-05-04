@@ -30,7 +30,7 @@ const PAGE_TITLES: Record<string, string> = {
   // admin...
 }
 
-export default function Layout({ children }: { children?: React.ReactNode }) {
+export default function Layout() {
   const location = useLocation()
   const title = PAGE_TITLES[location.pathname as keyof typeof PAGE_TITLES] || 'Página'
 

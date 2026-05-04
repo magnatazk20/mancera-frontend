@@ -35,14 +35,6 @@ const PIX_TYPE_OPTIONS: Array<{ value: PixKeyType; label: string; placeholder: s
   { value: 'CHAVE_ALEATORIA', label: 'Chave Aleatória', placeholder: 'Chave gerada pelo banco' },
 ]
 
-const maskCardPreview = (value: string) => {
-  const clean = String(value ?? '').trim()
-  if (!clean) return '•••• •••• •••• ••••'
-  if (clean.length <= 4) return clean
-  const visible = clean.slice(-4)
-  return `•••• •••• •••• ${visible}`
-}
-
 export default function BankCards() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)

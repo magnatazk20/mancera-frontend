@@ -10,6 +10,10 @@ type VipLevel = {
   withdrawTime?: string
   description?: string
   price?: number
+  durationDays?: number
+  dailyTaskLimit?: number
+  taskRewardAmount?: number
+  benefits?: string
 }
 
 type SiteSettings = {
@@ -88,7 +92,7 @@ export default function Manual() {
     { id: 'recarga' as Category, label: 'Recarga', icon: 'refresh' },
   ]
 
-  const iconSvgs: Record<string, JSX.Element> = {
+  const iconSvgs: Record<string, React.ReactElement> = {
     wallet: (
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4z" />

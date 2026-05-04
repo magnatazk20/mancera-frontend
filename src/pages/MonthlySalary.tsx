@@ -47,9 +47,6 @@ type ClaimResponse = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
-const formatBRL = (value: number) =>
-  Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-
 export default function MonthlySalary() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)

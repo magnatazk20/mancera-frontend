@@ -36,7 +36,7 @@ export default function Vip() {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState<string>('')
   const [currentVipLevelId, setCurrentVipLevelId] = useState<number | null>(null)
-  const [currentVipExpiresAt, setCurrentVipExpiresAt] = useState<string | null>(null)
+  const [_currentVipExpiresAt, setCurrentVipExpiresAt] = useState<string | null>(null)
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')

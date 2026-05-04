@@ -49,11 +49,6 @@ type ProfileMetricsResponse = {
   }
 }
 
-type MiniTasksBadgeResponse = {
-  ok?: boolean
-  badges?: string[]
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -92,12 +87,10 @@ export default function Profile() {
   const [vipImageUrl, setVipImageUrl] = useState('')
   const [copyFeedback, setCopyFeedback] = useState('')
   const [inviteCode, setInviteCode] = useState('')
-  const [monthlySalaryContract, setMonthlySalaryContract] = useState('')
-  const [giftCodeInput, setGiftCodeInput] = useState('')
-  const [redeemLoading, setRedeemLoading] = useState(false)
-  const [redeemFeedback, setRedeemFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [_monthlySalaryContract, setMonthlySalaryContract] = useState('')
+  const [redeemFeedback, _setRedeemFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [showRedeemSuccessModal, setShowRedeemSuccessModal] = useState(false)
-  const [redeemSuccessData, setRedeemSuccessData] = useState<{ message: string; rewardValue: number; code: string } | null>(null)
+  const [redeemSuccessData, _setRedeemSuccessData] = useState<{ message: string; rewardValue: number; code: string } | null>(null)
 
   const normalizedBadge = useMemo(() => userBadge.toLowerCase(), [userBadge])
 
@@ -234,75 +227,8 @@ export default function Profile() {
     navigate('/')
   }
 
-  const redeemGiftCode = async () => {
-    if (!user?.id) {
-      setRedeemFeedback({ type: 'error', message: 'Usuário não autenticado.' })
-      return
-    }
-
-    const code = giftCodeInput.trim().toUpperCase()
-    if (!code) {
-      setRedeemFeedback({ type: 'error', message: 'Informe um código válido.' })
-      return
-    }
-
-    setRedeemLoading(true)
-    setRedeemFeedback(null)
-
-    try {
-      const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
-      const res = await fetch(`${API_URL}/api/gift-codes/redeem`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          code,
-        }),
-      })
-
-      const data = await res.json() as {
-        ok?: boolean
-        error?: string
-        message?: string
-        balance?: number
-        rewardValue?: number
-      }
-
-      if (!res.ok || !data?.ok) {
-        setRedeemFeedback({
-          type: 'error',
-          message: data?.error || 'Não foi possível resgatar o código.',
-        })
-        setTimeout(() => setRedeemFeedback(null), 2500)
-        return
-      }
-
-      if (typeof data.balance === 'number') {
-        setBalance(Number(data.balance))
-      }
-
-      setGiftCodeInput('')
-      const rewardValue = typeof data.rewardValue === 'number' ? Number(data.rewardValue) : 0
-      const successMessage = data?.message || 'Código resgatado com sucesso!'
-      setRedeemSuccessData({
-        message: successMessage,
-        rewardValue,
-        code,
-      })
-      setShowRedeemSuccessModal(true)
-    } catch {
-      setRedeemFeedback({
-        type: 'error',
-        message: 'Erro de conexão ao resgatar código.',
-      })
-      setTimeout(() => setRedeemFeedback(null), 2500)
-    } finally {
-      setRedeemLoading(false)
-    }
-  }
+  // Gift code redeem — feature kept for future activation
+  // (UI wiring needed before enabling)
 
   return (
     <main className="dash-app profile-page">
