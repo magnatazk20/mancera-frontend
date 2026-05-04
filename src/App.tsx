@@ -101,7 +101,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/cadastro" element={<Register />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/roleta" element={<Roleta />} />
         <Route path="/roleta-test" element={<RoletaTestAutoSpin />} />

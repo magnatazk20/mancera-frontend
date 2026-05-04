@@ -154,8 +154,8 @@ export default function Login() {
 
           <p className="lo-register">
             Nenhuma conta?{' '}
-            <Link to="/cadastro" className="lo-register__link">
-              Registrar
+            <Link to="/register" className="lo-register__link">
+              Sign Up
             </Link>
           </p>
         </div>

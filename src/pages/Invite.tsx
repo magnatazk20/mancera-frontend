@@ -143,7 +143,7 @@ export default function Invite() {
     if (referralLinkState) return referralLinkState
     const origin = window.location.origin
     if (!refCode) return ''
-    return `${origin}/cadastro?ref=${encodeURIComponent(refCode)}`
+    return `${origin}/register?ref=${encodeURIComponent(refCode)}`
   }, [refCode, referralLinkState])
 
   const copyCode = async () => {
