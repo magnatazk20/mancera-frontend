@@ -125,9 +125,6 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-products'); setMenuOpen(false) }}>Produtos (Cycle)</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/mini-tasks'); setMenuOpen(false) }}>Mini Tasks</button>
 
-          <p className="dash-nav-group-title">Loja PGLM</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/shop-products'); setMenuOpen(false) }}>Produtos da Loja</button>
-
           <p className="dash-nav-group-title">Sistema</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-branding'); setMenuOpen(false) }}>Título e Foto do Site</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
