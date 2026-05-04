@@ -249,8 +249,8 @@ export default function MiningTask() {
       // Notifica a página /tasks para recarregar os dados
       window.dispatchEvent(new CustomEvent('mining-task-completed'))
 
-      // Recarrega a página após 500ms para garantir que Tasks.tsx veja os dados atualizados
-      setTimeout(() => window.location.href = '/tasks', 500)
+      // Navega de volta para /tasks (força remount do componente = dados frescos)
+      setTimeout(() => { window.location.href = '/tasks' }, 800)
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
     } finally {
