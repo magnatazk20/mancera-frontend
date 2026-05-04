@@ -259,8 +259,9 @@ export default function MiningTask() {
       setReward(Number(data.rewardAmount ?? 0))
       setMessage(data?.message ?? 'Tarefa concluída com sucesso.')
 
-      // Redirect IMEDIATO para /tasks — sem delay que causa problemas
-      window.location.href = '/tasks?t=' + Date.now()
+      // Redirect com reload forçado — elimina qualquer contexto React antigo
+      const url = '/tasks?t=' + Date.now() + '&reload=' + Math.random()
+      window.location.href = url
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
       completingRef.current = false
