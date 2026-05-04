@@ -33,6 +33,8 @@ export default function MiningTask() {
   const [loading, setLoading] = useState(false)
   const [checkingStatus, setCheckingStatus] = useState(true)
   const [alreadyCompletedToday, setAlreadyCompletedToday] = useState(false)
+  // Bloqueia duplo clique — setado ANTES de qualquer async call
+  const completingRef = useRef(false)
   const [message, setMessage] = useState('')
   const [reward, setReward] = useState<number | null>(null)
   const [toastMessage, setToastMessage] = useState('')
@@ -179,28 +181,37 @@ export default function MiningTask() {
   }, [isPlaying, watchedSeconds, alreadyCompletedToday, dailyLimitReached])
 
   const concluirTarefaVideo = async () => {
+    // Bloqueia duplo clique — completingRef é setado ANTES de qualquer async call
+    if (completingRef.current) return
+    completingRef.current = true
+
     if (alreadyCompletedToday) {
       setMessage('Você já concluiu esta tarefa hoje. Disponível novamente às 00:00.')
+      completingRef.current = false
       return
     }
 
     if (dailyLimitReached) {
       setMessage('Limite diário de tarefas atingido. Tente novamente amanhã.')
+      completingRef.current = false
       return
     }
 
     if (!podeConcluir) {
       setMessage('Assista ao vídeo por 00:30 para concluir a tarefa.')
+      completingRef.current = false
       return
     }
 
     if (rating < 1) {
       setMessage('Avalie a tarefa antes de receber a comissão.')
+      completingRef.current = false
       return
     }
 
     if (!user?.id || !taskId) {
       setMessage('Dados inválidos para concluir a tarefa.')
+      completingRef.current = false
       return
     }
 
@@ -223,6 +234,7 @@ export default function MiningTask() {
         data = await response.json()
       } catch {
         setMessage('Resposta inválida do servidor. Tente novamente.')
+        completingRef.current = false
         setLoading(false)
         return
       }
@@ -234,6 +246,7 @@ export default function MiningTask() {
         } else {
           setMessage(data?.error ?? 'Falha ao concluir tarefa de vídeo.')
         }
+        completingRef.current = false
         setLoading(false)
         return
       }
@@ -256,6 +269,7 @@ export default function MiningTask() {
       }, 800)
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
+      completingRef.current = false
     } finally {
       setLoading(false)
     }
