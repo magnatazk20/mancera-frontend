@@ -1618,3 +1618,85 @@
 .support-float-btn:active {
   transform: scale(0.95);
 }
+
+/* ── Página de Suporte ── */
+.support-cards {
+  display: flex;
+  gap: 20px;
+  padding: 24px 20px;
+  flex-wrap: wrap;
+}
+
+.support-card {
+  flex: 1;
+  min-width: 240px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(255, 138, 3, 0.12);
+  border: 1px solid rgba(255, 138, 3, 0.15);
+}
+
+.support-card__icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.support-card__icon--gerente {
+  background: linear-gradient(135deg, #ff8a03, #e67300);
+  color: #fff;
+}
+
+.support-card__icon--grupo {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #fff;
+}
+
+.support-card__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 10px;
+}
+
+.support-card__desc {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.support-card__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-card__btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.support-card__btn--gerente {
+  background: linear-gradient(135deg, #ff8a03, #e67300);
+}
+
+.support-card__btn--grupo {
+  background: linear-gradient(135deg, #25d366, #128c7e);
+}

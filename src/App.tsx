@@ -37,6 +37,7 @@ import Manual from './pages/Manual'
 import MonthlySalary from './pages/MonthlySalary'
 import RegistroDoDia from './pages/RegistroDoDia'
 import RegistrosTarefas from './pages/RegistrosTarefas'
+import Support from './pages/Support'
 import TeamExpansion from './pages/TeamExpansion'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
@@ -103,6 +104,7 @@ export default function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/support" element={<Support />} />
         <Route path="/roleta" element={<Roleta />} />
         <Route path="/roleta-test" element={<RoletaTestAutoSpin />} />
         <Route path="/sinuca" element={<Sinuca />} />
