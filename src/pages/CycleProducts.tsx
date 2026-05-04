@@ -449,8 +449,6 @@ export default function CycleProducts() {
 
                   <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
                     <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
-                    <div><strong>Lucro diário ({modalEffectivePercent}%):</strong> {formatBRL(modalDailyProfit)}</div>
-                    <div><strong>Lucro total ({modalTotalPercent}% em {selectedPlan.cycleDays} dias):</strong> {formatBRL(modalTotalProfit)}</div>
                     <div style={{
                       marginTop: 6,
                       padding: '8px 12px',
