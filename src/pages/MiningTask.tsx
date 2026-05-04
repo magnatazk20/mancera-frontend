@@ -262,8 +262,12 @@ export default function MiningTask() {
       // Notifica a página /tasks para recarregar os dados
       window.dispatchEvent(new CustomEvent('mining-task-completed'))
 
-      // Navega para /tasks com replace (força remount do componente Tasks)
-      setTimeout(() => navigate('/tasks', { replace: true }), 800)
+      // Full page reload com timestamp único — ignora qualquer cache do navegador
+      setTimeout(() => {
+        // Cria URL com cache-bust único
+        const url = '/tasks?t=' + Date.now() + '&r=' + Math.random()
+        window.location.href = url
+      }, 800)
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
       completingRef.current = false
