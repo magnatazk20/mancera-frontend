@@ -248,6 +248,9 @@ export default function MiningTask() {
 
       // Notifica a página /tasks para recarregar os dados
       window.dispatchEvent(new CustomEvent('mining-task-completed'))
+
+      // Redireciona para /tasks com replace (substitui histórico, não cria loop)
+      setTimeout(() => window.location.replace('/tasks'), 800)
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
     } finally {

@@ -57,12 +57,14 @@ export default function Tasks() {
 
   // AbortController cancela requisições anteriores quando uma nova chega (evita race conditions)
   const loadTasksCtrlRef = useRef<AbortController | null>(null)
+  const loadTasksMountedRef = useRef(true)
 
   const loadTasks = async () => {
     // Aborta qualquer requisição anterior pendente
     loadTasksCtrlRef.current?.abort()
     const controller = new AbortController()
     loadTasksCtrlRef.current = controller
+    loadTasksMountedRef.current = true
 
     setLoading(true)
     setError('')
@@ -81,6 +83,9 @@ export default function Tasks() {
       })
       const data = await response.json()
 
+      // Ignora resposta de requisição abortada ( superseded por outra mais recente )
+      if (controller.signal.aborted) return
+
       if (!response.ok || !data?.ok) {
         if (response.status === 403 || data?.code === 'VIP_REQUIRED') {
           setError('Você não possui VIP ativo. Ative um VIP para acessar as tarefas.')
@@ -93,6 +98,9 @@ export default function Tasks() {
         setLoading(false)
         return
       }
+
+      // Verifica novamente se foi abortada antes de setar state
+      if (controller.signal.aborted) return
 
       setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setVip(data.vip ?? null)
