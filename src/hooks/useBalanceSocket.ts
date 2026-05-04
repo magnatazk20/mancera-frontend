@@ -41,6 +41,16 @@ export function useBalanceSocket(
       }
     })
 
+    socket.on('force-logout', () => {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      sessionStorage.removeItem('token')
+      sessionStorage.removeItem('user')
+      socket.disconnect()
+      socketRef.current = null
+      window.location.href = '/?error=account_banned'
+    })
+
     return () => {
       socket.disconnect()
       socketRef.current = null
