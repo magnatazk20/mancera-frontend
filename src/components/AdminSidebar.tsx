@@ -126,6 +126,7 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/mini-tasks'); setMenuOpen(false) }}>Mini Tasks</button>
 
           <p className="dash-nav-group-title">Sistema</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-settings'); setMenuOpen(false) }}>⚙️ Configurações do Site</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-branding'); setMenuOpen(false) }}>Título e Foto do Site</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/community-links'); setMenuOpen(false) }}>Links da Comunidade</button>

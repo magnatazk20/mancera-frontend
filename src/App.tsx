@@ -57,6 +57,7 @@ import AdminTelegramConfig from './pages/AdminTelegramConfig'
 import AdminCycleProducts from './pages/AdminCycleProducts'
 import AdminMonthlySalary from './pages/AdminMonthlySalary'
 import AdminSiteBranding from './pages/AdminSiteBranding'
+import AdminSiteSettings from './pages/AdminSiteSettings'
 import AdminCommunityLinks from './pages/AdminCommunityLinks'
 import AdminMiniTasks from './pages/AdminMiniTasks'
 import AdminRouletteProbabilities from './pages/AdminRouletteProbabilities'
@@ -365,6 +366,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminMonthlySalary />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/site-settings"
+          element={(
+            <RequireMaxAdmin>
+              <AdminSiteSettings />
             </RequireMaxAdmin>
           )}
         />
