@@ -27,11 +27,13 @@ const readToken = () =>
 
 export default function AdminSiteSettings() {
   const [registrationRequiresInvite, setRegistrationRequiresInvite] = useState(false)
+  const [allowUserReferralLink, setAllowUserReferralLink] = useState(true)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [users, setUsers] = useState<UserRow[]>([])
   const [loadingUsers, setLoadingUsers] = useState(false)
   const [toggling, setToggling] = useState<number | null>(null)
+  const [bulkLoading, setBulkLoading] = useState(false)
   const [toast, setToast] = useState({ open: false, type: 'success' as 'success' | 'error', message: '' })
 
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -52,6 +54,7 @@ export default function AdminSiteSettings() {
         }
         const s = data.settings
         setRegistrationRequiresInvite(s.registrationRequiresInvite ?? false)
+        setAllowUserReferralLink(s.allowUserReferralLink ?? true)
       } catch {
         showToast('error', 'Erro de conexão ao carregar configurações.')
       } finally {
@@ -95,7 +98,7 @@ export default function AdminSiteSettings() {
           siteDescription: 'TRK',
           siteLogoUrl: '',
           telegramGroupLink: '',
-          allowUserReferralLink: true,
+          allowUserReferralLink,
           registrationRequiresInvite,
         }),
       })
@@ -141,6 +144,29 @@ export default function AdminSiteSettings() {
     }
   }
 
+  const handleBulkToggle = async (enable: boolean) => {
+    setBulkLoading(true)
+    try {
+      const token = readToken()
+      const res = await fetch(`${API_URL}/api/admin/users/referral-link-bulk`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ allow_referral_link: enable ? 1 : 0 }),
+      })
+      const data = await res.json() as { ok?: boolean; error?: string; updated?: number }
+      if (!res.ok || !data?.ok) {
+        showToast('error', data?.error ?? 'Erro ao atualizar.')
+        return
+      }
+      showToast('success', `${data.updated ?? 0} usuários atualizados.`)
+      setUsers((prev) => prev.map((u) => ({ ...u, allow_referral_link: enable ? 1 : 0 })))
+    } catch {
+      showToast('error', 'Erro de conexão.')
+    } finally {
+      setBulkLoading(false)
+    }
+  }
+
   return (
     <main className="admin-page">
       <AdminSidebar />
@@ -176,6 +202,19 @@ export default function AdminSiteSettings() {
                     </p>
                   </div>
                 </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={allowUserReferralLink}
+                    onChange={(e) => setAllowUserReferralLink(e.target.checked)}
+                  />
+                  <div>
+                    <strong>Permitir link de convite por padrão</strong>
+                    <p style={{ margin: 0, fontSize: 12, color: '#666' }}>
+                      Novos usuários criados terão o link de convite liberado automaticamente.
+                    </p>
+                  </div>
+                </label>
               </div>
             </section>
 
@@ -194,6 +233,15 @@ export default function AdminSiteSettings() {
               <div className="admin-panel-head">
                 <h2>Permissão de Link de Convite por Usuário</h2>
                 <span>Ative ou desative individualmente para cada usuário</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                <button type="button" className="btn paid" disabled={bulkLoading} onClick={() => handleBulkToggle(true)}>
+                  {bulkLoading ? '...' : '✅ Liberar todos'}
+                </button>
+                <button type="button" className="btn pending" disabled={bulkLoading} onClick={() => handleBulkToggle(false)}>
+                  {bulkLoading ? '...' : '❌ Bloquear todos'}
+                </button>
               </div>
 
               {loadingUsers ? (
