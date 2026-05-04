@@ -239,6 +239,8 @@ export default function MiningTask() {
         return
       }
 
+      console.log('[CONCLUIR-RESPONSE] ok=' + data?.ok + ' status=' + response.status + ' data=' + JSON.stringify(data))
+
       if (!response.ok || !data?.ok) {
         if (data?.code === 'TASK_ALREADY_COMPLETED_TODAY') {
           setAlreadyCompletedToday(true)
@@ -260,6 +262,7 @@ export default function MiningTask() {
       setMessage(data?.message ?? 'Tarefa concluída com sucesso.')
 
       // Redirect com reload forçado — elimina qualquer contexto React antigo
+      console.log('[CONCLUIR] userId=' + user.id + ' taskId=' + taskId + ' redirecting...')
       const url = '/tasks?t=' + Date.now() + '&reload=' + Math.random()
       window.location.href = url
     } catch {

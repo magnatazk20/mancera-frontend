@@ -107,6 +107,10 @@ export default function Tasks() {
       setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setVip(data.vip ?? null)
       setRemainingByVip(Number(data.remainingByVip ?? 0))
+
+      // DEBUG: mostra tasks com completedToday > 0
+      const completed = (data.tasks as any[]).filter((t: any) => Number(t.completedToday) > 0)
+      console.log('[TASKS-DEBUG] totalCompleted=' + data.totalCompletedToday + ' remaining=' + data.remainingByVip + ' completedTasks=' + JSON.stringify(completed.map(t => ({ id: t.id, name: t.name.slice(0, 20), completedToday: t.completedToday }))))
     } catch (err) {
       if ((err as Error)?.name === 'AbortError') return
       setError('Erro de conexão ao carregar tarefas.')
