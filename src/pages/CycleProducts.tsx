@@ -173,16 +173,6 @@ export default function CycleProducts() {
   const formatBRL = (value: number) =>
     Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-  const formatDateTime = (date: Date) =>
-    date.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    })
-
   const closePurchaseModal = () => {
     if (isBuying) return
     setSelectedPlan(null)
