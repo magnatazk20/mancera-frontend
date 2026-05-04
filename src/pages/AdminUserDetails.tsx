@@ -63,6 +63,7 @@ type UserDetailsResponse = {
     phone: string
     is_admin: number
     is_banned: number
+    allow_referral_link?: number
     created_at?: string
     balance: number
     shopBalance: number
@@ -128,6 +129,9 @@ export default function AdminUserDetails() {
   const [telegramMsgText, setTelegramMsgText] = useState('')
   const [telegramMsgLoading, setTelegramMsgLoading] = useState(false)
   const [telegramMsgFeedback, setTelegramMsgFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  const [referralLinkLoading, setReferralLinkLoading] = useState(false)
+  const [referralLinkFeedback, setReferralLinkFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const [withdrawPwdDeleteLoading, setWithdrawPwdDeleteLoading] = useState(false)
   const [withdrawPwdDeleteFeedback, setWithdrawPwdDeleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -258,6 +262,30 @@ export default function AdminUserDetails() {
       setWithdrawPwdModalOpen(false)
     } finally {
       setWithdrawPwdDeleteLoading(false)
+    }
+  }
+
+  const handleReferralLinkToggle = async () => {
+    if (!id || !user) return
+    setReferralLinkLoading(true)
+    setReferralLinkFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/referral-link`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ allow_referral_link: user.allow_referral_link ? 0 : 1 }),
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar.' })
+        return
+      }
+      setReferralLinkFeedback({ type: 'success', message: data?.message ?? 'Atualizado com sucesso.' })
+      await loadUserDetails()
+    } catch {
+      setReferralLinkFeedback({ type: 'error', message: 'Erro de conexão.' })
+    } finally {
+      setReferralLinkLoading(false)
     }
   }
 
@@ -624,6 +652,35 @@ export default function AdminUserDetails() {
               </p>
               <p><strong>Admin:</strong> {user.is_admin ? 'Sim' : 'Não'}</p>
               <p><strong>Status:</strong> {user.is_banned ? 'Banido' : 'Ativo'}</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <strong>Link de convite:</strong>
+                <span style={{ color: Number(user.allow_referral_link ?? 1) === 1 ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                  {Number(user.allow_referral_link ?? 1) === 1 ? '✅ Liberado' : '❌ Bloqueado'}
+                </span>
+                <button
+                  type="button"
+                  disabled={referralLinkLoading}
+                  onClick={handleReferralLinkToggle}
+                  style={{
+                    padding: '3px 10px',
+                    borderRadius: 8,
+                    border: '1.5px solid #6366f1',
+                    background: 'transparent',
+                    color: '#6366f1',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    cursor: referralLinkLoading ? 'not-allowed' : 'pointer',
+                    opacity: referralLinkLoading ? 0.6 : 1,
+                  }}
+                >
+                  {referralLinkLoading ? '...' : Number(user.allow_referral_link ?? 1) === 1 ? '🔒 Bloquear' : '🔓 Liberar'}
+                </button>
+                {referralLinkFeedback ? (
+                  <span style={{ fontSize: 12, color: referralLinkFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {referralLinkFeedback.message}
+                  </span>
+                ) : null}
+              </p>
               <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <strong>Telegram conectado:</strong>
                 <span>{Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</span>
