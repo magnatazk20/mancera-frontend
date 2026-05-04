@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import {
@@ -55,15 +55,23 @@ export default function Tasks() {
     }
   }, [])
 
+  // Bloqueia chamadas simultâneas de loadTasks ( StrictMode dispara effects 2× em dev )
+  const isLoadingRef = useRef(false)
+
   const loadTasks = async () => {
+    if (isLoadingRef.current) return
+    isLoadingRef.current = true
+    setLoading(true)
+    setError('')
+
     if (!user?.id) {
-      setError('Usuário não autenticado.')
+      setTasks([])
+      setVip(null)
+      setRemainingByVip(0)
+      isLoadingRef.current = false
       setLoading(false)
       return
     }
-
-    setLoading(true)
-    setError('')
 
     try {
       const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`)
@@ -78,14 +86,21 @@ export default function Tasks() {
         setTasks([])
         setVip(null)
         setRemainingByVip(0)
+        isLoadingRef.current = false
+        setLoading(false)
         return
       }
 
       setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setVip(data.vip ?? null)
       setRemainingByVip(Number(data.remainingByVip ?? 0))
+      isLoadingRef.current = false
     } catch {
       setError('Erro de conexão ao carregar tarefas.')
+      setTasks([])
+      setVip(null)
+      setRemainingByVip(0)
+      isLoadingRef.current = false
     } finally {
       setLoading(false)
     }
