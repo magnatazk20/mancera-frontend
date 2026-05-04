@@ -1,5 +1,8 @@
 /* ─── Banner TRK topo ──────────────────────────── */
-.profile-banner-top {
+.profile-page {
+  background: inherit;
+  color: #5a3d1a;
+}
   width: 100%;
   margin-bottom: 14px;
   border-radius: 14px;
@@ -41,13 +44,13 @@
   height: 64px;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  box-shadow: 0 8px 22px rgba(255, 138, 3, 0.25);
   transition: border-color 0.2s ease;
 }
 
 .profile-page .profile-avatar-btn:hover .profile-avatar-frame {
-  border-color: rgba(56, 189, 248, 0.6);
+  border-color: rgba(255, 138, 3, 0.6);
 }
 
 .profile-page .profile-avatar-img {
@@ -74,7 +77,7 @@
   font-size: 20px;
   font-weight: 800;
   line-height: 1.1;
-  color: #e2e8f0;
+  color: #5a3d1a;
   word-break: break-word;
 }
 
@@ -87,9 +90,9 @@
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: rgba(255, 138, 3, 0.12);
+  color: #ff8a03;
 }
 
 .profile-page .profile-user-badge-icon {
@@ -108,9 +111,9 @@
 }
 
 .profile-page .profile-user-badge-regular {
-  border-color: rgba(148, 163, 184, 0.35);
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
+  border-color: rgba(255, 138, 3, 0.35);
+  background: rgba(255, 138, 3, 0.12);
+  color: #ff8a03;
 }
 
 .profile-page .profile-user-badge-bronze {
@@ -146,9 +149,9 @@
 .profile-page .profile-vip-pill {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(148, 163, 184, 0.1);
-  color: #cbd5e1;
+  border: 1px solid rgba(255, 138, 3, 0.3);
+  background: rgba(255, 138, 3, 0.1);
+  color: #ff8a03;
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 12px;
@@ -168,7 +171,7 @@
   width: 14px;
   height: 14px;
   margin-left: 4px;
-  color: #94a3b8;
+  color: #ff8a03;
 }
 
 .profile-page .profile-invite-row {
@@ -176,13 +179,13 @@
   align-items: center;
   gap: 4px;
   flex-wrap: wrap;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 14px;
   font-weight: 600;
 }
 
 .profile-page .profile-invite-code {
-  color: #e2e8f0;
+  color: #5a3d1a;
   font-weight: 800;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
@@ -201,21 +204,21 @@
 }
 
 .profile-page .profile-vip-expiry--active {
-  background: rgba(16, 185, 129, 0.16);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.32);
+  background: rgba(45, 122, 58, 0.16);
+  color: #2d7a3a;
+  border: 1px solid rgba(45, 122, 58, 0.32);
 }
 
 .profile-page .profile-vip-expiry--expired {
-  background: rgba(239, 68, 68, 0.14);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.32);
+  background: rgba(185, 28, 28, 0.14);
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.32);
 }
 
 .profile-page .profile-vip-expiry--none {
-  background: rgba(148, 163, 184, 0.18);
-  color: #cbd5e1;
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(160, 128, 80, 0.18);
+  color: #8a6b3f;
+  border: 1px solid rgba(160, 128, 80, 0.3);
 }
 
 .profile-page .profile-copy-btn {
@@ -225,14 +228,14 @@
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #38bdf8;
+  color: #ff8a03;
   display: grid;
   place-items: center;
   cursor: pointer;
 }
 
 .profile-page .profile-copy-btn:hover {
-  background: rgba(56, 189, 248, 0.12);
+  background: rgba(255, 138, 3, 0.12);
 }
 
 .profile-page .profile-copy-icon {
@@ -241,7 +244,7 @@
 }
 
 .profile-page .profile-copy-feedback {
-  color: #34d399;
+  color: #2d7a3a;
   font-size: 12px;
   font-weight: 700;
   margin-left: 2px;
@@ -345,9 +348,9 @@
   margin: 0 0 12px;
   border-radius: 16px;
   padding: 16px;
-  border: 1px solid var(--dash-border);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.06) 0%, var(--dash-card) 52%, rgba(245, 158, 11, 0.06) 100%);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 24px rgba(90, 61, 26, 0.12);
 }
 
 .profile-page .gift-redeem-head {
@@ -364,8 +367,8 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
+  box-shadow: 0 6px 14px rgba(255, 138, 3, 0.25);
   color: #fff;
 }
 
@@ -381,21 +384,21 @@
 
 .profile-page .gift-redeem-copy h3 {
   margin: 0;
-  color: #e2e8f0;
+  color: #5a3d1a;
   font-size: 14px;
   font-weight: 700;
 }
 
 .profile-page .gift-redeem-copy p {
   margin: 2px 0 0;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 12px;
 }
 
 .profile-page .gift-redeem-spark {
   width: 20px;
   height: 20px;
-  color: #fbbf24;
+  color: #ff8a03;
   flex-shrink: 0;
 }
 
@@ -415,9 +418,9 @@
   min-width: 0;
   min-height: 44px;
   border-radius: 12px;
-  border: 1px solid var(--dash-border);
-  background: var(--dash-card-2);
-  color: #e2e8f0;
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   padding: 10px 12px;
   text-align: center;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
@@ -426,7 +429,7 @@
 }
 
 .profile-page .gift-redeem-input::placeholder {
-  color: #64748b;
+  color: #a08050;
 }
 
 .profile-page .gift-redeem-btn {
@@ -435,7 +438,7 @@
   border: none;
   border-radius: 12px;
   padding: 10px 14px;
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
@@ -492,7 +495,7 @@
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(2, 6, 23, 0.62);
+  background: rgba(90, 61, 26, 0.45);
   backdrop-filter: blur(5px);
 }
 
@@ -501,9 +504,9 @@
   width: min(92vw, 460px);
   border-radius: 22px;
   padding: 22px 20px 18px;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fbff 50%, #eef6ff 100%);
-  border: 1px solid #dbeafe;
-  box-shadow: 0 28px 68px rgba(2, 6, 23, 0.35);
+  background: linear-gradient(145deg, #ffffff 0%, #fff8ef 50%, #fff3e0 100%);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  box-shadow: 0 28px 68px rgba(90, 61, 26, 0.25);
   text-align: center;
   animation: redeemModalPop 340ms cubic-bezier(0.2, 0.85, 0.2, 1);
 }
@@ -542,20 +545,20 @@
   margin: 14px auto 0;
   padding: 12px 14px;
   border-radius: 14px;
-  border: 1px solid #bfdbfe;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(37, 99, 235, 0.12) 100%);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: linear-gradient(135deg, rgba(255, 211, 138, 0.08) 0%, rgba(255, 138, 3, 0.12) 100%);
   display: grid;
   gap: 4px;
 }
 
 .profile-page .redeem-modal-highlight span {
-  color: #334155;
+  color: #5a3d1a;
   font-size: 12px;
   font-weight: 700;
 }
 
 .profile-page .redeem-modal-highlight strong {
-  color: #1d4ed8;
+  color: #ff8a03;
   font-size: 28px;
   line-height: 1.1;
   font-weight: 900;
@@ -563,12 +566,12 @@
 
 .profile-page .redeem-modal-code {
   margin: 10px 0 0;
-  color: #475569;
+  color: #8a6b3f;
   font-size: 13px;
 }
 
 .profile-page .redeem-modal-code b {
-  color: #0f172a;
+  color: #5a3d1a;
 }
 
 .profile-page .redeem-modal-btn {
@@ -578,12 +581,12 @@
   min-height: 46px;
   padding: 10px 16px;
   width: 100%;
-  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
   color: #fff;
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
-  box-shadow: 0 12px 22px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 12px 22px rgba(255, 138, 3, 0.28);
 }
 
 .profile-page .redeem-modal-btn:hover {
@@ -607,13 +610,13 @@
   animation: confettiFall 2.4s linear infinite;
 }
 
-.profile-page .confetti-1 { left: 4%; background: #38bdf8; animation-delay: 0s; }
-.profile-page .confetti-2 { left: 12%; background: #f59e0b; animation-delay: .2s; }
-.profile-page .confetti-3 { left: 20%; background: #22c55e; animation-delay: .35s; }
-.profile-page .confetti-4 { left: 28%; background: #ef4444; animation-delay: .5s; }
-.profile-page .confetti-5 { left: 36%; background: #a78bfa; animation-delay: .65s; }
-.profile-page .confetti-6 { left: 44%; background: #06b6d4; animation-delay: .8s; }
-.profile-page .confetti-7 { left: 52%; background: #f97316; animation-delay: .95s; }
+.profile-page .confetti-1 { left: 4%; background: #ff8a03; animation-delay: 0s; }
+.profile-page .confetti-2 { left: 12%; background: #ffb347; animation-delay: .2s; }
+.profile-page .confetti-3 { left: 20%; background: #2d7a3a; animation-delay: .35s; }
+.profile-page .confetti-4 { left: 28%; background: #b91c1c; animation-delay: .5s; }
+.profile-page .confetti-5 { left: 36%; background: #5a3d1a; animation-delay: .65s; }
+.profile-page .confetti-6 { left: 44%; background: #ffe1b8; animation-delay: .8s; }
+.profile-page .confetti-7 { left: 52%; background: #fec075; animation-delay: .95s; }
 .profile-page .confetti-1:nth-child(8n) { left: 60%; animation-delay: 1.1s; }
 .profile-page .confetti-2:nth-child(9n) { left: 68%; animation-delay: 1.25s; }
 .profile-page .confetti-3:nth-child(10n) { left: 76%; animation-delay: 1.4s; }
@@ -649,10 +652,11 @@
   border-radius: 22px;
   padding: 28px 24px;
   background:
-    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.12), transparent 45%),
-    linear-gradient(135deg, #1e3a5f 0%, #2563eb 55%, #38bdf8 100%);
-  box-shadow: 0 20px 44px rgba(37, 99, 235, 0.3);
-  color: #ffffff;
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.45), transparent 45%),
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    linear-gradient(135deg, #fff5eb 0%, #ffe1b8 55%, #fec075 100%);
+  box-shadow: 0 20px 44px rgba(255, 138, 3, 0.25);
+  color: #5a3d1a;
   overflow: hidden;
 }
 
@@ -708,40 +712,40 @@
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
+  color: #8a6b3f;
   font-weight: 700;
 }
 
 .profile-page .profile-hero h1 {
   margin: 6px 0 8px;
-  color: #ffffff;
+  color: #5a3d1a;
   font-size: 2rem;
   font-weight: 900;
   letter-spacing: 0.4px;
-  text-shadow: 0 2px 8px rgba(15, 23, 42, 0.4);
+  text-shadow: 0 2px 8px rgba(255, 138, 3, 0.15);
 }
 
 .profile-page .profile-hero__subtitle {
   margin: 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: #8a6b3f;
   font-size: 0.95rem;
   max-width: 540px;
   line-height: 1.45;
-  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
+  text-shadow: 0 1px 2px rgba(255, 138, 3, 0.1);
 }
 
 .profile-page .profile-hero__back {
   align-self: flex-start;
   text-decoration: none;
   background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  color: #2563eb;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  color: #ff8a03;
   border-radius: 999px;
   padding: 10px 16px;
   font-weight: 800;
   font-size: 0.85rem;
   white-space: nowrap;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 6px 14px rgba(255, 138, 3, 0.2);
   transition: transform 0.15s ease, filter 0.15s ease;
   cursor: pointer;
 }
@@ -839,17 +843,17 @@
   display: flex;
   flex-wrap: wrap;
   padding: 1px;
-  background: var(--dash-card);
-  border: 1px solid var(--dash-border);
-  border-radius: 10px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .profile-page .profile-menu-item {
   flex-basis: 25%;
   width: 80px;
   border: none;
-  background: var(--dash-card);
+  background: transparent;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -857,17 +861,12 @@
   justify-content: center;
   padding: 14px 4px;
   gap: 8px;
-  border-right: 1px solid var(--dash-border);
-  border-bottom: 1px solid var(--dash-border);
-}
-
-.profile-page .profile-menu-item:nth-child(4n) {
-  border-right: none;
+  border: none;
 }
 
 .profile-page .profile-menu-item:active {
   opacity: 0.7;
-  background: var(--dash-card-2);
+  background: transparent;
 }
 
 .profile-page .profile-menu-icon-wrap {
@@ -886,7 +885,7 @@
 
 .profile-page .profile-menu-label {
   font-size: 12px;
-  color: #cbd5e1;
+  color: #5a3d1a;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   text-align: center;
@@ -894,9 +893,9 @@
 }
 
 .profile-page .profile-menu-item.logout .profile-menu-icon-wrap svg {
-  color: #f87171;
+  color: #b91c1c;
 }
 
 .profile-page .profile-menu-item.logout .profile-menu-label {
-  color: #f87171;
+  color: #b91c1c;
 }

@@ -2,7 +2,11 @@
 
 .ck-page {
   min-height: 100vh;
-  background: #f7f7f7;
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
 }

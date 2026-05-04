@@ -1,6 +1,6 @@
 .admin-page {
   min-height: 100vh;
-  color: #e9eefc;
+  color: #5a3d1a;
   display: grid;
   grid-template-columns: 272px minmax(0, 1fr);
 }
@@ -29,7 +29,7 @@
 
 .admin-subtitle {
   margin: 8px 0 0;
-  color: #b5c2e2;
+  color: #8a6b3f;
 }
 
 .admin-header-meta {
@@ -39,9 +39,9 @@
 }
 
 .admin-chip {
-  background: #293a62;
-  color: #dfe9ff;
-  border: 1px solid #3b5188;
+  background: rgba(255, 255, 255, 0.85);
+  color: #5a3d1a;
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 999px;
   padding: 8px 12px;
   font-size: 0.85rem;
@@ -49,14 +49,14 @@
 }
 
 .admin-chip.soft {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 245, 235, 0.6);
+  border-color: rgba(255, 138, 3, 0.18);
 }
 
 .admin-chip--online {
-  background: rgba(16, 185, 80, 0.15);
-  border-color: rgba(16, 185, 80, 0.4);
-  color: #34d470;
+  background: rgba(45, 122, 58, 0.15);
+  border-color: rgba(45, 122, 58, 0.4);
+  color: #2d7a3a;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -91,7 +91,7 @@
 
 .admin-kpi-label {
   font-size: 0.88rem;
-  color: #b9c7e8;
+  color: #8a6b3f;
   font-weight: 600;
 }
 
@@ -99,13 +99,13 @@
   display: block;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #fff;
+  color: #5a3d1a;
   margin-top: 4px;
 }
 
 .admin-kpi-sub {
   font-size: 0.85rem;
-  color: #7c92c4;
+  color: #8a6b3f;
   margin-top: 2px;
 }
 
@@ -117,8 +117,8 @@
 }
 
 .admin-kpi-card {
-  background: linear-gradient(180deg, #1a2440, #111a31);
-  border: 1px solid #2a3a63;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 16px;
 }
@@ -126,7 +126,7 @@
 .admin-kpi-card h3 {
   margin: 0;
   font-size: 0.95rem;
-  color: #b9c7e8;
+  color: #8a6b3f;
   font-weight: 600;
 }
 
@@ -134,13 +134,13 @@
   display: block;
   margin-top: 8px;
   font-size: 1.45rem;
-  color: #ffffff;
+  color: #5a3d1a;
 }
 
 .admin-kpi-card p {
   margin: 6px 0 0;
   font-size: 0.82rem;
-  color: #95a7d2;
+  color: #8a6b3f;
 }
 
 /* segunda linha de KPIs (depósitos e saques hoje/mês) */
@@ -151,40 +151,40 @@
 
 /* card destaque — cadastros hoje */
 .admin-kpi-card--highlight {
-  border-color: #2563eb;
-  background: linear-gradient(180deg, #1a2f5a, #111a31);
+  border-color: rgba(255, 138, 3, 0.45);
+  background: rgba(255, 255, 255, 0.90);
 }
 
 .admin-kpi-card--highlight strong {
-  color: #60a5fa;
+  color: #ff8a03;
 }
 
 /* cards de depósito */
 .admin-kpi-card--deposit {
-  border-color: #166534;
-  background: linear-gradient(180deg, #14281f, #111a31);
+  border-color: rgba(45, 122, 58, 0.45);
+  background: rgba(255, 255, 255, 0.90);
 }
 
 .admin-kpi-card--deposit strong {
-  color: #4ade80;
+  color: #2d7a3a;
 }
 
 .admin-kpi-card--deposit p {
-  color: #86efac;
+  color: #2d7a3a;
 }
 
 /* cards de saque */
 .admin-kpi-card--withdraw {
-  border-color: #7f1d1d;
-  background: linear-gradient(180deg, #2a1515, #111a31);
+  border-color: rgba(185, 28, 28, 0.45);
+  background: rgba(255, 255, 255, 0.90);
 }
 
 .admin-kpi-card--withdraw strong {
-  color: #f87171;
+  color: #b91c1c;
 }
 
 .admin-kpi-card--withdraw p {
-  color: #fca5a5;
+  color: #b91c1c;
 }
 
 .admin-grid {
@@ -194,8 +194,8 @@
 }
 
 .admin-panel {
-  background: rgba(17, 25, 45, 0.9);
-  border: 1px solid #25375e;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   padding: 14px;
 }
@@ -214,10 +214,11 @@
 .admin-panel-head h2 {
   margin: 0;
   font-size: 1.05rem;
+  color: #5a3d1a;
 }
 
 .admin-panel-head span {
-  color: #9cb0df;
+  color: #8a6b3f;
   font-size: 0.82rem;
 }
 
@@ -228,9 +229,9 @@
 }
 
 .admin-shortcuts button {
-  background: linear-gradient(180deg, #22355f, #1a2b4d);
-  color: #e8efff;
-  border: 1px solid #3b5a99;
+  background: rgba(255, 255, 255, 0.85);
+  color: #5a3d1a;
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
@@ -239,13 +240,13 @@
 }
 
 .admin-shortcuts button:hover {
-  background: #24365f;
+  background: rgba(255, 245, 235, 0.9);
 }
 
 .admin-status-list {
   margin: 0;
   padding-left: 18px;
-  color: #d6e1ff;
+  color: #5a3d1a;
   line-height: 1.8;
 }
 
@@ -261,13 +262,13 @@
 .admin-table th,
 .admin-table td {
   padding: 10px;
-  border-bottom: 1px solid #25375e;
+  border-bottom: 1px solid rgba(255, 138, 3, 0.12);
   text-align: left;
   white-space: nowrap;
 }
 
 .admin-table th {
-  color: #a9bce6;
+  color: #8a6b3f;
   font-weight: 700;
 }
 
@@ -280,18 +281,18 @@
 }
 
 .status.pending {
-  background: #4f3a16;
-  color: #ffcf7a;
+  background: rgba(255, 138, 3, 0.12);
+  color: #ff8a03;
 }
 
 .status.paid {
-  background: #153d2a;
-  color: #7cf0ba;
+  background: rgba(45, 122, 58, 0.12);
+  color: #2d7a3a;
 }
 
 .status.processing {
-  background: #1d3459;
-  color: #8fc2ff;
+  background: rgba(255, 138, 3, 0.08);
+  color: #8a6b3f;
 }
 
 @media (max-width: 1500px) {
@@ -316,9 +317,9 @@
 .admin-dash-user-chip {
   margin-top: 10px;
   padding: 8px 10px 12px;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 0.78rem;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+  border-bottom: 1px solid rgba(255, 138, 3, 0.15);
 }
 
 .admin-mobile-topbar {
@@ -332,13 +333,13 @@
 
 .admin-mobile-user strong {
   font-size: 0.88rem;
-  color: #e5e7eb;
+  color: #5a3d1a;
   line-height: 1.1;
 }
 
 .admin-mobile-user small {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #8a6b3f;
   line-height: 1.1;
 }
 
@@ -373,8 +374,8 @@
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-    background: rgba(9, 14, 26, 0.96);
+    border-bottom: 1px solid rgba(255, 138, 3, 0.15);
+    background: rgba(255, 245, 235, 0.96);
     backdrop-filter: blur(4px);
   }
 
@@ -475,9 +476,9 @@
   align-items: end;
   margin-bottom: 12px;
   padding: 12px;
-  border: 1px solid #25375e;
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
-  background: rgba(12, 20, 37, 0.72);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .admin-withdraw-filter-field {
@@ -487,7 +488,7 @@
 
 .admin-withdraw-filter-field label {
   font-size: 0.77rem;
-  color: #9cb0df;
+  color: #8a6b3f;
   font-weight: 700;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -496,21 +497,21 @@
 .admin-withdraw-filter-input {
   height: 38px;
   border-radius: 10px;
-  border: 1px solid #334a7a;
-  background: #101a30;
-  color: #e6eeff;
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   padding: 0 12px;
   outline: none;
   font-size: 0.9rem;
 }
 
 .admin-withdraw-filter-input::placeholder {
-  color: #7f95c2;
+  color: #a08050;
 }
 
 .admin-withdraw-filter-input:focus {
-  border-color: #4a6fb8;
-  box-shadow: 0 0 0 2px rgba(74, 111, 184, 0.28);
+  border-color: #ff8a03;
+  box-shadow: 0 0 0 2px rgba(255, 138, 3, 0.15);
 }
 
 .admin-withdraw-filter-actions {
@@ -553,7 +554,7 @@
 
 .admin-cycle-field label {
   font-size: 0.82rem;
-  color: #9cb0df;
+  color: #8a6b3f;
   font-weight: 700;
 }
 
@@ -561,9 +562,9 @@
 .admin-cycle-field textarea {
   width: 100%;
   border-radius: 10px;
-  border: 1px solid #334a7a;
-  background: #101a30;
-  color: #e6eeff;
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   padding: 10px 12px;
   outline: none;
   font-size: 0.92rem;
@@ -572,13 +573,13 @@
 
 .admin-cycle-field input::placeholder,
 .admin-cycle-field textarea::placeholder {
-  color: #7f95c2;
+  color: #a08050;
 }
 
 .admin-cycle-field input:focus,
 .admin-cycle-field textarea:focus {
-  border-color: #4a6fb8;
-  box-shadow: 0 0 0 2px rgba(74, 111, 184, 0.28);
+  border-color: #ff8a03;
+  box-shadow: 0 0 0 2px rgba(255, 138, 3, 0.15);
 }
 
 .admin-cycle-checkbox {
@@ -605,10 +606,10 @@
 }
 
 .admin-cycle-item {
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 10px;
   padding: 12px;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 .admin-cycle-item-head {
@@ -619,22 +620,22 @@
 }
 
 .admin-cycle-item-title {
-  color: #f8fafc;
+  color: #5a3d1a;
 }
 
 .admin-cycle-item-description {
   margin: 6px 0;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .admin-cycle-item-meta {
   margin: 0;
-  color: #cbd5e1;
+  color: #5a3d1a;
 }
 
 .admin-cycle-item-meta.secondary {
   margin-top: 6px;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .admin-cycle-item-actions {
@@ -644,8 +645,12 @@
 }
 
 .admin-cycle-delete-btn {
-  background: #7f1d1d;
-  color: #fff;
+  background: rgba(185, 28, 28, 0.15);
+  color: #b91c1c;
+}
+
+.admin-cycle-delete-btn:hover {
+  background: rgba(185, 28, 28, 0.25);
 }
 
 /* ── Resumo de saques pendentes ── */
@@ -657,8 +662,8 @@
 }
 
 .apw-summary-card {
-  background: linear-gradient(180deg, #1a2440, #111a31);
-  border: 1px solid #2a3a63;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
@@ -667,13 +672,12 @@
 }
 
 .apw-summary-card--amount {
-  border-color: #7f3a1a;
-  background: linear-gradient(180deg, #2a1a10, #111a31);
+  border-color: rgba(255, 138, 3, 0.45);
 }
 
 .apw-summary-label {
   font-size: 0.78rem;
-  color: #8a9ec8;
+  color: #8a6b3f;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -682,17 +686,17 @@
 .apw-summary-value {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #ffffff;
+  color: #5a3d1a;
   line-height: 1.1;
 }
 
 .apw-summary-card--amount .apw-summary-value {
-  color: #fb923c;
+  color: #ff8a03;
 }
 
 .apw-summary-sub {
   font-size: 0.76rem;
-  color: #7a93c8;
+  color: #8a6b3f;
 }
 
 @media (max-width: 480px) {
@@ -749,8 +753,8 @@
   }
 
   .admin-withdraw-card {
-    border: 1px solid #25375e;
-    background: rgba(13, 21, 38, 0.85);
+    border: 1px solid rgba(255, 138, 3, 0.22);
+    background: rgba(255, 255, 255, 0.85);
     border-radius: 10px;
     padding: 10px;
   }
@@ -761,7 +765,7 @@
     gap: 8px;
     margin-bottom: 6px;
     font-size: 0.82rem;
-    color: #dbe7ff;
+    color: #5a3d1a;
   }
 
   .admin-withdraw-row:last-child {
@@ -769,7 +773,7 @@
   }
 
   .admin-withdraw-row strong {
-    color: #9cb0df;
+    color: #8a6b3f;
     font-size: 0.78rem;
   }
 

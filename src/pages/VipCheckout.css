@@ -495,6 +495,117 @@
   overflow-x: auto;
 }
 
+/* ── Wallet Selector ── */
+.vip-checkout-wallet-section {
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(255,138,3,0.22);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vip-checkout-wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.vip-checkout-wallet-card {
+  border: 2px solid rgba(255,138,3,0.22);
+  border-radius: 14px;
+  padding: 16px 14px;
+  background: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.vip-checkout-wallet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.vip-checkout-wallet-card--selected {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.vip-checkout-wallet-icon {
+  font-size: 1.5rem;
+  width: 36px;
+  text-align: center;
+}
+
+.vip-checkout-wallet-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.vip-checkout-wallet-label {
+  font-size: 0.8rem;
+  color: #8a6b3f;
+  font-weight: 600;
+}
+
+.vip-checkout-wallet-value {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.vip-checkout-wallet-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.vip-checkout-wallet-hint {
+  font-size: 0.78rem;
+  color: #a08050;
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Wallet Select ── */
+.vip-checkout-select-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vip-checkout-select {
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  border: 2px solid rgba(255,138,3,0.22);
+  border-radius: 14px;
+  background: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #5a3d1a;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.vip-checkout-select:focus {
+  border-color: #ff8a03;
+  box-shadow: 0 0 0 3px rgba(255,138,3,0.15);
+}
+
+.vip-checkout-select-arrow {
+  position: absolute;
+  right: 14px;
+  pointer-events: none;
+  color: #a08050;
+}
+
 /* ── Responsividade ── */
 @media (max-width: 560px) {
   .vip-checkout-header h1 {

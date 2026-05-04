@@ -1,14 +1,7 @@
-/* ===== Checkout Page — Bank Style (White Background) ===== */
+/* ===== Checkout Page — Bank Style ===== */
 
-/* Override dash-content background for checkout */
-.dash-app:has(.checkout-container) .dash-content {
-  background: #f5f7fa;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Bank pattern background icons */
-.dash-app:has(.checkout-container) .dash-content::before {
+/* Checkout uses profile-page default background (bege gradient) */
+.profile-page:has(.checkout-container) .dash-content::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -31,9 +24,7 @@
 
 .checkout-container {
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 0 32px;
+  padding: 0 16px 32px;
   display: flex;
   flex-direction: column;
   gap: 16px;

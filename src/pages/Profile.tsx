@@ -470,14 +470,14 @@ export default function Profile() {
                   </div>
                   <span className="profile-menu-label">Registros Contábeis</span>
                 </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/vip-rules')}>
+                <button type="button" className="profile-menu-item" onClick={() => navigate('/statement')}>
                   <div className="profile-menu-icon-wrap">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M3 17l4-8l5 6l3-4l4 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       <path d="M3 20h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                   </div>
-                  <span className="profile-menu-label">Valorização da riqueza</span>
+                  <span className="profile-menu-label">Extrato</span>
                 </button>
                 <button type="button" className="profile-menu-item" onClick={() => navigate('/bank-cards')}>
                   <div className="profile-menu-icon-wrap">

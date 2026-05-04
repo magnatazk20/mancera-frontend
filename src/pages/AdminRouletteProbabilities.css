@@ -1,6 +1,6 @@
 .admin-roulette-prob-page {
   min-height: 100vh;
-  color: #e9eefc;
+  color: #5a3d1a;
   display: grid;
   grid-template-columns: 272px minmax(0, 1fr);
 }
@@ -13,8 +13,8 @@
 }
 
 .admin-roulette-prob-card {
-  background: rgba(17, 25, 45, 0.9);
-  border: 1px solid #25375e;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   padding: 16px;
 }
@@ -23,12 +23,12 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 800;
-  color: #f8fbff;
+  color: #5a3d1a;
 }
 
 .admin-roulette-prob-subtitle {
   margin: 8px 0 0;
-  color: #b5c2e2;
+  color: #8a6b3f;
   font-size: 0.92rem;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .admin-roulette-prob-label {
-  color: #e2e8f0;
+  color: #5a3d1a;
   font-weight: 600;
 }
 
@@ -56,9 +56,9 @@
 
 .admin-roulette-prob-input {
   width: 100%;
-  border: 1px solid #334a7a;
-  background: #101a30;
-  color: #e6eeff;
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   border-radius: 10px;
   padding: 10px 28px 10px 10px;
   box-sizing: border-box;
@@ -67,8 +67,8 @@
 }
 
 .admin-roulette-prob-input:focus {
-  border-color: #4a6fb8;
-  box-shadow: 0 0 0 2px rgba(74, 111, 184, 0.28);
+  border-color: #ff8a03;
+  box-shadow: 0 0 0 2px rgba(255, 138, 3, 0.15);
 }
 
 .admin-roulette-prob-percent {
@@ -76,7 +76,7 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: #93c5fd;
+  color: #8a6b3f;
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -87,11 +87,11 @@
 }
 
 .admin-roulette-prob-total.ok {
-  color: #86efac;
+  color: #2d7a3a;
 }
 
 .admin-roulette-prob-total.bad {
-  color: #fca5a5;
+  color: #b91c1c;
 }
 
 .admin-roulette-prob-actions {
@@ -102,9 +102,9 @@
 }
 
 .admin-roulette-prob-save-btn {
-  border: 1px solid #3b82f6;
-  background: #1d4ed8;
-  color: #dbeafe;
+  border: 1px solid rgba(255, 138, 3, 0.45);
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
+  color: #ffffff;
   border-radius: 8px;
   padding: 10px 14px;
   font-weight: 700;
@@ -112,20 +112,21 @@
 }
 
 .admin-roulette-prob-save-btn:disabled {
-  background: #1e3a8a;
+  background: #d4c9b8;
+  color: #9a8a6f;
   cursor: not-allowed;
 }
 
 .admin-roulette-prob-feedback {
   margin-top: 12px;
-  color: #93c5fd;
+  color: #8a6b3f;
   font-weight: 600;
 }
 
 .admin-roulette-prob-feedback--error {
-  color: #fca5a5;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #b91c1c;
+  background: rgba(185, 28, 28, 0.12);
+  border: 1px solid rgba(185, 28, 28, 0.35);
   border-radius: 8px;
   padding: 10px 14px;
 }

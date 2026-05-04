@@ -1,16 +1,47 @@
 /* ═══════════════════════════════════════════════════════════════
-   Salario Mensal — mesmo tema escuro do Dashboard
+   Salario Mensal
 ═══════════════════════════════════════════════════════════════ */
+
+.ms-content {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px 60px;
+}
+
+/* ── Descrição ── */
+.ms-desc {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  border-radius: 16px;
+  padding: 16px 18px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.ms-desc p {
+  margin: 0;
+  color: #8a6b3f;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
 
 /* ── Banner header ─────────────────────────────────── */
 .ms-banner {
   position: relative;
   border-radius: 16px;
-  padding: 22px 20px;
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  padding: 22px 20px 18px;
+  background: linear-gradient(135deg, #ff8a03 0%, #f7a93b 55%, #f7d981 100%);
   border: none;
   overflow: hidden;
+  box-shadow: 0 20px 44px rgba(255, 138, 3, 0.3);
   color: #ffffff;
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
 }
 
 .ms-banner__bg {
@@ -78,7 +109,6 @@
   color: rgba(255, 255, 255, 0.85);
   font-size: 0.88rem;
   line-height: 1.45;
-  max-width: 520px;
 }
 
 /* ── Modal de feedback ─────────────────────────────── */
@@ -86,7 +116,7 @@
   position: fixed;
   inset: 0;
   z-index: 50;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(90, 61, 26, 0.45);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -101,8 +131,8 @@
 }
 
 .ms-modal {
-  background: var(--dash-card, #121a2b);
-  border: 1px solid var(--dash-border, rgba(148, 163, 184, 0.22));
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 18px;
   padding: 28px 24px;
   max-width: 400px;
@@ -113,7 +143,7 @@
   align-items: center;
   gap: 12px;
   animation: ms-modal-in 0.25s ease;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(90, 61, 26, 0.18);
 }
 
 @keyframes ms-modal-in {
@@ -155,7 +185,7 @@
 
 .ms-modal__message {
   margin: 0;
-  color: var(--dash-text, #e5e7eb);
+  color: #5a3d1a;
   font-size: 0.9rem;
   line-height: 1.5;
   word-break: break-word;
@@ -176,7 +206,7 @@
 .ms-modal--error .ms-modal__btn {
   background: rgba(248, 113, 113, 0.18);
   border: 1px solid rgba(248, 113, 113, 0.35);
-  color: #fca5a5;
+  color: #b91c1c;
 }
 
 .ms-modal--error .ms-modal__btn:hover {
@@ -184,9 +214,9 @@
 }
 
 .ms-modal--success .ms-modal__btn {
-  background: rgba(52, 211, 153, 0.18);
-  border: 1px solid rgba(52, 211, 153, 0.35);
-  color: #6ee7b7;
+  background: rgba(45, 122, 58, 0.18);
+  border: 1px solid rgba(45, 122, 58, 0.35);
+  color: #2d7a3a;
 }
 
 .ms-modal--success .ms-modal__btn:hover {
@@ -195,277 +225,155 @@
 
 /* ── Empty / loading card ──────────────────────────── */
 .ms-empty-card {
-  background: var(--dash-card);
-  border: 1px solid var(--dash-border);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 16px;
   padding: 24px 16px;
   text-align: center;
-  color: var(--dash-muted);
+  color: #8a6b3f;
   font-weight: 600;
   font-size: 0.9rem;
+  max-width: 480px;
+  width: 100%;
 }
 
-/* ── Grid de planos ──────────────────────────────── */
+/* ── Grid ──────────────────────────────────────────── */
 .ms-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr;
-}
-
-/* ── Card ────────────────────────────────────────── */
-.ms-card {
-  background: var(--dash-card);
-  border: 1px solid var(--dash-border);
-  border-radius: 16px;
-  overflow: hidden;
+  width: 100%;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Card ──────────────────────────────────────────── */
+.ms-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  border-radius: 16px;
+  overflow: hidden;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .ms-card:hover {
-  border-color: rgba(56, 189, 248, 0.35);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 138, 3, 0.40);
+  box-shadow: 0 8px 24px rgba(255, 138, 3, 0.15);
 }
 
-/* ── Card image ── */
-.ms-card__img-wrap {
-  position: relative;
-  width: 100%;
-  height: 160px;
+.ms-card__image {
+  width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 138, 3, 0.05);
+  border-left: 1px solid rgba(255, 138, 3, 0.12);
+  padding: 8px;
   overflow: hidden;
-  background: var(--dash-card-2);
+  border-radius: 0 16px 16px 0;
 }
 
-.ms-card__img {
-  width: 100%;
-  height: 100%;
+.ms-card__image img {
+  width: 70px;
+  height: 70px;
   object-fit: cover;
-  display: block;
-}
-
-.ms-card__img-placeholder {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  color: var(--dash-muted);
-  opacity: 0.5;
-}
-
-.ms-card__tag {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  background: rgba(56, 189, 248, 0.85);
-  color: #ffffff;
-  border-radius: 8px;
-  padding: 4px 10px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  backdrop-filter: blur(6px);
-}
-
-.ms-card__salary-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: rgba(52, 211, 153, 0.85);
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 800;
-  backdrop-filter: blur(4px);
-}
-
-.ms-card__salary-badge small {
-  font-size: 0.6rem;
-  font-weight: 600;
-  opacity: 0.85;
+  border-radius: 10px;
 }
 
 /* ── Card body ── */
 .ms-card__body {
-  padding: 14px 16px 16px;
+  padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.ms-card__left {
   flex: 1;
-}
-
-.ms-card__price {
   display: flex;
   flex-direction: column;
-  line-height: 1.1;
+  align-items: center;
 }
 
-.ms-card__price small {
-  color: var(--dash-muted);
+.ms-card__salary {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 16px 18px;
+  background: linear-gradient(135deg, #ff8a03 0%, #f7a93b 55%, #f7d981 100%);
+  gap: 2px;
+}
+
+.ms-card__salary small {
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.7rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
 }
 
-.ms-card__price strong {
-  color: var(--dash-green);
-  font-size: 1.45rem;
+.ms-card__salary strong {
+  color: #ffffff;
+  font-size: 1.6rem;
   font-weight: 900;
   letter-spacing: 0.3px;
 }
 
-/* ── Info rows ── */
-.ms-card__info {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ms-card__info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: var(--dash-card-2);
-  border: 1px solid var(--dash-border);
-  font-size: 0.82rem;
-  color: var(--dash-text);
-  font-weight: 500;
-}
-
-.ms-card__info-row svg {
-  color: var(--dash-blue);
-  flex-shrink: 0;
-}
-
-.ms-card__info-row strong {
-  font-weight: 800;
-  color: var(--dash-text);
-}
-
-.ms-card__info-row--highlight {
-  background: rgba(56, 189, 248, 0.08);
-  border-color: rgba(56, 189, 248, 0.22);
-}
-
-.ms-card__info-row--highlight strong {
-  color: var(--dash-blue);
-}
-
 /* ── Requirements ── */
-.ms-requirements {
-  background: rgba(124, 58, 237, 0.08);
-  border: 1px solid rgba(124, 58, 237, 0.22);
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-
-.ms-requirements__title {
+.ms-card__requirements {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--dash-muted);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.ms-requirements__title svg {
-  color: rgba(167, 139, 250, 0.8);
-  flex-shrink: 0;
-}
-
-.ms-requirements__list {
-  display: flex;
+  justify-content: center;
   gap: 8px;
-  flex-wrap: wrap;
+  padding: 12px 16px;
 }
 
-.ms-requirements__item {
+.ms-req {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   flex: 1;
-  min-width: 60px;
-  background: rgba(124, 58, 237, 0.10);
-  border: 1px solid rgba(124, 58, 237, 0.18);
-  border-radius: 10px;
-  padding: 8px 6px;
 }
 
-.ms-requirements__label {
-  font-size: 0.65rem;
+.ms-req__label {
+  color: #8a6b3f;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--dash-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.ms-requirements__item strong {
-  font-size: 1.1rem;
-  font-weight: 900;
-  color: #a78bfa;
-}
-
-.ms-requirements__sub {
-  font-size: 0.62rem;
-  color: var(--dash-muted);
-  font-weight: 500;
+.ms-req__value {
+  color: #ff8a03;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
 /* ── CTA Button ── */
 .ms-btn {
-  margin-top: auto;
   width: 100%;
   border: 0;
-  border-radius: 12px;
-  padding: 12px 12px;
+  border-radius: 0 0 0 0;
+  margin-top: auto;
+  padding: 14px 16px;
   font-weight: 700;
   font-size: 0.9rem;
   cursor: pointer;
-  background: linear-gradient(135deg, var(--dash-blue), #7c3aed);
-  color: #ffffff;
+  background: #ffffff;
+  color: #ff8a03;
   letter-spacing: 0.3px;
-  box-shadow: 0 6px 16px rgba(56, 189, 248, 0.20);
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .ms-btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.08);
+  background: #ff8a03;
+  color: #ffffff;
 }
 
 .ms-btn:disabled {
-  background: var(--dash-card-2);
-  color: var(--dash-muted);
+  background: rgba(255, 245, 235, 0.6);
+  color: #8a6b3f;
   cursor: not-allowed;
-  box-shadow: none;
-  border: 1px solid var(--dash-border);
-}
-
-/* ── Responsividade ──────────────────────────────── */
-@media (min-width: 600px) {
-  .ms-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 960px) {
-  .ms-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .ms-card__img-wrap {
-    height: 180px;
-  }
 }

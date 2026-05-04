@@ -1,14 +1,19 @@
 .mini-tasks-page {
   min-height: 100vh;
-  color: #e5e7eb;
+  color: #5a3d1a;
   padding: 22px 16px 92px;
   max-width: 980px;
   margin: 0 auto;
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
 }
 
 .mini-tasks-hero {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.85));
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b, #f7d981);
+  border: 1px solid rgba(255, 138, 3, 0.35);
   border-radius: 16px;
   padding: 16px;
   margin-bottom: 14px;
@@ -16,13 +21,13 @@
 
 .mini-tasks-hero h2 {
   margin: 0;
-  color: #f8fafc;
+  color: #fff;
   font-size: 20px;
 }
 
 .mini-tasks-hero p {
   margin: 8px 0 0;
-  color: #cbd5e1;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
 }
 
@@ -36,8 +41,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 14px;
 }
@@ -52,8 +57,8 @@
   width: 30px;
   height: 30px;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.2);
-  color: #93c5fd;
+  background: rgba(255, 138, 3, 0.15);
+  color: #b45309;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -64,13 +69,13 @@
 .mini-task-title {
   margin: 0;
   font-size: 15px;
-  color: #f8fafc;
+  color: #5a3d1a;
 }
 
 .mini-task-sub {
   margin: 2px 0 0;
   font-size: 12px;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .mini-task-badge {
@@ -78,226 +83,70 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid rgba(250, 204, 21, 0.35);
-  background: rgba(250, 204, 21, 0.12);
-  color: #fde68a;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: rgba(255, 138, 3, 0.12);
+  color: #b45309;
   border-radius: 999px;
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 700;
 }
 
-.mini-task-shield-icon {
-  position: relative;
-  display: inline-flex;
-  width: 16px;
-  height: 16px;
-  color: currentColor;
-}
+.mini-task-shield-bronze { color: #b45309; }
+.mini-task-shield-silver { color: #94a3b8; }
+.mini-task-shield-gold { color: #d97706; }
+.mini-task-shield-diamond { color: #0891b2; }
+.mini-task-shield-vip { color: #ff8a03; }
+.mini-task-shield-regular { color: #8a6b3f; }
 
-.mini-task-shield-icon svg {
-  width: 16px;
-  height: 16px;
-}
-
-.mini-task-shield-mark {
-  position: absolute;
-  inset: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.38);
-}
-
-.mini-task-shield-mark-bronze {
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
-
-.mini-task-shield-mark-silver {
-  border-radius: 3px;
-}
-
-.mini-task-shield-mark-gold {
-  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 92%, 50% 70%, 21% 92%, 32% 57%, 2% 35%, 39% 35%);
-}
-
-.mini-task-shield-mark-diamond {
-  clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%);
-}
-
-.mini-task-shield-mark-vip {
-  border-radius: 2px;
-  transform: rotate(45deg);
-}
-
-.mini-task-shield-mark-regular {
-  border-radius: 50%;
-}
-
-.mini-task-shield-bronze {
-  color: #b45309;
-}
-
-.mini-task-shield-silver {
-  color: #94a3b8;
-}
-
-.mini-task-shield-gold {
-  color: #d97706;
-}
-
-.mini-task-shield-diamond {
-  color: #06b6d4;
-}
-
-.mini-task-shield-vip {
-  color: #7c3aed;
-}
-
-.mini-task-shield-regular {
-  color: #64748b;
-}
-
-.mini-task-reward {
-  text-align: right;
-}
-
-.mini-task-reward span {
-  display: block;
-  color: #86efac;
-  font-size: 12px;
-}
-
-.mini-task-reward strong {
-  color: #22c55e;
-  font-size: 17px;
-}
+.mini-task-reward { text-align: right; }
+.mini-task-reward span { display: block; color: #16a34a; font-size: 12px; }
+.mini-task-reward strong { color: #16a34a; font-size: 17px; }
 
 .mini-task-redeem-btn {
-  margin-top: 8px;
-  width: 100%;
-  border: 0;
-  border-radius: 10px;
-  padding: 8px 10px;
-  background: #22c55e;
-  color: #052e16;
-  font-weight: 800;
-  cursor: pointer;
+  margin-top: 8px; width: 100%; border: 0; border-radius: 10px;
+  padding: 8px 10px; background: linear-gradient(135deg, #ff8a03, #f7a93b);
+  color: #fff; font-weight: 800; cursor: pointer;
 }
-
-.mini-task-redeem-btn:disabled {
-  background: #334155;
-  color: #94a3b8;
-  cursor: not-allowed;
-}
+.mini-task-redeem-btn:disabled { background: rgba(148, 163, 184, 0.3); color: #8a6b3f; cursor: not-allowed; }
 
 .mini-task-earned-badge {
-  margin-top: 8px;
-  margin-bottom: 2px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(16, 185, 129, 0.38);
-  background: rgba(16, 185, 129, 0.18);
-  color: #bbf7d0;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 700;
+  margin-top: 8px; margin-bottom: 2px; display: inline-flex; align-items: center;
+  justify-content: center; border: 1px solid rgba(22, 163, 74, 0.38);
+  background: rgba(22, 163, 74, 0.18); color: #16a34a; border-radius: 999px;
+  padding: 4px 10px; font-size: 12px; font-weight: 700;
 }
+.mini-task-card.is-done { border-color: rgba(22, 163, 74, 0.55); }
 
-.mini-task-card.is-done {
-  border-color: rgba(16, 185, 129, 0.55);
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.18) inset;
-}
-
-.mini-tasks-rule {
-  display: block;
-  margin-top: 8px;
-  color: #93c5fd;
-  font-size: 12px;
-}
+.mini-tasks-rule { display: block; margin-top: 8px; color: #b45309; font-size: 12px; }
 
 .mini-tasks-notice {
-  margin-bottom: 12px;
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  background: rgba(14, 116, 144, 0.2);
-  color: #cffafe;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
+  margin-bottom: 12px; border: 1px solid rgba(255, 138, 3, 0.35);
+  background: rgba(255, 138, 3, 0.12); color: #b45309; border-radius: 10px;
+  padding: 10px 12px; font-size: 13px; font-weight: 600;
 }
 
 .mini-tasks-earned {
-  margin-bottom: 14px;
-  border: 1px solid rgba(250, 204, 21, 0.3);
-  background: rgba(30, 41, 59, 0.72);
-  border-radius: 14px;
-  padding: 12px;
+  margin-bottom: 14px; border: 1px solid rgba(255, 138, 3, 0.3);
+  background: rgba(255, 138, 3, 0.1); border-radius: 14px; padding: 12px;
 }
+.mini-tasks-earned h3 { margin: 0 0 8px; font-size: 14px; color: #b45309; }
 
-.mini-tasks-earned h3 {
-  margin: 0 0 8px;
-  font-size: 14px;
-  color: #fde68a;
-}
-
-.mini-tasks-earned-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+.mini-tasks-earned-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .mini-task-earned-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid rgba(250, 204, 21, 0.35);
-  background: rgba(250, 204, 21, 0.12);
-  color: #fde68a;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 12px;
-  font-weight: 700;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid rgba(255, 138, 3, 0.35); background: rgba(255, 138, 3, 0.12);
+  color: #b45309; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700;
 }
 
-.mini-task-badge-bronze {
-  border-color: rgba(180, 83, 9, 0.45);
-  background: rgba(180, 83, 9, 0.18);
-  color: #fdba74;
-}
-
-.mini-task-badge-silver {
-  border-color: rgba(148, 163, 184, 0.5);
-  background: rgba(148, 163, 184, 0.18);
-  color: #e2e8f0;
-}
-
-.mini-task-badge-gold {
-  border-color: rgba(245, 158, 11, 0.45);
-  background: rgba(245, 158, 11, 0.18);
-  color: #fde68a;
-}
-
-.mini-task-badge-diamond {
-  border-color: rgba(6, 182, 212, 0.45);
-  background: rgba(6, 182, 212, 0.16);
-  color: #a5f3fc;
-}
-
-.mini-task-badge-vip {
-  border-color: rgba(124, 58, 237, 0.45);
-  background: rgba(124, 58, 237, 0.16);
-  color: #ddd6fe;
-}
-
-.mini-task-badge-regular {
-  border-color: rgba(100, 116, 139, 0.45);
-  background: rgba(100, 116, 139, 0.16);
-  color: #cbd5e1;
-}
+.mini-task-badge-bronze { border-color: rgba(180, 83, 9, 0.45); background: rgba(180, 83, 9, 0.18); color: #b45309; }
+.mini-task-badge-silver { border-color: rgba(148, 163, 184, 0.5); background: rgba(148, 163, 184, 0.18); color: #5a3d1a; }
+.mini-task-badge-gold { border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.18); color: #b45309; }
+.mini-task-badge-diamond { border-color: rgba(6, 182, 212, 0.45); background: rgba(6, 182, 212, 0.16); color: #0891b2; }
+.mini-task-badge-vip { border-color: rgba(255, 138, 3, 0.45); background: rgba(255, 138, 3, 0.16); color: #ff8a03; }
+.mini-task-badge-regular { border-color: rgba(100, 116, 139, 0.45); background: rgba(100, 116, 139, 0.16); color: #5a3d1a; }
 
 @media (min-width: 760px) {
-  .mini-tasks-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .mini-tasks-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

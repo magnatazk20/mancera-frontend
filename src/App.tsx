@@ -32,6 +32,8 @@ import CaixasBox from './pages/CaixasBox'
 import CycleProducts from './pages/CycleProducts'
 import MiniTasks from './pages/MiniTasks'
 import VipRules from './pages/VipRules'
+import Statement from './pages/Statement'
+import Manual from './pages/Manual'
 import MonthlySalary from './pages/MonthlySalary'
 import RegistroDoDia from './pages/RegistroDoDia'
 import RegistrosTarefas from './pages/RegistrosTarefas'
@@ -65,28 +67,13 @@ import AdminVipLevels from './pages/AdminVipLevels'
 import AdminTaskCommissions from './pages/AdminTaskCommissions'
 import AdminVipRefunds from './pages/AdminVipRefunds'
 import AdminVipPhotos from './pages/AdminVipPhotos'
+import About from './pages/About'
 import Introduction from './pages/Introduction'
+import ProtectedLayout from './components/ProtectedLayout'
+import AdminProtectedLayout from './components/AdminProtectedLayout'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
-
-function AnimatedBackground() {
-  return (
-    <div className="bg-animation" aria-hidden="true">
-      <div className="orb orb-1" />
-      <div className="orb orb-2" />
-      <div className="orb orb-3" />
-      <div className="orb orb-4" />
-      <div className="orb orb-5" />
-      <div className="grid-overlay" />
-      <div className="particles">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <span key={i} className="particle" style={{ '--i': i } as React.CSSProperties} />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 export default function App() {
   useEffect(() => {
@@ -113,7 +100,6 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <AnimatedBackground />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/cadastro" element={<Register />} />
@@ -127,11 +113,14 @@ export default function App() {
         <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
         <Route path="/vip" element={<Vip />} />
         <Route path="/vip/checkout/:id" element={<VipCheckout />} />
+        <Route path="/about" element={<About />} />
         <Route path="/introducao" element={<Introduction />} />
         <Route path="/invite" element={<Invite />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/mini-tasks" element={<MiniTasks />} />
         <Route path="/vip-rules" element={<VipRules />} />
+        <Route path="/statement" element={<Statement />} />
+        <Route path="/manual" element={<Manual />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
         <Route
           path="/monthly-salary"
@@ -181,6 +170,14 @@ export default function App() {
         <Route path="/tax-declaration" element={<TaxDeclaration />} />
         <Route path="/withdraw-password" element={<WithdrawPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
+        <Route
+          path="/envelope"
+          element={(
+            <RequireAuth>
+              <GiftVouchers />
+            </RequireAuth>
+          )}
+        />
         <Route
           path="/gift-vouchers"
           element={(

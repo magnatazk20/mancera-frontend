@@ -1,23 +1,20 @@
 .sinuca-page {
   min-height: 100vh;
   padding: 20px;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(59, 130, 246, 0.2), transparent 30%),
-    radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.2), transparent 30%),
-    linear-gradient(145deg, #020617, #0b1220 45%, #111827);
-  color: #e5e7eb;
+  background: inherit;
+  color: #5a3d1a;
 }
 
 .sinuca-shell {
   max-width: 1240px;
   margin: 0 auto;
-  background: rgba(15, 23, 42, 0.58);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 22px;
   padding: 18px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 30px rgba(255, 138, 3, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .sinuca-header {
@@ -31,11 +28,12 @@
 .sinuca-header h1 {
   margin: 0;
   font-size: clamp(1.2rem, 2vw, 1.9rem);
+  color: #5a3d1a;
 }
 
 .sinuca-header p {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 0.92rem;
 }
 
@@ -55,13 +53,13 @@
 }
 
 .sinuca-link {
-  color: #0f172a;
-  background: linear-gradient(135deg, #67e8f9, #c4b5fd);
+  color: #5a3d1a;
+  background: linear-gradient(135deg, #ff8a03, #f7d981);
 }
 
 .sinuca-reset {
-  color: #f8fafc;
-  background: #1e293b;
+  color: #5a3d1a;
+  background: rgba(255, 138, 3, 0.15);
 }
 
 .sinuca-board {
@@ -80,36 +78,37 @@
   width: 100%;
   height: auto;
   border-radius: 16px;
-  border: 2px solid rgba(248, 250, 252, 0.2);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 138, 3, 0.25);
+  box-shadow: 0 8px 24px rgba(255, 138, 3, 0.15);
   background: #0f6b3b;
   cursor: crosshair;
 }
 
 .pocket-lane {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.92));
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 12px;
   min-height: 100%;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  box-shadow: 0 4px 16px rgba(255, 138, 3, 0.08);
 }
 
 .pocket-lane h3 {
   margin: 0;
   font-size: 0.95rem;
+  color: #5a3d1a;
 }
 
 .pocket-sub {
   margin: 6px 0 10px;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 0.78rem;
 }
 
 .pocket-track {
   border-radius: 10px;
-  border: 1px dashed rgba(148, 163, 184, 0.28);
-  background: linear-gradient(180deg, rgba(2, 6, 23, 0.8), rgba(15, 23, 42, 0.65));
+  border: 1px dashed rgba(255, 138, 3, 0.28);
+  background: rgba(255, 245, 235, 0.6);
   padding: 10px;
   min-height: 220px;
   display: flex;
@@ -119,7 +118,7 @@
 }
 
 .pocket-empty {
-  color: #64748b;
+  color: #8a6b3f;
   font-size: 0.8rem;
 }
 
@@ -132,16 +131,16 @@
   place-items: center;
   font-size: 0.68rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #5a3d1a;
   background:
-    radial-gradient(circle at 30% 30%, #fff 0%, rgba(255, 255, 255, 0.88) 20%, var(--ball-color) 58%, #111827 100%);
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.38);
+    radial-gradient(circle at 30% 30%, #fff 0%, rgba(255, 255, 255, 0.88) 20%, var(--ball-color) 58%, #c9a96e 100%);
+  box-shadow: 0 5px 12px rgba(180, 83, 9, 0.3);
   animation: pocketDrop 0.5s ease both;
 }
 
 .pocket-ball.stripe {
   position: relative;
-  color: #111827;
+  color: #5a3d1a;
   overflow: hidden;
 }
 
@@ -187,11 +186,11 @@
 
 .hud p {
   margin: 0;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 10px;
   padding: 9px 10px;
-  color: #cbd5e1;
+  color: #5a3d1a;
   font-size: 0.88rem;
 }
 

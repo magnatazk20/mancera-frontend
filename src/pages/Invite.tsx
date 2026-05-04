@@ -184,8 +184,7 @@ export default function Invite() {
                   <img
                     src="https://vlm7.com/static/images/yq_br-Bra.png"
                     alt="Banner Brasil"
-                    width="100%"
-                    style={{ borderRadius: 5, display: 'block' }}
+                    style={{ borderRadius: 5, display: 'block', width: '100%', maxWidth: '100%' }}
                   />
                 </div>
                 <h4 className="invite-promote-name">Seu melhor amigo {displayName}</h4>

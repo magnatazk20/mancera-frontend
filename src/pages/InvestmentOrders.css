@@ -1,10 +1,14 @@
 .investment-orders-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #000, #111827, #1e293b, rgba(30, 58, 138, 0.2), rgba(8, 145, 178, 0.3));
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
+  color: #5a3d1a;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
-  color: var(--text-primary, #e5e7eb);
 }
 
 .lw-gradient-fx {

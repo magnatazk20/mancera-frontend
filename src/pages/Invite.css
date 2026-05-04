@@ -1,15 +1,201 @@
-/* ── Banner Comissão VIP Padrão ─────────────────────── */
-.invite-page .invite-vip-commission {
-  margin: 12px 10px 14px;
-  padding: 16px;
-  border-radius: 16px;
+/* ── Invite Page base ──────────────────────────── */
+.invite-page,
+.dash-app.invite-page {
+  min-height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
+  padding: 0 16px 100px;
   background:
-    linear-gradient(135deg, rgba(124, 58, 237, 0.85) 0%, rgba(59, 130, 246, 0.85) 50%, rgba(6, 182, 212, 0.85) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 14px 30px rgba(2, 6, 23, 0.45);
-  color: #ffffff;
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
+  color: #5a3d1a;
+  position: relative;
+  z-index: 2;
+}
+
+.invite-page *,
+.dash-app.invite-page * {
+  box-sizing: border-box;
+}
+
+/* ── Sidebar (fixed on mobile) ────────────────── */
+.invite-page .dash-sidebar,
+.dash-app.invite-page .dash-sidebar {
+  position: fixed;
+  z-index: 30;
+  inset: 0 auto 0 0;
+  width: 272px;
+  background: rgba(255, 245, 235, 0.98);
+  border-right: 1px solid rgba(255, 138, 3, 0.22);
+  transform: translateX(-100%);
+  transition: transform 0.28s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px;
+}
+
+.invite-page .dash-sidebar.open,
+.dash-app.invite-page .dash-sidebar.open {
+  transform: translateX(0);
+}
+
+.invite-page .dash-main,
+.dash-app.invite-page .dash-main {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: inherit;
+}
+
+/* ── Bottom nav (fixed on mobile) ──────────────── */
+.invite-page .dash-bottom-nav {
+  position: fixed;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(70px + env(safe-area-inset-bottom));
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  background: rgba(255, 245, 235, 0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 138, 3, 0.22);
+  box-shadow: 0 -4px 20px rgba(255, 138, 3, 0.12);
+}
+
+.invite-page .dash-bottom-nav button {
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #6b5a3f;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.invite-page .dash-bottom-nav button.active {
+  background: rgba(255, 138, 3, 0.15);
+  color: #ff8a03;
+}
+
+.invite-page .dash-bottom-nav small {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.invite-page .dash-bottom-nav span {
+  font-size: 1.1rem;
+}
+
+/* ── Icons ───────────────────────────────────── */
+.invite-page .icon-sm {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Overlay ─────────────────────────────────── */
+.invite-page .dash-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(95, 61, 26, 0.4);
+  z-index: 20;
+  cursor: pointer;
+}
+
+/* ── Content padding for fixed bottom nav ────── */
+.invite-page .dash-content,
+.dash-app.invite-page .dash-content {
+  display: grid;
+  gap: 12px;
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* ── Mobile: center and constrain width ─────── */
+@media (max-width: 859px) {
+  .invite-page .dash-main,
+  .dash-app.invite-page .dash-main {
+    align-items: center;
+  }
+
+  .invite-page .dash-content,
+  .dash-app.invite-page .dash-content {
+    width: 100%;
+    max-width: 600px;
+  }
+}
+
+/* ── Sidebar nav ─────────────────────────────── */
+.invite-page .dash-nav {
+  margin-top: 14px;
+  display: grid;
+  gap: 8px;
+}
+
+.invite-page .dash-nav-group-title {
+  padding: 0 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a6b3f;
+  margin-bottom: 2px;
+}
+
+.invite-page .dash-nav-item {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #5a3d1a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.invite-page .dash-nav-item.active,
+.invite-page .dash-nav-item:hover {
+  background: rgba(255, 138, 3, 0.12);
+  border-color: rgba(255, 138, 3, 0.35);
+  color: #ff8a03;
+}
+
+.invite-page .dash-logout.side {
+  margin-top: auto;
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.1);
+  color: #b91c1c;
+  border-radius: 12px;
+  padding: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── VIP Commission Banner ───────────────────── */
+.invite-page .invite-vip-commission {
+  background: linear-gradient(135deg, #ff8a03, #f7a93b, #f7d981);
+  border: 1px solid rgba(255, 138, 3, 0.4);
+  box-shadow: 0 14px 30px rgba(255, 138, 3, 0.25);
+  color: #5a3d1a;
   position: relative;
   overflow: hidden;
+  border-radius: 18px;
+  padding: 20px 16px;
+  margin: 16px 0 0;
 }
 
 .invite-page .invite-vip-commission::before {
@@ -42,13 +228,13 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  color: #fde68a;
+  color: #fff;
 }
 
 .invite-page .invite-vip-commission__icon svg {
   width: 22px;
   height: 22px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 2px 4px rgba(180, 83, 9, 0.4));
 }
 
 .invite-page .invite-vip-commission__title {
@@ -56,14 +242,14 @@
   font-size: 1.02rem;
   font-weight: 800;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 2px rgba(180, 83, 9, 0.5);
   letter-spacing: 0.01em;
 }
 
 .invite-page .invite-vip-commission__subtitle {
   margin: 2px 0 0;
   font-size: 0.78rem;
-  color: rgba(241, 245, 249, 0.88);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 500;
 }
 
@@ -76,8 +262,8 @@
 }
 
 .invite-page .invite-vip-commission__level {
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   padding: 10px 8px;
   text-align: center;
@@ -90,7 +276,7 @@
 .invite-page .invite-vip-commission__level-name {
   font-size: 0.72rem;
   font-weight: 600;
-  color: rgba(241, 245, 249, 0.92);
+  color: rgba(255, 255, 255, 0.92);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -99,48 +285,51 @@
   font-size: 1.45rem;
   font-weight: 800;
   color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 3px rgba(180, 83, 9, 0.5);
   line-height: 1;
 }
 
-/* ── Loading / Error ───────────────────────────────── */
+/* ── Loading / Error ─────────────────────────── */
 .invite-page .invite-loading,
 .invite-page .invite-error {
   padding: 18px;
   border-radius: 10px;
-  background: var(--dash-card);
-  border: 1px solid var(--dash-border);
-  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  color: #8a6b3f;
   font-weight: 600;
   text-align: center;
+  margin: 0;
 }
 
 .invite-page .invite-error {
-  color: #f87171;
+  color: #dc2626;
 }
 
-/* ── Banner Promote ───────────────────────────────── */
+/* ── Banner Promote ───────────────────────────── */
 .invite-page .invite-promote {
-  background: linear-gradient(to right, #f7d981, #ff8a03);
-  margin: 0 10px;
+  background: linear-gradient(135deg, #ff8a03, #f7a93b, #f7d981);
+  margin: 16px 0 0;
   padding: 0 0 20px;
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(255, 138, 3, 0.2);
   text-align: center;
-  color: #000;
+  color: #fff;
   overflow: hidden;
 }
 
 .invite-page .invite-promote-banner {
   margin-bottom: 14px;
-  border-radius: 5px 5px 0 0;
+  border-radius: 0;
   overflow: hidden;
   line-height: 0;
+  max-width: 100%;
 }
 
 .invite-page .invite-promote-banner img {
   width: 100%;
-  border-radius: 5px;
+  max-width: 100%;
+  border-radius: 18px 18px 0 0;
   display: block;
 }
 
@@ -148,26 +337,29 @@
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #fff;
+  padding: 0 16px;
 }
 
 .invite-page .invite-promote-desc {
   margin: 0 0 14px;
   font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   line-height: 1.4;
+  padding: 0 16px;
 }
 
 .invite-page .invite-promote-code-row {
   margin-bottom: 6px;
   font-size: 13px;
-  color: #1a1a1a;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0 16px;
 }
 
 .invite-page .invite-promote-code-row strong {
   font-size: 15px;
-  color: #000;
+  color: #fff;
 }
 
 .invite-page .invite-promote-copy-btn {
@@ -175,14 +367,18 @@
   align-items: center;
   gap: 6px;
   border: none;
-  background: none;
-  color: #1a1a1a;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  padding: 6px 0;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transition: background 0.18s;
+}
+
+.invite-page .invite-promote-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .invite-page .invite-promote-copy-btn:active {
@@ -193,23 +389,24 @@
   margin-top: 10px;
   margin-bottom: 4px;
   font-size: 11px;
-  color: #333;
+  color: rgba(255, 255, 255, 0.8);
   word-break: break-all;
   line-height: 1.4;
+  padding: 0 16px;
 }
 
-/* ── Search / Filtro de datas ─────────────────────── */
+/* ── Filtro de datas ──────────────────────────── */
 .invite-page .invite-search-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 10px 10px;
-  padding: 10px;
-  background: var(--dash-card);
-  border: 1px solid var(--dash-border);
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  margin: 12px 0 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.1);
 }
 
 .invite-page .invite-search-inputs {
@@ -223,21 +420,20 @@
   flex: 1;
   min-width: 0;
   padding: 8px 10px;
-  border: 1px solid var(--dash-border);
-  border-radius: 5px;
-  background: var(--dash-card-2);
-  color: #e2e8f0;
+  border: 1px solid rgba(255, 138, 3, 0.3);
+  border-radius: 10px;
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   font-size: 13px;
   font-weight: 600;
 }
 
 .invite-page .invite-date-input::-webkit-calendar-picker-indicator {
-  filter: invert(0.7);
   cursor: pointer;
 }
 
 .invite-page .invite-date-sep {
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 14px;
   font-weight: 600;
   flex-shrink: 0;
@@ -247,34 +443,41 @@
   flex-shrink: 0;
   padding: 8px 16px;
   border: none;
-  border-radius: 5px;
-  background: linear-gradient(to right, #3b82f6, #2563eb);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.3);
+  transition: opacity 0.18s;
+}
+
+.invite-page .invite-search-btn:hover {
+  opacity: 0.9;
 }
 
 .invite-page .invite-search-btn:active {
   opacity: 0.8;
 }
 
-/* ── Stats Row (2 colunas) ────────────────────────── */
+/* ── Stats Row (2 colunas) ────────────────────── */
 .invite-page .invite-stats-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  padding: 0 10px;
+  margin: 12px 0 0;
+  padding: 0;
 }
 
 .invite-page .invite-stat-card {
-  margin: 5px;
-  padding: 10px;
-  background: var(--dash-card);
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--dash-border);
+  margin: 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.08);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   text-align: left;
 }
 
@@ -282,77 +485,89 @@
   margin: 0;
   font-size: 12px;
   white-space: nowrap;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .invite-page .invite-stat-value {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
-  color: #f5a23e;
+  color: #ff8a03;
 }
 
-/* ── Botão Posição ────────────────────────────────── */
+/* ── Botão Posição ────────────────────────────── */
 .invite-page .invite-position-btn {
   display: block;
-  margin: 10px auto;
+  margin: 12px auto 0;
   width: 230px;
-  padding: 10px 0;
+  padding: 12px 0;
   border: none;
   border-radius: 999px;
-  background: linear-gradient(to right, #f7d981, #ff8a03);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   color: #fff;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(255, 138, 3, 0.35);
+  transition: opacity 0.18s, transform 0.15s;
+}
+
+.invite-page .invite-position-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
 .invite-page .invite-position-btn:active {
   opacity: 0.8;
+  transform: scale(0.98);
 }
 
-/* ── Team Card ────────────────────────────────────── */
+/* ── Team Card ────────────────────────────────── */
 .invite-page .invite-team-card {
-  margin: 0 10px;
-  padding: 10px 0;
-  background: var(--dash-card);
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--dash-border);
+  margin: 12px 0 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.1);
+  border: 1px solid rgba(255, 138, 3, 0.22);
 }
 
 .invite-page .invite-team-card .invite-stats-row {
-  padding: 0 0;
+  margin: 0;
 }
 
-/* ── Level Card ───────────────────────────────────── */
+.invite-page .invite-team-card .invite-stat-card {
+  border-radius: 12px;
+}
+
+/* ── Level Card ───────────────────────────────── */
 .invite-page .invite-level-card {
-  margin: 5px 10px;
-  padding: 10px;
-  background: var(--dash-card-2);
-  border-radius: 5px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--dash-border);
+  margin: 8px 0 0;
+  padding: 12px;
+  background: rgba(255, 245, 235, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 138, 3, 0.08);
+  border: 1px solid rgba(255, 138, 3, 0.2);
 }
 
 .invite-page .invite-level-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-size: 13px;
   margin-bottom: 8px;
 }
 
 .invite-page .invite-level-grid {
   display: flex;
-  padding-left: 5px;
+  padding-left: 0;
+  gap: 4px;
 }
 
 .invite-page .invite-level-cell {
   flex-basis: 33.333%;
-  padding-right: 5px;
+  padding-right: 4px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -361,14 +576,14 @@
 }
 
 .invite-page .invite-level-cell-value {
-  color: #f5a23e;
+  color: #ff8a03;
   font-size: 15px;
   font-weight: 700;
 }
 
 .invite-page .invite-level-cell-label {
   font-size: 10px;
-  color: #94a3b8;
+  color: #8a6b3f;
   line-height: 1.3;
   min-height: 28px;
   display: flex;
@@ -376,26 +591,10 @@
   text-align: center;
 }
 
-/* ── Responsive ───────────────────────────────────── */
-@media (max-width: 480px) {
-  .invite-page .invite-promote-name {
-    font-size: 14px;
-  }
-
-  .invite-page .invite-promote-desc {
-    font-size: 12px;
-  }
-
-  .invite-page .invite-position-btn {
-    width: 200px;
-    font-size: 15px;
-  }
-}
-
-/* ── Banner inferior Invite ──────────────────────── */
+/* ── Bottom Banner ────────────────────────────── */
 .invite-bottom-banner {
   width: 100%;
-  margin-top: 18px;
+  margin: 18px 0 0;
   border-radius: 14px;
   overflow: hidden;
 }
@@ -406,4 +605,45 @@
   display: block;
   object-fit: cover;
   border-radius: 14px;
+}
+
+/* ── Desktop layout ──────────────────────────── */
+@media (min-width: 860px) {
+  .invite-page,
+  .dash-app.invite-page {
+    display: grid;
+    grid-template-columns: 272px 1fr;
+    padding: 0;
+  }
+
+  .invite-page .dash-sidebar,
+  .dash-app.invite-page .dash-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    transform: none;
+  }
+
+  .invite-page .dash-overlay,
+  .invite-page .dash-bottom-nav {
+    display: none;
+  }
+
+  .invite-page .dash-main,
+  .dash-app.invite-page .dash-main {
+    padding: 0 0 0 286px;
+  }
+
+  .invite-page .dash-content,
+  .dash-app.invite-page .dash-content {
+    padding-top: 14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .invite-page .invite-promote-name { font-size: 14px; }
+  .invite-page .invite-promote-desc { font-size: 12px; }
+  .invite-page .invite-position-btn { width: 200px; font-size: 15px; }
 }

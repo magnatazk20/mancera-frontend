@@ -168,30 +168,6 @@ export default function BankCards() {
             </div>
           </div>
 
-          {/* Card preview */}
-          <section className="bc-card-preview">
-            <div className="bc-card-preview__bg">
-              <span className="bc-card-glow bc-card-glow--1" />
-              <span className="bc-card-glow bc-card-glow--2" />
-            </div>
-            <div className="bc-card-preview__content">
-              <div className="bc-card-row-top">
-                <span className="bc-card-chip" />
-                <span className="bc-card-brand">PIX</span>
-              </div>
-              <p className="bc-card-number">{maskCardPreview(pixKey)}</p>
-              <div className="bc-card-row-bottom">
-                <div>
-                  <span className="bc-card-label">Titular</span>
-                  <strong className="bc-card-value">
-                    {holderName ? holderName.toUpperCase() : 'NOME DO TITULAR'}
-                  </strong>
-                </div>
-                <div className="bc-card-type-pill">{selectedTypeMeta.label}</div>
-              </div>
-            </div>
-          </section>
-
           {/* Mensagem */}
           {msg && (
             <div className={`bc-msg ${msg.type}`}>

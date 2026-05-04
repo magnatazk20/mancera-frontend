@@ -155,10 +155,6 @@ export default function CashIn() {
   const normalized = Number(amount.replace(',', '.'))
   const displayValue = Number.isFinite(normalized) && normalized > 0 ? normalized : 0
   const minLabel = minDepositAmount.toFixed(2).replace('.', ',')
-  const maxLabel =
-    Number.isInteger(maxDepositAmount)
-      ? `${Math.trunc(maxDepositAmount)},00`
-      : maxDepositAmount.toFixed(2).replace('.', ',')
 
   return (
     <main className="cashin-page">
@@ -168,7 +164,7 @@ export default function CashIn() {
             <div className="cashin-label-row">
               <span>Valor do depósito</span>
               <small>
-                mín. R$ {minLabel} • máx. R$ {maxLabel}
+                mín. R$ {minLabel}
               </small>
             </div>
 

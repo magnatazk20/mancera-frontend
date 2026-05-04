@@ -1,8 +1,8 @@
 /* ── Botão Ver Detalhes ── */
 .auw-detail-btn {
-  background: rgba(37, 55, 110, 0.7);
-  border: 1px solid #334a7a;
-  color: #93b4f0;
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
+  border: 1px solid rgba(255, 138, 3, 0.45);
+  color: #ffffff;
   border-radius: 8px;
   padding: 5px 12px;
   font-size: 0.78rem;
@@ -13,8 +13,7 @@
 }
 
 .auw-detail-btn:hover {
-  background: #2a4070;
-  color: #c5d9ff;
+  filter: brightness(1.05);
 }
 
 .auw-detail-btn--full {
@@ -29,7 +28,7 @@
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(5, 9, 20, 0.82);
+  background: rgba(90, 61, 26, 0.45);
   backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
@@ -39,15 +38,15 @@
 
 /* ── Modal container ── */
 .auw-modal {
-  background: linear-gradient(180deg, #111d38, #0c1528);
-  border: 1px solid #2a3f6e;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 16px;
   width: 100%;
   max-width: 580px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 24px 60px rgba(90, 61, 26, 0.18);
 }
 
 /* ── Modal header ── */
@@ -56,7 +55,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 18px 20px 14px;
-  border-bottom: 1px solid #1e3059;
+  border-bottom: 1px solid rgba(255, 138, 3, 0.22);
   flex-shrink: 0;
 }
 
@@ -64,13 +63,13 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
-  color: #dce8ff;
+  color: #5a3d1a;
 }
 
 .auw-modal-close {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #94a3b8;
+  background: rgba(255, 245, 235, 0.8);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  color: #8a6b3f;
   border-radius: 8px;
   width: 32px;
   height: 32px;
@@ -84,8 +83,8 @@
 }
 
 .auw-modal-close:hover {
-  background: rgba(255, 255, 255, 0.14);
-  color: #e2e8f0;
+  background: #fff5eb;
+  color: #5a3d1a;
 }
 
 /* ── Modal body ── */
@@ -100,8 +99,8 @@
 
 /* ── Sections ── */
 .auw-modal-section {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid #1e3059;
+  background: rgba(255, 245, 235, 0.5);
+  border: 1px solid rgba(255, 138, 3, 0.18);
   border-radius: 10px;
   padding: 12px 14px;
 }
@@ -112,7 +111,7 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #5b78b2;
+  color: #8a6b3f;
 }
 
 /* ── Grid de campos ── */
@@ -134,7 +133,7 @@
 
 .auw-modal-label {
   font-size: 0.72rem;
-  color: #7a93c8;
+  color: #8a6b3f;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -142,34 +141,34 @@
 
 .auw-modal-value {
   font-size: 0.88rem;
-  color: #dce8ff;
+  color: #5a3d1a;
   word-break: break-all;
 }
 
 .auw-value-highlight {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #7cf0ba;
+  color: #ff8a03;
 }
 
 .auw-mono {
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.82rem;
-  color: #b5c9f0;
+  color: #8a6b3f;
 }
 
 /* ── Modal footer ── */
 .auw-modal-footer {
   padding: 14px 20px 18px;
-  border-top: 1px solid #1e3059;
+  border-top: 1px solid rgba(255, 138, 3, 0.22);
   flex-shrink: 0;
 }
 
 .auw-modal-btn-close {
   width: 100%;
-  background: rgba(37, 55, 110, 0.7);
-  border: 1px solid #334a7a;
-  color: #93b4f0;
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
+  border: 1px solid rgba(255, 138, 3, 0.45);
+  color: #ffffff;
   border-radius: 10px;
   padding: 10px;
   font-size: 0.92rem;
@@ -179,8 +178,7 @@
 }
 
 .auw-modal-btn-close:hover {
-  background: #2a4070;
-  color: #c5d9ff;
+  filter: brightness(1.05);
 }
 
 /* ── Mobile ── */

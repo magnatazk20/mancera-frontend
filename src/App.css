@@ -15,6 +15,7 @@ body {
     radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
     radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
     linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
   color: #5a3d1a;
   overflow-x: hidden;
   position: relative;
@@ -24,7 +25,11 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background: linear-gradient(#fff5eb, #fec075);
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
   z-index: -1;
   pointer-events: none;
 }
@@ -36,155 +41,19 @@ body::before {
   background: inherit;
 }
 
-/* Global override for page-specific backgrounds */
-[class$="-page"],
-.dash-app,
-.dash-content,
-.vip-page {
-  background: inherit !important;
-  min-height: 100vh !important;
-}
-
 /* ═══════════════════════════════════════
-   ANIMATED BACKGROUND
+   ANIMATED BACKGROUND (disabled — TRK uses App.css body bg)
 ═══════════════════════════════════════ */
 
 .bg-animation {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/* Gradient orbs */
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.55;
-  animation: float linear infinite;
-}
-
-.orb-1 {
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, #3b82f6, #1d4ed8);
-  top: -160px;
-  left: -120px;
-  animation-duration: 18s;
-  animation-name: floatA;
-}
-
-.orb-2 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, #8b5cf6, #4f46e5);
-  bottom: -100px;
-  right: -80px;
-  animation-duration: 22s;
-  animation-name: floatB;
-}
-
-.orb-3 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, #06b6d4, #0284c7);
-  top: 40%;
-  left: 55%;
-  animation-duration: 26s;
-  animation-name: floatC;
-  opacity: 0.35;
-}
-
-.orb-4 {
-  width: 240px;
-  height: 240px;
-  background: radial-gradient(circle, #ec4899, #be185d);
-  top: 60%;
-  left: 10%;
-  animation-duration: 20s;
-  animation-name: floatD;
-  opacity: 0.3;
-}
-
-.orb-5 {
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, #f59e0b, #d97706);
-  top: 20%;
-  right: 15%;
-  animation-duration: 24s;
-  animation-name: floatA;
-  opacity: 0.25;
-}
-
-@keyframes floatA {
-  0%   { transform: translate(0, 0) scale(1); }
-  25%  { transform: translate(60px, 40px) scale(1.08); }
-  50%  { transform: translate(30px, 80px) scale(0.95); }
-  75%  { transform: translate(-40px, 30px) scale(1.05); }
-  100% { transform: translate(0, 0) scale(1); }
-}
-
-@keyframes floatB {
-  0%   { transform: translate(0, 0) scale(1); }
-  25%  { transform: translate(-50px, -30px) scale(1.06); }
-  50%  { transform: translate(-20px, -70px) scale(0.97); }
-  75%  { transform: translate(35px, -20px) scale(1.04); }
-  100% { transform: translate(0, 0) scale(1); }
-}
-
-@keyframes floatC {
-  0%   { transform: translate(0, 0) rotate(0deg); }
-  33%  { transform: translate(-40px, 50px) rotate(120deg); }
-  66%  { transform: translate(40px, -30px) rotate(240deg); }
-  100% { transform: translate(0, 0) rotate(360deg); }
-}
-
-@keyframes floatD {
-  0%   { transform: translate(0, 0) scale(1); }
-  50%  { transform: translate(70px, -50px) scale(1.1); }
-  100% { transform: translate(0, 0) scale(1); }
+  display: none;
 }
 
 /* Grid overlay removed per user request */
 
-/* Floating particles */
+/* Floating particles (disabled) */
 .particles {
-  position: absolute;
-  inset: 0;
-}
-
-.particle {
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
-  left: calc(var(--i) * 5.2%);
-  bottom: -10px;
-  animation: rise calc(6s + var(--i) * 0.4s) ease-in infinite;
-  animation-delay: calc(var(--i) * 0.3s);
-}
-
-.particle:nth-child(even) {
-  width: 2px;
-  height: 2px;
-  background: rgba(147, 197, 253, 0.7);
-}
-
-.particle:nth-child(3n) {
-  width: 4px;
-  height: 4px;
-  background: rgba(167, 139, 250, 0.6);
-}
-
-@keyframes rise {
-  0%   { transform: translateY(0) translateX(0); opacity: 0; }
-  10%  { opacity: 1; }
-  90%  { opacity: 0.6; }
-  100% { transform: translateY(-100vh) translateX(calc(sin(var(--i)) * 60px)); opacity: 0; }
+  display: none;
 }
 
 /* ═══════════════════════════════════════

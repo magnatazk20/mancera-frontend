@@ -142,26 +142,28 @@ export default function CashInCheckout() {
 
   if (!hasData) {
     return (
-      <main className="dash-app">
+      <main className="dash-app profile-page">
         <AppSidebar />
-        <section className="dash-content">
-          <div className="checkout-container">
-            <div className="checkout-empty-card">
-              <div className="checkout-empty-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M15 9l-6 6M9 9l6 6" />
-                </svg>
-              </div>
-              <h2>Pagamento não encontrado</h2>
-              <p>Dados de cobrança não encontrados. Volte e gere um novo pagamento.</p>
-              <div className="checkout-empty-actions">
-                <button type="button" className="checkout-btn checkout-btn--secondary" onClick={() => navigate('/cashin')}>
-                  Novo depósito
-                </button>
-                <button type="button" className="checkout-btn checkout-btn--primary" onClick={() => navigate('/dashboard')}>
-                  Voltar ao início
-                </button>
+        <section className="dash-main">
+          <div className="dash-content">
+            <div className="checkout-container">
+              <div className="checkout-empty-card">
+                <div className="checkout-empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M15 9l-6 6M9 9l6 6" />
+                  </svg>
+                </div>
+                <h2>Pagamento não encontrado</h2>
+                <p>Dados de cobrança não encontrados. Volte e gere um novo pagamento.</p>
+                <div className="checkout-empty-actions">
+                  <button type="button" className="checkout-btn checkout-btn--secondary" onClick={() => navigate('/cashin')}>
+                    Novo depósito
+                  </button>
+                  <button type="button" className="checkout-btn checkout-btn--primary" onClick={() => navigate('/dashboard')}>
+                    Voltar ao início
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -171,149 +173,151 @@ export default function CashInCheckout() {
   }
 
   return (
-    <main className="dash-app">
+    <main className="dash-app profile-page">
       <AppSidebar />
-      <section className="dash-content">
-      <div className="checkout-container">
-        {/* Top Bar */}
-        <header className="checkout-topbar">
-          <button type="button" className="checkout-back-btn" onClick={() => navigate('/cashin')}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          <div className="checkout-topbar-info">
-            <span className="checkout-topbar-brand">PIX</span>
-            <span className="checkout-topbar-title">Pagamento</span>
-          </div>
-          <div className="checkout-status-badge" style={{ background: statusInfo.bg, color: statusInfo.color }}>
-            <span className="checkout-status-icon">{statusInfo.icon}</span>
-            {statusInfo.label}
-          </div>
-        </header>
+      <section className="dash-main">
+        <div className="dash-content">
+          <div className="checkout-container">
+            {/* Top Bar */}
+            <header className="checkout-topbar">
+              <button type="button" className="checkout-back-btn" onClick={() => navigate('/cashin')}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              <div className="checkout-topbar-info">
+                <span className="checkout-topbar-brand">PIX</span>
+                <span className="checkout-topbar-title">Pagamento</span>
+              </div>
+              <div className="checkout-status-badge" style={{ background: statusInfo.bg, color: statusInfo.color }}>
+                <span className="checkout-status-icon">{statusInfo.icon}</span>
+                {statusInfo.label}
+              </div>
+            </header>
 
-        {/* Paid Success Banner */}
-        {paidMsg && (
-          <div className="checkout-success-banner">
-            <div className="checkout-success-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <path d="M22 4L12 14.01l-3-3" />
-              </svg>
-            </div>
-            <div className="checkout-success-text">
-              <strong>Pagamento confirmado!</strong>
-              <span>{paidBalance != null ? `Novo saldo: ${formatBRL(paidBalance)}` : 'Saldo atualizado com sucesso.'}</span>
-            </div>
-            <button type="button" className="checkout-btn checkout-btn--success" onClick={() => navigate('/dashboard')}>
-              Ir ao início
-            </button>
-          </div>
-        )}
+            {/* Paid Success Banner */}
+            {paidMsg && (
+              <div className="checkout-success-banner">
+                <div className="checkout-success-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="28" height="28">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <path d="M22 4L12 14.01l-3-3" />
+                  </svg>
+                </div>
+                <div className="checkout-success-text">
+                  <strong>Pagamento confirmado!</strong>
+                  <span>{paidBalance != null ? `Novo saldo: ${formatBRL(paidBalance)}` : 'Saldo atualizado com sucesso.'}</span>
+                </div>
+                <button type="button" className="checkout-btn checkout-btn--success" onClick={() => navigate('/dashboard')}>
+                  Ir ao início
+                </button>
+              </div>
+            )}
 
-        {/* Amount Card */}
-        <div className="checkout-amount-card">
-          <span className="checkout-amount-label">Valor do depósito</span>
-          <span className="checkout-amount-value">{formatBRL(amount)}</span>
-          {status === 'pending' && countdown > 0 && (
-            <span className="checkout-timer">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              Expira em {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
-            </span>
-          )}
-        </div>
-
-        {/* QR Code Section */}
-        <div className="checkout-qr-section">
-          <div className="checkout-qr-card">
-            <div className="checkout-qr-frame">
-              {generatedQrUrl ? (
-                <img src={generatedQrUrl} alt="QR Code PIX" className="checkout-qr-img" />
-              ) : qrImage ? (
-                <img src={qrImage} alt="QR Code PIX" className="checkout-qr-img" />
-              ) : (
-                <div className="checkout-qr-fallback">QR Code indisponível</div>
+            {/* Amount Card */}
+            <div className="checkout-amount-card">
+              <span className="checkout-amount-label">Valor do depósito</span>
+              <span className="checkout-amount-value">{formatBRL(amount)}</span>
+              {status === 'pending' && countdown > 0 && (
+                <span className="checkout-timer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="14" height="14">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                  Expira em {String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+                </span>
               )}
             </div>
-            <p className="checkout-qr-hint">Abra o app do seu banco e escaneie o QR Code acima</p>
-          </div>
-        </div>
 
-        {/* Divider */}
-        <div className="checkout-divider">
-          <span className="checkout-divider-line" />
-          <span className="checkout-divider-text">ou copie o código</span>
-          <span className="checkout-divider-line" />
-        </div>
+            {/* QR Code Section */}
+            <div className="checkout-qr-section">
+              <div className="checkout-qr-card">
+                <div className="checkout-qr-frame">
+                  {generatedQrUrl ? (
+                    <img src={generatedQrUrl} alt="QR Code PIX" className="checkout-qr-img" />
+                  ) : qrImage ? (
+                    <img src={qrImage} alt="QR Code PIX" className="checkout-qr-img" />
+                  ) : (
+                    <div className="checkout-qr-fallback">QR Code indisponível</div>
+                  )}
+                </div>
+                <p className="checkout-qr-hint">Abra o app do seu banco e escaneie o QR Code acima</p>
+              </div>
+            </div>
 
-        {/* PIX Copy Section */}
-        <div className="checkout-pix-section">
-          <label className="checkout-pix-label">Código PIX Copia e Cola</label>
-          <div className="checkout-pix-box">
-            <div className="checkout-pix-code">{pixCode}</div>
-          </div>
-          <button
-            type="button"
-            className={`checkout-copy-btn ${copied ? 'checkout-copy-btn--copied' : ''}`}
-            onClick={handleCopy}
-          >
-            {copied ? (
-              <>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-                Código copiado!
-              </>
-            ) : (
-              <>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
-                  <rect x="9" y="9" width="13" height="13" rx="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
-                Copiar código PIX
-              </>
-            )}
-          </button>
-        </div>
+            {/* Divider */}
+            <div className="checkout-divider">
+              <span className="checkout-divider-line" />
+              <span className="checkout-divider-text">ou copie o código</span>
+              <span className="checkout-divider-line" />
+            </div>
 
-        {/* Instructions */}
-        <div className="checkout-instructions">
-          <h3 className="checkout-instructions-title">Como pagar</h3>
-          <div className="checkout-step">
-            <span className="checkout-step-num">1</span>
-            <span className="checkout-step-text">Abra o app do seu banco ou carteira digital</span>
-          </div>
-          <div className="checkout-step">
-            <span className="checkout-step-num">2</span>
-            <span className="checkout-step-text">Escolha pagar com PIX e escaneie o QR Code ou cole o código</span>
-          </div>
-          <div className="checkout-step">
-            <span className="checkout-step-num">3</span>
-            <span className="checkout-step-text">Confirme o pagamento e aguarde a confirmação automática</span>
-          </div>
-        </div>
+            {/* PIX Copy Section */}
+            <div className="checkout-pix-section">
+              <label className="checkout-pix-label">Código PIX Copia e Cola</label>
+              <div className="checkout-pix-box">
+                <div className="checkout-pix-code">{pixCode}</div>
+              </div>
+              <button
+                type="button"
+                className={`checkout-copy-btn ${copied ? 'checkout-copy-btn--copied' : ''}`}
+                onClick={handleCopy}
+              >
+                {copied ? (
+                  <>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                      <path d="M20 6L9 17l-5-5" />
+                    </svg>
+                    Código copiado!
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    Copiar código PIX
+                  </>
+                )}
+              </button>
+            </div>
 
-        {/* Transaction Info */}
-        <div className="checkout-tx-info">
-          <div className="checkout-tx-row">
-            <span className="checkout-tx-label">ID da transação</span>
-            <span className="checkout-tx-value">{transactionId}</span>
+            {/* Instructions */}
+            <div className="checkout-instructions">
+              <h3 className="checkout-instructions-title">Como pagar</h3>
+              <div className="checkout-step">
+                <span className="checkout-step-num">1</span>
+                <span className="checkout-step-text">Abra o app do seu banco ou carteira digital</span>
+              </div>
+              <div className="checkout-step">
+                <span className="checkout-step-num">2</span>
+                <span className="checkout-step-text">Escolha pagar com PIX e escaneie o QR Code ou cole o código</span>
+              </div>
+              <div className="checkout-step">
+                <span className="checkout-step-num">3</span>
+                <span className="checkout-step-text">Confirme o pagamento e aguarde a confirmação automática</span>
+              </div>
+            </div>
+
+            {/* Transaction Info */}
+            <div className="checkout-tx-info">
+              <div className="checkout-tx-row">
+                <span className="checkout-tx-label">ID da transação</span>
+                <span className="checkout-tx-value">{transactionId}</span>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="checkout-bottom-actions">
+              <button type="button" className="checkout-btn checkout-btn--outline" onClick={() => navigate('/cashin')}>
+                Novo pagamento
+              </button>
+              <button type="button" className="checkout-btn checkout-btn--primary" onClick={() => navigate('/dashboard')}>
+                Voltar ao início
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Bottom Actions */}
-        <div className="checkout-bottom-actions">
-          <button type="button" className="checkout-btn checkout-btn--outline" onClick={() => navigate('/cashin')}>
-            Novo pagamento
-          </button>
-          <button type="button" className="checkout-btn checkout-btn--primary" onClick={() => navigate('/dashboard')}>
-            Voltar ao início
-          </button>
-        </div>
-      </div>
       </section>
     </main>
   )

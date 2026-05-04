@@ -81,7 +81,7 @@ export default function Register() {
       <div className="login-orange__hero">
         <div className="login-orange__hero-logo" aria-hidden="true">
           <span className="login-orange__hero-mark">TRK</span>
-          <span className="login-orange__hero-sub">Tarefas & Recompensas</span>
+          <span className="login-orange__hero-sub">Suas recompensas estão esperando por você.</span>
         </div>
       </div>
 

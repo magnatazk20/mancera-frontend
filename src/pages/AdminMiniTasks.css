@@ -1,5 +1,5 @@
 .admin-mini-tasks-page .admin-users-header p {
-  color: #94a3b8;
+  color: #8a6b3f;
   margin-top: 6px;
 }
 
@@ -9,8 +9,8 @@
 }
 
 .admin-mini-card {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 16px;
   backdrop-filter: blur(4px);
@@ -19,7 +19,7 @@
 .admin-mini-card-title {
   margin: 0 0 12px;
   font-size: 16px;
-  color: #e2e8f0;
+  color: #5a3d1a;
 }
 
 .admin-mini-form-grid {
@@ -36,7 +36,7 @@
 
 .admin-mini-field label {
   font-size: 12px;
-  color: #94a3b8;
+  color: #8a6b3f;
   font-weight: 600;
 }
 
@@ -45,9 +45,9 @@
 .admin-mini-field input[type='url'] {
   height: 38px;
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.32);
-  background: rgba(2, 6, 23, 0.48);
-  color: #e2e8f0;
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
   padding: 0 12px;
   outline: none;
   font-size: 13px;
@@ -56,12 +56,12 @@
 .admin-mini-field input[type='text']:focus,
 .admin-mini-field input[type='number']:focus,
 .admin-mini-field input[type='url']:focus {
-  border-color: rgba(56, 189, 248, 0.8);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  border-color: rgba(255, 138, 3, 0.8);
+  box-shadow: 0 0 0 3px rgba(255, 138, 3, 0.15);
 }
 
 .admin-mini-field input[type='url']::placeholder {
-  color: #64748b;
+  color: #a08050;
 }
 
 .admin-mini-image-preview {
@@ -76,13 +76,13 @@
   height: 80px;
   border-radius: 8px;
   object-fit: cover;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
 }
 
 .admin-mini-image-preview .admin-mini-image-error {
   font-size: 11px;
-  color: #f87171;
+  color: #b91c1c;
 }
 
 .admin-mini-table-img {
@@ -90,8 +90,8 @@
   height: 36px;
   border-radius: 6px;
   object-fit: cover;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(255, 245, 235, 0.8);
   vertical-align: middle;
 }
 
@@ -102,8 +102,8 @@
   width: 36px;
   height: 36px;
   border-radius: 6px;
-  border: 1px dashed rgba(148, 163, 184, 0.25);
-  color: #475569;
+  border: 1px dashed rgba(255, 138, 3, 0.28);
+  color: #8a6b3f;
   font-size: 16px;
 }
 
@@ -113,7 +113,7 @@
   gap: 8px;
   align-self: end;
   margin-bottom: 6px;
-  color: #cbd5e1;
+  color: #5a3d1a;
   font-size: 13px;
 }
 
@@ -128,7 +128,7 @@
 .admin-mini-table-wrap {
   overflow: auto;
   border-radius: 12px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid rgba(255, 138, 3, 0.18);
 }
 
 .admin-mini-table {
@@ -141,29 +141,29 @@
   text-align: left;
   font-size: 12px;
   letter-spacing: 0.02em;
-  color: #cbd5e1;
-  background: rgba(30, 41, 59, 0.85);
+  color: #8a6b3f;
+  background: rgba(255, 245, 235, 0.8);
   padding: 10px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.24);
+  border-bottom: 1px solid rgba(255, 138, 3, 0.22);
 }
 
 .admin-mini-table tbody td {
   padding: 10px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255, 138, 3, 0.12);
+  color: #5a3d1a;
   font-size: 13px;
 }
 
 .admin-mini-table tbody tr:hover {
-  background: rgba(30, 41, 59, 0.45);
+  background: rgba(255, 245, 235, 0.5);
 }
 
 .admin-mini-badge {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(250, 204, 21, 0.35);
-  background: rgba(250, 204, 21, 0.12);
-  color: #fde68a;
+  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: rgba(255, 138, 3, 0.12);
+  color: #ff8a03;
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 12px;
@@ -176,11 +176,11 @@
 }
 
 .admin-mini-status.active {
-  color: #4ade80;
+  color: #2d7a3a;
 }
 
 .admin-mini-status.inactive {
-  color: #f87171;
+  color: #b91c1c;
 }
 
 .admin-mini-row-actions {
@@ -210,35 +210,35 @@
 }
 
 .btn.primary {
-  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #ffb347, #ff8a03);
   color: #fff;
-  border-color: #1d4ed8;
+  border-color: rgba(255, 138, 3, 0.45);
 }
 
 .btn.primary:hover:not(:disabled) {
-  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  filter: brightness(1.05);
 }
 
 .btn.ghost {
-  background: rgba(148, 163, 184, 0.12);
-  color: #cbd5e1;
-  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(255, 245, 235, 0.8);
+  color: #5a3d1a;
+  border-color: rgba(255, 138, 3, 0.22);
 }
 
 .btn.ghost:hover:not(:disabled) {
-  background: rgba(148, 163, 184, 0.22);
-  border-color: rgba(148, 163, 184, 0.5);
+  background: #fff5eb;
+  border-color: rgba(255, 138, 3, 0.4);
 }
 
 .btn.danger {
-  background: rgba(220, 38, 38, 0.18);
-  color: #f87171;
-  border-color: rgba(220, 38, 38, 0.4);
+  background: rgba(185, 28, 28, 0.12);
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.35);
 }
 
 .btn.danger:hover:not(:disabled) {
-  background: rgba(220, 38, 38, 0.32);
-  border-color: rgba(220, 38, 38, 0.6);
+  background: rgba(185, 28, 28, 0.22);
+  border-color: rgba(185, 28, 28, 0.55);
 }
 
 @media (max-width: 840px) {

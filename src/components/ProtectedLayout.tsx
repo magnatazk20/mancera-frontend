@@ -1,4 +1,5 @@
-import { Outlet, ReactNode } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
+import { ReactNode } from 'react'
 import RequireAuth from './RequireAuth'
 import Layout from './Layout'
 

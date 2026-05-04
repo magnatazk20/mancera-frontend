@@ -1,15 +1,14 @@
-/* Dark theme override for dashboard compatibility */
-.dash-app {
-  background: #060b18 !important;
-}
-
-.dash-content {
-  background: #060b18;
-  color: #e2e8f0;
+/* ─── Team Expansion Page ─────────────────────────────────────────────────── */
+.team-exp-page {
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
+    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
+    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
+  background-attachment: fixed;
+  color: #5a3d1a;
   min-height: 100vh;
+  padding: 24px 16px 100px;
 }
-
-/* ===== Team Expansion Page ===== */
 
 .team-exp-header {
   display: flex;
@@ -19,11 +18,11 @@
 }
 
 .team-exp-back {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 10px;
   padding: 8px;
-  color: #e2e8f0;
+  color: #5a3d1a;
   cursor: pointer;
   transition: background 0.2s;
   display: flex;
@@ -32,19 +31,19 @@
 }
 
 .team-exp-back:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 138, 3, 0.15);
 }
 
 .team-exp-title {
   font-size: 1.35rem;
   font-weight: 700;
-  color: #fff;
+  color: #5a3d1a;
   margin: 0;
 }
 
 .team-exp-loading {
   text-align: center;
-  color: #94a3b8;
+  color: #8a6b3f;
   padding: 48px 0;
   font-size: 0.95rem;
 }
@@ -58,8 +57,8 @@
 }
 
 .team-exp-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 16px;
   display: flex;
@@ -76,6 +75,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ff8a03;
 }
 
 .team-exp-card-icon svg {
@@ -93,7 +93,7 @@
 .team-exp-card-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #fff;
+  color: #5a3d1a;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -102,7 +102,7 @@
 
 .team-exp-card-label {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #8a6b3f;
   line-height: 1.2;
 }
 
@@ -110,7 +110,7 @@
 .team-exp-section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #fff;
+  color: #5a3d1a;
   margin: 0 0 14px;
   display: flex;
   align-items: center;
@@ -119,8 +119,8 @@
 
 /* Referral Section */
 .team-exp-referral {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   padding: 20px;
   margin-bottom: 20px;
@@ -128,7 +128,7 @@
 
 .team-exp-referral-desc {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #8a6b3f;
   margin: 0 0 16px;
   line-height: 1.5;
 }
@@ -147,7 +147,7 @@
 
 .team-exp-ref-label {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .team-exp-ref-value {
@@ -164,18 +164,18 @@
 
 .team-exp-ref-input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 245, 235, 0.8);
+  border: 1px solid rgba(255, 138, 3, 0.3);
   border-radius: 10px;
   padding: 10px 14px;
-  color: #e2e8f0;
+  color: #5a3d1a;
   font-size: 0.82rem;
   outline: none;
   min-width: 0;
 }
 
 .team-exp-copy-btn {
-  background: linear-gradient(135deg, #ff8a03, #ff6b00);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   border: none;
   border-radius: 10px;
   padding: 10px 18px;
@@ -203,8 +203,8 @@
 }
 
 .team-exp-level-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   padding: 16px;
 }
@@ -217,7 +217,7 @@
 }
 
 .team-exp-level-badge {
-  background: linear-gradient(135deg, #ff8a03, #ff6b00);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   color: #fff;
   font-size: 0.78rem;
   font-weight: 700;
@@ -227,7 +227,7 @@
 
 .team-exp-level-commission {
   font-size: 0.78rem;
-  color: #22c55e;
+  color: #16a34a;
   font-weight: 600;
 }
 
@@ -247,17 +247,17 @@
 .team-exp-level-stat-value {
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: #5a3d1a;
 }
 
 .team-exp-level-stat-label {
   font-size: 0.7rem;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .team-exp-empty {
   text-align: center;
-  color: #64748b;
+  color: #8a6b3f;
   font-size: 0.9rem;
   padding: 24px 0;
 }
@@ -268,8 +268,8 @@
 }
 
 .team-exp-commission-table {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -279,7 +279,7 @@
   grid-template-columns: 80px 1fr 80px;
   padding: 12px 16px;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 138, 3, 0.12);
 }
 
 .team-exp-commission-row:last-child {
@@ -296,18 +296,18 @@
 .team-exp-commission-level {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #5a3d1a;
 }
 
 .team-exp-commission-name {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: #8a6b3f;
 }
 
 .team-exp-commission-percent {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #22c55e;
+  color: #16a34a;
   text-align: right;
 }
 
@@ -324,7 +324,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #ff8a03, #ff6b00);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   border: none;
   border-radius: 12px;
   padding: 14px 16px;
@@ -340,36 +340,16 @@
 }
 
 .team-exp-action-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
+  color: #5a3d1a;
 }
 
 .team-exp-action-secondary:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 138, 3, 0.15);
 }
 
-/* ── New Sections: How-to Guides ───────────────── */
-.team-exp-howto-section {
-  margin-bottom: 24px;
-}
-
-.team-exp-banner {
-  width: 100%;
-  max-width: 100%;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 14px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.team-exp-actions-spacer {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* ── Tips / Como funciona ─────────────────────── */
+/* ── Tips ─────────────────────── */
 .team-exp-tips {
   margin-bottom: 20px;
 }
@@ -384,8 +364,8 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 12px;
   padding: 14px 16px;
 }
@@ -393,7 +373,7 @@
 .team-exp-tip-item p {
   margin: 0;
   font-size: 0.85rem;
-  color: #e2e8f0;
+  color: #5a3d1a;
   line-height: 1.5;
 }
 
@@ -407,7 +387,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff8a03, #ff6b00);
+  background: linear-gradient(135deg, #ff8a03, #f7a93b);
   color: #fff;
   font-size: 0.8rem;
   font-weight: 700;
@@ -417,13 +397,9 @@
   margin-top: 1px;
 }
 
-/* Responsivo: cards summary em 1 coluna no mobile */
+/* Responsive */
 @media (max-width: 520px) {
   .team-exp-summary {
     grid-template-columns: 1fr;
-  }
-  
-  .team-exp-banner {
-    height: 120px;
   }
 }

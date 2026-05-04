@@ -141,35 +141,12 @@ export default function MonthlySalary() {
     loadPlans()
   }, [navigate, user?.id])
 
-  const hasRequirements = (plan: MonthlySalaryPlan) =>
-    plan.requiredLevel1Deposited > 0 ||
-    plan.requiredLevel2Deposited > 0 ||
-    plan.requiredLevel3Deposited > 0
-
   return (
     <main className="dash-app">
       <section className="dash-main">
         <AppSidebar />
 
-        <div className="dash-content">
-          {/* ── Header banner ── */}
-          <section className="ms-banner">
-            <div className="ms-banner__bg" aria-hidden="true">
-              <span className="ms-banner__glow ms-banner__glow--1" />
-              <span className="ms-banner__glow ms-banner__glow--2" />
-            </div>
-            <div className="ms-banner__content">
-              <button type="button" className="ms-banner__back" onClick={() => navigate('/dashboard')}>
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-                Voltar
-              </button>
-              <h2 className="ms-banner__title">Salario Mensal</h2>
-              <p className="ms-banner__desc">
-                Convide amigos, atinja as metas de cada nivel e garanta um salario mensal fixo como colaborador da plataforma.
-              </p>
-            </div>
-          </section>
-
+        <div className="ms-content">
           {/* ── Modal de feedback ── */}
           {(error || successMessage) ? (
             <div className="ms-modal-overlay" onClick={() => { setError(''); setSuccessMessage('') }}>
@@ -194,100 +171,52 @@ export default function MonthlySalary() {
             </div>
           ) : null}
 
+          {/* ── Descrição ── */}
+          <div className="ms-desc">
+            <p>Convide pessoas para a TRK. Quanto mais indicados você tiver em cada nível, mais alto o seu salário mensal!</p>
+          </div>
+
           {/* ── Plans grid ── */}
           {loading ? (
-            <div className="ms-empty-card">Carregando planos...</div>
+            <div className="ms-empty-card">Carregando...</div>
           ) : plans.length === 0 ? (
-            <div className="ms-empty-card">Nenhum plano de salario mensal disponivel no momento.</div>
+            <div className="ms-empty-card">Nenhum plano disponível no momento.</div>
           ) : (
             <div className="ms-grid">
               {plans.map((plan) => (
                 <article key={plan.id} className="ms-card">
-                  {/* Image */}
-                  <div className="ms-card__img-wrap">
-                    {plan.imageUrl ? (
-                      <img
-                        src={plan.imageUrl}
-                        alt={plan.title}
-                        className="ms-card__img"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="ms-card__img-placeholder">
-                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-                      </div>
-                    )}
-                    <span className="ms-card__tag">{plan.title}</span>
-                    <span className="ms-card__salary-badge">
-                      {formatBRL(plan.monthlySalary)}<small>/mes</small>
-                    </span>
-                  </div>
-
-                  {/* Body */}
                   <div className="ms-card__body">
-                    <div className="ms-card__price">
-                      <small>salario mensal</small>
-                      <strong>{formatBRL(plan.monthlySalary)}</strong>
-                    </div>
-
-                    {/* Info rows */}
-                    <div className="ms-card__info">
-                      <div className="ms-card__info-row">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
-                        <span>Renda mensal: <strong>{formatBRL(plan.monthlySalary)}</strong></span>
+                    <div className="ms-card__left">
+                      <div className="ms-card__salary">
+                        <small>{plan.title}</small>
+                        <strong>R$ {plan.monthlySalary.toLocaleString('pt-BR')}</strong>
                       </div>
-                      <div className="ms-card__info-row">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
-                        <span>Renda diaria: <strong>{formatBRL(Number((plan.monthlySalary / 30).toFixed(2)))}</strong></span>
-                      </div>
-                      <div className="ms-card__info-row ms-card__info-row--highlight">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" /></svg>
-                        <span>Renda anual: <strong>{formatBRL(plan.monthlySalary * 12)}</strong></span>
-                      </div>
-                    </div>
-
-                    {/* Requirements */}
-                    {hasRequirements(plan) && (
-                      <div className="ms-requirements">
-                        <div className="ms-requirements__title">
-                          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-                          Requisitos de convidados depositados
+                      <div className="ms-card__requirements">
+                        <div className="ms-req">
+                          <span className="ms-req__label">Nível 1</span>
+                          <span className="ms-req__value">{plan.requiredLevel1Deposited} indicados</span>
                         </div>
-                        <div className="ms-requirements__list">
-                          {plan.requiredLevel1Deposited > 0 && (
-                            <div className="ms-requirements__item">
-                              <span className="ms-requirements__label">Nivel 1</span>
-                              <strong>{plan.requiredLevel1Deposited}</strong>
-                              <span className="ms-requirements__sub">depositados</span>
-                            </div>
-                          )}
-                          {plan.requiredLevel2Deposited > 0 && (
-                            <div className="ms-requirements__item">
-                              <span className="ms-requirements__label">Nivel 2</span>
-                              <strong>{plan.requiredLevel2Deposited}</strong>
-                              <span className="ms-requirements__sub">depositados</span>
-                            </div>
-                          )}
-                          {plan.requiredLevel3Deposited > 0 && (
-                            <div className="ms-requirements__item">
-                              <span className="ms-requirements__label">Nivel 3</span>
-                              <strong>{plan.requiredLevel3Deposited}</strong>
-                              <span className="ms-requirements__sub">depositados</span>
-                            </div>
-                          )}
+                        <div className="ms-req">
+                          <span className="ms-req__label">Nível 2</span>
+                          <span className="ms-req__value">{plan.requiredLevel2Deposited} indicados</span>
+                        </div>
+                        <div className="ms-req">
+                          <span className="ms-req__label">Nível 3</span>
+                          <span className="ms-req__value">{plan.requiredLevel3Deposited} indicados</span>
                         </div>
                       </div>
-                    )}
-
-                    {/* CTA Button */}
-                    <button
-                      type="button"
-                      className="ms-btn"
-                      onClick={() => handleClaim(plan.id)}
-                      disabled={claimLoadingPlanId === plan.id}
-                    >
-                      {claimLoadingPlanId === plan.id ? 'Obtendo...' : 'Obter Contrato'}
-                    </button>
+                      <button
+                        type="button"
+                        className="ms-btn"
+                        onClick={() => handleClaim(plan.id)}
+                        disabled={claimLoadingPlanId === plan.id}
+                      >
+                        {claimLoadingPlanId === plan.id ? 'Obtendo...' : 'Contratar'}
+                      </button>
+                    </div>
+                    <div className="ms-card__image">
+                      <img src={plan.imageUrl} alt={plan.title} />
+                    </div>
                   </div>
                 </article>
               ))}

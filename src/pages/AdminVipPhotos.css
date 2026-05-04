@@ -8,8 +8,8 @@
 }
 
 .vip-photo-card {
-  background: #1e1e2e;
-  border: 1px solid #2a2a3e;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 138, 3, 0.22);
   border-radius: 14px;
   overflow: hidden;
   display: flex;
@@ -24,7 +24,7 @@
 .vip-photo-preview {
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: #14141e;
+  background: rgba(255, 245, 235, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +42,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: #555;
+  color: #8a6b3f;
   font-size: 0.85rem;
 }
 
@@ -53,14 +53,14 @@
 .vip-photo-info h3 {
   margin: 0;
   font-size: 1rem;
-  color: #f0f0f0;
+  color: #5a3d1a;
   font-weight: 600;
 }
 
 .vip-photo-info p {
   margin: 0.25rem 0 0.4rem;
   font-size: 0.85rem;
-  color: #aaa;
+  color: #8a6b3f;
 }
 
 .vip-photo-status {
@@ -74,13 +74,13 @@
 }
 
 .vip-photo-status.active {
-  background: rgba(0, 200, 83, 0.15);
-  color: #00c853;
+  background: rgba(45, 122, 58, 0.12);
+  color: #2d7a3a;
 }
 
 .vip-photo-status.inactive {
-  background: rgba(255, 82, 82, 0.15);
-  color: #ff5252;
+  background: rgba(185, 28, 28, 0.12);
+  color: #b91c1c;
 }
 
 .vip-photo-upload-btn {

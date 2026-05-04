@@ -1,6 +1,7 @@
-- [x] Atualizar Dashboard.tsx para exibir modal de boas-vindas com foto do CEO
-- [x] Atualizar Dashboard.css com estilos do modal de boas-vindas
-- [x] Substituir welcome-card por banner animado com texto e foto do CEO em movimento lateral
-- [x] Ajustar CSS do banner animado (responsivo)
-- [ ] Testar visualmente o /dashboard
-- [ ] Commit e push das alterações
+# TODO: Adicionar navbar inferior na página VIP
+
+- [ ] Criar TODO.md ✅
+- [ ] Editar src/pages/Vip.tsx: adicionar import AppBottomNav e renderizar no final do main ✅
+- [ ] Completar AppBottomNav.css com estilos ✅
+- [ ] Verificar no browser localhost:5173/vip ✅ (Browser tool disabled; recarregue a página)
+- [ ] Completar tarefa ✅

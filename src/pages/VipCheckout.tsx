@@ -19,6 +19,40 @@ type CommissionLevel = {
   commissionPercent: number
 }
 
+type WalletKey = 'balance' | 'commission_balance' | 'recharge_balance'
+
+type WalletOption = {
+  key: WalletKey
+  label: string
+  value: number
+}
+
+const WALLET_COLORS: Record<string, string> = {
+  balance: '#0066cc',
+  commission_balance: '#16a34a',
+  recharge_balance: '#7c3aed',
+}
+
+const WALLET_ICONS: Record<string, React.ReactNode> = {
+  balance: (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+      <line x1="1" y1="10" x2="23" y2="10" />
+    </svg>
+  ),
+  commission_balance: (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+      <polyline points="16 7 22 7 22 13" />
+    </svg>
+  ),
+  recharge_balance: (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </svg>
+  ),
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -34,12 +68,14 @@ export default function VipCheckout() {
   const [submitting, setSubmitting] = useState(false)
   const [activeVipName, setActiveVipName] = useState<string | null>(null)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null)
+  const [wallets, setWallets] = useState<WalletOption[]>([])
+  const [selectedWallet, setSelectedWallet] = useState<WalletKey>('recharge_balance')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
     try {
-      return JSON.parse(raw) as { id: number; name: string }
+      return JSON.parse(raw) as { id: number; name: string; balance?: number; commission_balance?: number; recharge_balance?: number }
     } catch {
       return null
     }
@@ -54,26 +90,51 @@ export default function VipCheckout() {
     const loadData = async () => {
       setLoading(true)
       try {
+        const tokenHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
+
         const fetches: Promise<Response>[] = [
           fetch(`${API_URL}/api/vip/levels`),
           fetch(`${API_URL}/api/referral/commission-levels`),
         ]
-        // Verifica se o usuário já possui VIP ativo
+        // Verifica se o usuário já possui VIP ativo e saldos das carteiras
         if (user?.id) {
-          fetches.push(fetch(`${API_URL}/api/vip/user/${user.id}`))
+          fetches.push(fetch(`${API_URL}/api/vip/user/${user.id}`, { headers: tokenHeader }))
         }
-        const [levelsRes, commRes, userVipRes] = await Promise.all(fetches)
+        const results = await Promise.allSettled(fetches)
+        const [levelsRes, commRes, userVipRes] = results.map(r => r.status === 'fulfilled' ? r.value : null)
 
-        // Checa VIP ativo (para informar que é upgrade/troca)
-        if (userVipRes) {
-          const userVipJson = await userVipRes.json().catch(() => ({}))
-          if (userVipRes.ok && userVipJson?.ok && userVipJson?.hasVip && userVipJson?.vip) {
-            setActiveVipName(String(userVipJson.vip.levelName ?? ''))
+        // Pega saldos das carteiras a partir da resposta do vip/user
+        if (userVipRes?.ok) {
+          const vipJson = await userVipRes.json().catch(() => ({})) as { balance?: number; commission_balance?: number; recharge_balance?: number; ok?: boolean; hasVip?: boolean; vip?: { levelName?: string } }
+          const walletOpts: WalletOption[] = [
+            { key: 'balance', label: 'Saldo Geral', value: Number(vipJson?.balance ?? 0) },
+            { key: 'commission_balance', label: 'Carteira de Comissão', value: Number(vipJson?.commission_balance ?? 0) },
+            { key: 'recharge_balance', label: 'Carteira de Recarga', value: Number(vipJson?.recharge_balance ?? 0) },
+          ].filter(w => w.value > 0)
+          setWallets(walletOpts)
+          // Default to first wallet with balance
+          if (walletOpts.length > 0) {
+            setSelectedWallet(walletOpts[0].key)
+          }
+          // Chec active VIP from same json
+          if (vipJson?.ok && vipJson?.hasVip && vipJson?.vip) {
+            setActiveVipName(String(vipJson.vip.levelName ?? ''))
+          }
+        } else if (user) {
+          // Fallback from localStorage user object
+          const walletOpts: WalletOption[] = [
+            { key: 'balance', label: 'Saldo Geral', value: Number(user.balance ?? 0) },
+            { key: 'commission_balance', label: 'Carteira de Comissão', value: Number(user.commission_balance ?? 0) },
+            { key: 'recharge_balance', label: 'Carteira de Recarga', value: Number(user.recharge_balance ?? 0) },
+          ].filter(w => w.value > 0)
+          setWallets(walletOpts)
+          if (walletOpts.length > 0) {
+            setSelectedWallet(walletOpts[0].key)
           }
         }
 
-        const levelsJson = await levelsRes.json().catch(() => ({}))
-        const commJson = await commRes.json().catch(() => ({}))
+        const levelsJson = await levelsRes?.json().catch(() => ({})) ?? {}
+        const commJson = await commRes?.json().catch(() => ({})) ?? {}
 
         if (levelsRes.ok && levelsJson?.ok && Array.isArray(levelsJson.levels)) {
           const found = levelsJson.levels.find(
@@ -114,7 +175,7 @@ export default function VipCheckout() {
     }
 
     loadData()
-  }, [id])
+  }, [id, token])
 
   const handleConfirm = async () => {
     if (!user?.id || !plan) {
@@ -132,7 +193,7 @@ export default function VipCheckout() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id }),
+        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id, wallet: selectedWallet }),
       })
 
       const data = await response.json().catch(() => ({}))
@@ -415,6 +476,39 @@ export default function VipCheckout() {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Seletor de Carteira */}
+            {wallets.length > 0 && (
+              <div className="vip-checkout-wallet-section">
+                <label className="vip-checkout-section-title" htmlFor="wallet-select">
+                 
+                  Wallet para um pagamento
+                </label>
+                <div className="vip-checkout-select-wrap">
+                  <select
+                    id="wallet-select"
+                    className="vip-checkout-select"
+                    value={selectedWallet}
+                    onChange={(e) => setSelectedWallet(e.target.value as WalletKey)}
+                    style={{ borderColor: WALLET_COLORS[selectedWallet] }}
+                  >
+                    {wallets.map((wallet) => (
+                      <option key={wallet.key} value={wallet.key}>
+                        {wallet.label} — {formatBRL(wallet.value)}
+                      </option>
+                    ))}
+                  </select>
+                  <svg className="vip-checkout-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+                <p className="vip-checkout-wallet-hint" style={{ color: WALLET_COLORS[selectedWallet] }}>
+                  {wallets.find(w => w.key === selectedWallet)
+                    ? `${formatBRL(wallets.find(w => w.key === selectedWallet)!.value)} disponível`
+                    : ''}
+                </p>
               </div>
             )}
 
