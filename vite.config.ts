@@ -25,6 +25,7 @@ export default defineConfig({
     port: 4173,
   },
   build: {
-    cssMinify: 'esbuild',
+    minify: false,
+    cssMinify: false,
   },
 })
