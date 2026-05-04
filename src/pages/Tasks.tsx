@@ -108,9 +108,10 @@ export default function Tasks() {
       setVip(data.vip ?? null)
       setRemainingByVip(Number(data.remainingByVip ?? 0))
 
-      // DEBUG: mostra tasks com completedToday > 0
-      const completed = (data.tasks as any[]).filter((t: any) => Number(t.completedToday) > 0)
-      console.log('[TASKS-DEBUG] totalCompleted=' + data.totalCompletedToday + ' remaining=' + data.remainingByVip + ' completedTasks=' + JSON.stringify(completed.map(t => ({ id: t.id, name: t.name.slice(0, 20), completedToday: t.completedToday }))))
+      // DEBUG: mostra TODAS as tasks com completedToday e visibleSlots
+      const allTasks = (data.tasks as any[]).map((t: any) => ({ id: t.id, name: t.name.slice(0, 30), completedToday: t.completedToday }))
+      console.log('[TASKS-DEBUG] totalCompleted=' + data.totalCompletedToday + ' remaining=' + data.remainingByVip + ' vipDailyLimit=' + data.vip?.vipDailyTaskLimit)
+      console.log('[TASKS-DEBUG] ALLtasks=' + JSON.stringify(allTasks))
     } catch (err) {
       if ((err as Error)?.name === 'AbortError') return
       setError('Erro de conexão ao carregar tarefas.')
@@ -150,6 +151,9 @@ export default function Tasks() {
     }
     return result
   }, [tasks, vip?.vipDailyTaskLimit, user?.id])
+
+  // DEBUG: log visibleSlots
+  console.log('[VISIBLE-SLOTS] count=' + visibleSlots.length + ' slots=' + JSON.stringify(visibleSlots.map(s => ({ slot: s.slotIndex, id: s.id, name: s.name?.slice(0, 20), completedToday: s.completedToday }))))
 
   // Títulos buscados na API oEmbed do YouTube (cache em utils/miningVideos)
   const [videoTitles, setVideoTitles] = useState<Record<string, string>>({})
