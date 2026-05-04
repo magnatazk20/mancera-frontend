@@ -133,6 +133,9 @@ export default function AdminUserDetails() {
   const [referralLinkLoading, setReferralLinkLoading] = useState(false)
   const [referralLinkFeedback, setReferralLinkFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
+  const [banLoading, setBanLoading] = useState(false)
+  const [banFeedback, setBanFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const [withdrawPwdDeleteLoading, setWithdrawPwdDeleteLoading] = useState(false)
   const [withdrawPwdDeleteFeedback, setWithdrawPwdDeleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [withdrawPwdModalOpen, setWithdrawPwdModalOpen] = useState(false)
@@ -286,6 +289,30 @@ export default function AdminUserDetails() {
       setReferralLinkFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
       setReferralLinkLoading(false)
+    }
+  }
+
+  const handleBanToggle = async () => {
+    if (!id || !user) return
+    setBanLoading(true)
+    setBanFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/ban`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ is_banned: user.is_banned ? 0 : 1 }),
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      if (!res.ok || !data?.ok) {
+        setBanFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar banimento.' })
+        return
+      }
+      setBanFeedback({ type: 'success', message: data?.message ?? 'Atualizado.' })
+      await loadUserDetails()
+    } catch {
+      setBanFeedback({ type: 'error', message: 'Erro de conexão.' })
+    } finally {
+      setBanLoading(false)
     }
   }
 
@@ -651,7 +678,35 @@ export default function AdminUserDetails() {
                 )}
               </p>
               <p><strong>Admin:</strong> {user.is_admin ? 'Sim' : 'Não'}</p>
-              <p><strong>Status:</strong> {user.is_banned ? 'Banido' : 'Ativo'}</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <strong>Status:</strong>
+                <span style={{ color: user.is_banned ? '#dc2626' : '#16a34a', fontWeight: 600 }}>
+                  {user.is_banned ? '🔴 Banido' : '🟢 Ativo'}
+                </span>
+                <button
+                  type="button"
+                  disabled={banLoading}
+                  onClick={handleBanToggle}
+                  style={{
+                    padding: '3px 10px',
+                    borderRadius: 8,
+                    border: '1.5px solid #6366f1',
+                    background: 'transparent',
+                    color: '#6366f1',
+                    fontWeight: 700,
+                    fontSize: 12,
+                    cursor: banLoading ? 'not-allowed' : 'pointer',
+                    opacity: banLoading ? 0.6 : 1,
+                  }}
+                >
+                  {banLoading ? '...' : user.is_banned ? '♻️ Desbanir' : '🔒 Banir'}
+                </button>
+                {banFeedback ? (
+                  <span style={{ fontSize: 12, color: banFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {banFeedback.message}
+                  </span>
+                ) : null}
+              </p>
               <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <strong>Link de convite:</strong>
                 <span style={{ color: Number(user.allow_referral_link ?? 1) === 1 ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
