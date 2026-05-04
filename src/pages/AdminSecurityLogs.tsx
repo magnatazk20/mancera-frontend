@@ -31,10 +31,11 @@ const formatDateTime = (value?: string | null) => {
 }
 
 const EVENT_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  missing_token:       { label: 'Sem Token',         color: '#92400e', bg: '#fef3c7' },
-  invalid_token:       { label: 'Token Inválido',    color: '#7c2d12', bg: '#fee2e2' },
-  unauthorized_action: { label: 'Ação Não Permitida',color: '#991b1b', bg: '#fecaca' },
-  rate_limit_exceeded: { label: 'Rate Limit',        color: '#1e3a5f', bg: '#dbeafe' },
+  missing_token:        { label: 'Sem Token',           color: '#92400e', bg: '#fef3c7' },
+  invalid_token:        { label: 'Token Inválido',      color: '#7c2d12', bg: '#fee2e2' },
+  unauthorized_action:  { label: 'Ação Não Permitida', color: '#991b1b', bg: '#fecaca' },
+  rate_limit_exceeded:  { label: 'Rate Limit',         color: '#1e3a5f', bg: '#dbeafe' },
+  insufficient_balance: { label: 'Saldo Insuficiente', color: '#065f46', bg: '#d1fae5' },
 }
 
 const EventBadge = ({ eventType }: { eventType: string }) => {
@@ -184,6 +185,7 @@ export default function AdminSecurityLogs() {
                 <option value="invalid_token">Token Inválido</option>
                 <option value="unauthorized_action">Ação Não Permitida</option>
                 <option value="rate_limit_exceeded">Rate Limit</option>
+                <option value="insufficient_balance">Saldo Insuficiente</option>
               </select>
             </label>
             <label style={{ display: 'flex', alignItems: 'flex-end' }}>
