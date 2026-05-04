@@ -8,16 +8,6 @@ export default function Support() {
         <AppSidebar />
         <div className="dash-content">
 
-          {/* ── Banner de título ── */}
-          <section className="trk-hero-banner" aria-label="Suporte">
-            <div className="trk-hero-vip-wrap">
-              <div className="trk-hero-vip" style={{ background: '#ff8a03' }}>Suporte</div>
-            </div>
-            <h1 className="trk-hero-title">Central de Suporte TRK</h1>
-            <p className="trk-hero-sub">Entre em contato com seu gerente ou junte-se ao grupo de membros.</p>
-            <div className="trk-hero-glow" />
-          </section>
-
           {/* ── Botões de suporte ── */}
           <section className="support-cards">
 
