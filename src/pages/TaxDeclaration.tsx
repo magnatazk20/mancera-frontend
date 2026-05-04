@@ -163,7 +163,7 @@ export default function TaxDeclaration() {
             <div className="report-header">
               <div className="company-header">
                 <div>
-                  <h3>PGLM SOLUCOES LTDA</h3>
+                  <h3>TRK SOLUCOES LTDA</h3>
                   <p className="company-sub">Comprovante Fiscal de Transações Aprovadas</p>
                   <p>CNPJ Nº 49.710.828/0001-22</p>
                   <p>Rua Arealva, nº 373, Bairro Vila Arizona, Itaquaquecetuba - SP, CEP: 08575-520</p>

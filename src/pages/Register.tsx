@@ -70,7 +70,7 @@ export default function Register() {
 
       setTimeout(() => navigate('/dashboard'), 800)
     } catch {
-      setError('Não foi possível conectar ao servidor.')
+      setError('Unable to connect to the server.')
     } finally {
       setLoading(false)
     }

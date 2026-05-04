@@ -362,7 +362,7 @@ export default function Position() {
                     className="pos-action-card-img"
                   />
                 </div>
-                <div className="pos-action-card-btn">Descrição da vaga na PGLM</div>
+                <div className="pos-action-card-btn">Descrição da vaga na TRK</div>
               </button>
             </section>
           ) : null}
@@ -643,7 +643,7 @@ export default function Position() {
         <div className="pos-desc-overlay" role="dialog" aria-modal="true" aria-labelledby="pos-desc-title">
           <div className="pos-desc-modal">
             <div className="pos-desc-modal-header">
-              <h3 id="pos-desc-title">Descrição da vaga na PGLM</h3>
+              <h3 id="pos-desc-title">Descrição da vaga na TRK</h3>
               <button
                 type="button"
                 className="pos-desc-close"

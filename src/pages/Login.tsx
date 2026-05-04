@@ -52,7 +52,7 @@ export default function Login() {
       sessionStorage.removeItem('loginReturnTo')
       setTimeout(() => navigate(returnTo), 800)
     } catch {
-      setError('Não foi possível conectar ao servidor.')
+      setError('Unable to connect to the server.')
     } finally {
       setLoading(false)
     }

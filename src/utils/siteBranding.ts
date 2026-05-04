@@ -1,4 +1,4 @@
-const DEFAULT_TITLE = 'PGLM Plataforma'
+const DEFAULT_TITLE = 'TRK'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export type SiteBrandingConfig = {

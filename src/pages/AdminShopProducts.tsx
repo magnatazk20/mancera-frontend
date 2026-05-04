@@ -334,7 +334,7 @@ export default function AdminShopProducts() {
       <section className="admin-content admin-users-page">
         <header className="admin-users-header">
           <div>
-            <h1>Produtos da Loja PGLM</h1>
+            <h1>Produtos da Loja TRK</h1>
             <p>Gerencie o catálogo de produtos e os códigos de gift card do estoque.</p>
           </div>
         </header>
