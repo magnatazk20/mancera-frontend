@@ -152,7 +152,6 @@ export default function Dashboard() {
     }
 
     loadSummary()
-    loadCyclePlans()
     loadCommissionLevels()
   }, [user?.id])
 
