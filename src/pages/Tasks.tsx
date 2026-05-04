@@ -78,8 +78,10 @@ export default function Tasks() {
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`, {
+      const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}?ts=${Date.now()}`, {
         signal: controller.signal,
+        // Força o navegador a nunca usar cache
+        cache: 'no-store',
       })
       const data = await response.json()
 
