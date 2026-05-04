@@ -55,12 +55,15 @@ export default function Tasks() {
     }
   }, [])
 
-  // Bloqueia chamadas simultâneas de loadTasks ( StrictMode dispara effects 2× em dev )
-  const isLoadingRef = useRef(false)
+  // AbortController cancela requisições anteriores quando uma nova chega (evita race conditions)
+  const loadTasksCtrlRef = useRef<AbortController | null>(null)
 
   const loadTasks = async () => {
-    if (isLoadingRef.current) return
-    isLoadingRef.current = true
+    // Aborta qualquer requisição anterior pendente
+    loadTasksCtrlRef.current?.abort()
+    const controller = new AbortController()
+    loadTasksCtrlRef.current = controller
+
     setLoading(true)
     setError('')
 
@@ -68,13 +71,14 @@ export default function Tasks() {
       setTasks([])
       setVip(null)
       setRemainingByVip(0)
-      isLoadingRef.current = false
       setLoading(false)
       return
     }
 
     try {
-      const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`)
+      const response = await fetch(`${API_URL}/api/mining/tasks/${user.id}`, {
+        signal: controller.signal,
+      })
       const data = await response.json()
 
       if (!response.ok || !data?.ok) {
@@ -86,7 +90,6 @@ export default function Tasks() {
         setTasks([])
         setVip(null)
         setRemainingByVip(0)
-        isLoadingRef.current = false
         setLoading(false)
         return
       }
@@ -94,13 +97,12 @@ export default function Tasks() {
       setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setVip(data.vip ?? null)
       setRemainingByVip(Number(data.remainingByVip ?? 0))
-      isLoadingRef.current = false
-    } catch {
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return
       setError('Erro de conexão ao carregar tarefas.')
       setTasks([])
       setVip(null)
       setRemainingByVip(0)
-      isLoadingRef.current = false
     } finally {
       setLoading(false)
     }
