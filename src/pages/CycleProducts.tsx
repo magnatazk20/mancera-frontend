@@ -383,14 +383,10 @@ export default function CycleProducts() {
               const modalInvestStr = investAmounts[selectedPlan.id] ?? ''
               const modalInvestNum = Number(String(modalInvestStr).replace(',', '.')) || 0
               const modalEffectivePercent = selectedPlan.profitPercent > 0 ? selectedPlan.profitPercent : selectedPlan.profit
-              const modalTotalPercent = Number((modalEffectivePercent * selectedPlan.cycleDays).toFixed(2))
-              const modalDailyProfit = modalEffectivePercent > 0
+              const daily = modalEffectivePercent > 0
                 ? Number((modalInvestNum * (modalEffectivePercent / 100)).toFixed(2))
                 : 0
-              const modalTotalProfit = modalEffectivePercent > 0
-                ? Number((modalDailyProfit * selectedPlan.cycleDays).toFixed(2))
-                : 0
-              const modalTotalReturn = Number((modalInvestNum + modalTotalProfit).toFixed(2))
+              const modalTotalReturn = Number((modalInvestNum + daily * selectedPlan.cycleDays).toFixed(2))
               return (
                 <>
                   <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12, background: '#f4fdff', border: '2px solid #66b8d7' }}>
