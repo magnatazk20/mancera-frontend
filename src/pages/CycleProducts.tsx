@@ -434,7 +434,7 @@ export default function CycleProducts() {
                     {modalInvestNum > 0 && modalEffectivePercent > 0 ? (
                       <div style={{ marginTop: 12, fontSize: 13, color: '#2f3f49', display: 'grid', gap: 6 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #d0e8f0', paddingTop: 6 }}>
-                          <span>Retorno total ao final do ciclo:</span>
+                          <span>Retorno total ao final:</span>
                           <strong style={{ color: '#16a34a', fontSize: 15 }}>{formatBRL(modalTotalReturn)}</strong>
                         </div>
                       </div>
@@ -443,8 +443,8 @@ export default function CycleProducts() {
 
                   <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
                     <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
-                    <div><strong>Início do ciclo:</strong> {formatDateTime(new Date())}</div>
-                    <div><strong>Fim do ciclo:</strong> {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}</div>
+                    <div><strong>Início:</strong>-{formatDateTime(new Date())}</div>
+                    <div><strong>Fim:</strong>-{formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}</div>
                     <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
                     <div style={{
                       marginTop: 6,
