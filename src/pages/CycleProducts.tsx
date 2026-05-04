@@ -431,14 +431,6 @@ export default function CycleProducts() {
                     />
                     {modalInvestNum > 0 && modalEffectivePercent > 0 ? (
                       <div style={{ marginTop: 12, fontSize: 13, color: '#2f3f49', display: 'grid', gap: 6 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span>Lucro diário ({modalEffectivePercent}%):</span>
-                          <strong style={{ color: '#0798cb' }}>{formatBRL(modalDailyProfit)}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <span>Lucro total ({modalTotalPercent}% em {selectedPlan.cycleDays} dias):</span>
-                          <strong style={{ color: '#16a34a' }}>{formatBRL(modalTotalProfit)}</strong>
-                        </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #d0e8f0', paddingTop: 6 }}>
                           <span>Retorno total ao final do ciclo:</span>
                           <strong style={{ color: '#16a34a', fontSize: 15 }}>{formatBRL(modalTotalReturn)}</strong>
