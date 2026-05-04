@@ -259,15 +259,8 @@ export default function MiningTask() {
       setReward(Number(data.rewardAmount ?? 0))
       setMessage(data?.message ?? 'Tarefa concluída com sucesso.')
 
-      // Notifica a página /tasks para recarregar os dados
-      window.dispatchEvent(new CustomEvent('mining-task-completed'))
-
-      // Full page reload com timestamp único — ignora qualquer cache do navegador
-      setTimeout(() => {
-        // Cria URL com cache-bust único
-        const url = '/tasks?t=' + Date.now() + '&r=' + Math.random()
-        window.location.href = url
-      }, 800)
+      // Redirect IMEDIATO para /tasks — sem delay que causa problemas
+      window.location.href = '/tasks?t=' + Date.now()
     } catch {
       setMessage('Erro de conexão ao concluir tarefa.')
       completingRef.current = false
