@@ -131,16 +131,6 @@ export default function Dashboard() {
       } catch {/* silencioso */}
     }
 
-    const loadCyclePlans = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/dashboard/cycle-products`)
-        if (!response.ok) return
-        const data = (await response.json()) as { ok?: boolean; products?: CycleProduct[] }
-        if (!data?.ok || !Array.isArray(data.products)) return
-        setSelectedPlan(data.products[0] ?? null)
-      } catch {/* silencioso */}
-    }
-
     const loadCommissionLevels = async () => {
       try {
         const response = await fetch(`${API_URL}/api/referral/commission-levels`)
