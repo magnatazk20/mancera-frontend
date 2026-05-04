@@ -254,7 +254,7 @@ export default function Profile() {
                         src={
                           vipImageUrl
                             ? (vipImageUrl.startsWith('http') ? vipImageUrl : `${API_URL}${vipImageUrl}`)
-                            : `https://api.dicebear.com/7.x/personas/svg?seed=${user?.id ?? 'default'}-${user?.phone ?? user?.name ?? 'user'}`
+                            : 'https://i.imgur.com/PFbnl4y_d.webp?maxwidth=760&fidelity=grand'
                         }
                       />
                     </div>
