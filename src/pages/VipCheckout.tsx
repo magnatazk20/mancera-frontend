@@ -84,7 +84,7 @@ export default function VipCheckout() {
             { key: 'balance' as WalletKey, label: 'Saldo Geral', value: Number(vipJson?.balance ?? 0) },
             { key: 'commission_balance' as WalletKey, label: 'Carteira de Comissão', value: Number(vipJson?.commission_balance ?? 0) },
             { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(vipJson?.recharge_balance ?? 0) },
-          ].filter(w => w.value > 0)
+          ].filter(w => w.value >= 0)
           setWallets(walletOpts)
           if (vipJson?.ok && vipJson?.hasVip && vipJson?.vip) {
             setActiveVipName(String(vipJson.vip.levelName ?? ''))
@@ -95,7 +95,7 @@ export default function VipCheckout() {
             { key: 'balance' as WalletKey, label: 'Saldo Geral', value: Number(user.balance ?? 0) },
             { key: 'commission_balance' as WalletKey, label: 'Carteira de Comissão', value: Number(user.commission_balance ?? 0) },
             { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(user.recharge_balance ?? 0) },
-          ].filter(w => w.value > 0)
+          ].filter(w => w.value >= 0)
           setWallets(walletOpts)
         }
 
