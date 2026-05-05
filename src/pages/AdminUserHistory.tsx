@@ -220,7 +220,42 @@ export default function AdminUserHistory() {
                           <strong>{item.planName}</strong>
                           <p>{item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}</p>
                         </div>
-                        <span>{formatBRL(item.amountPaid)}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span>{formatBRL(item.amountPaid)}</span>
+                          <button
+                            type='button'
+                            onClick={async () => {
+                              if (!confirm(`Remover VIP '${item.planName}' deste usuário?')) return
+                              try {
+                                const res = await fetch(`${API_URL}/api/admin/users/${id}/vip`, {
+                                  method: 'DELETE',
+                                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                                })
+                                const data = await res.json()
+                                if (res.ok && data?.ok) {
+                                  alert(`VIP '${item.planName}' removido.`)
+                                  window.location.reload()
+                                } else {
+                                  alert(data?.error || 'Erro ao remover VIP.')
+                                }
+                              } catch {
+                                alert('Erro de conexão.')
+                              }
+                            }}
+                            style={{
+                              padding: '3px 10px',
+                              borderRadius: '8px',
+                              border: '1.5px solid #dc2626',
+                              background: 'transparent',
+                              color: '#dc2626',
+                              fontWeight: 700,
+                              fontSize: '12px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            🗑️ Remover VIP
+                          </button>
+                        </div>
                       </article>
                     ))}
                   </div>
