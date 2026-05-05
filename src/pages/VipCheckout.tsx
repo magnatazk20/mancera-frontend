@@ -173,7 +173,7 @@ export default function VipCheckout() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id, wallet: selectedWallet }),
+        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id }),
       })
 
       const data = await response.json().catch(() => ({}))
@@ -459,35 +459,31 @@ export default function VipCheckout() {
               </div>
             )}
 
-            {/* Seletor de Carteira */}
+            {/* Seção: Informações de Pagamento */}
             {wallets.length > 0 && (
               <div className="vip-checkout-wallet-section">
-                <label className="vip-checkout-section-title" htmlFor="wallet-select">
-                 
-                  Wallet para um pagamento
-                </label>
-                <div className="vip-checkout-select-wrap">
-                  <select
-                    id="wallet-select"
-                    className="vip-checkout-select"
-                    value={selectedWallet}
-                    onChange={(e) => setSelectedWallet(e.target.value as WalletKey)}
-                    style={{ borderColor: WALLET_COLORS[selectedWallet] }}
-                  >
-                    {wallets.map((wallet) => (
-                      <option key={wallet.key} value={wallet.key}>
-                        {wallet.label} — {formatBRL(wallet.value)}
-                      </option>
-                    ))}
-                  </select>
-                  <svg className="vip-checkout-select-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9" />
+                <label className="vip-checkout-section-title">
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" />
                   </svg>
+                  Saldo disponivel para pagamento
+                </label>
+                <div className="vip-checkout-select-wrap" style={{ background: '#f0f0f0', borderRadius: '8px', padding: '12px 16px' }}>
+                  {wallets.map((wallet) => (
+                    <div key={wallet.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
+                      <span style={{ color: WALLET_COLORS[wallet.key], fontWeight: 600 }}>{wallet.label}</span>
+                      <span style={{ fontWeight: 700, color: '#333' }}>{formatBRL(wallet.value)}</span>
+                    </div>
+                  ))}
+                  <div style={{ borderTop: '1px solid #ddd', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 700 }}>Total disponivel</span>
+                    <span style={{ fontWeight: 700, color: '#16a34a' }}>
+                      {formatBRL(wallets.reduce((sum, w) => sum + w.value, 0))}
+                    </span>
+                  </div>
                 </div>
-                <p className="vip-checkout-wallet-hint" style={{ color: WALLET_COLORS[selectedWallet] }}>
-                  {wallets.find(w => w.key === selectedWallet)
-                    ? `${formatBRL(wallets.find(w => w.key === selectedWallet)!.value)} disponível`
-                    : ''}
+                <p className="vip-checkout-wallet-hint" style={{ color: '#555' }}>
+                  O pagamento sera realizado utilizando o saldo de todas as carteiras automaticamente, priorizando da carteira de recarga ate o saldo geral.
                 </p>
               </div>
             )}
