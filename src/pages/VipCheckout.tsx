@@ -91,11 +91,6 @@ export default function VipCheckout() {
             { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(vipJson?.recharge_balance ?? 0) },
           ].filter(w => w.value > 0)
           setWallets(walletOpts)
-          // Default to first wallet with balance
-          if (walletOpts.length > 0) {
-            setSelectedWallet(walletOpts[0].key)
-          }
-          // Chec active VIP from same json
           if (vipJson?.ok && vipJson?.hasVip && vipJson?.vip) {
             setActiveVipName(String(vipJson.vip.levelName ?? ''))
           }
@@ -107,9 +102,6 @@ export default function VipCheckout() {
             { key: 'recharge_balance' as WalletKey, label: 'Carteira de Recarga', value: Number(user.recharge_balance ?? 0) },
           ].filter(w => w.value > 0)
           setWallets(walletOpts)
-          if (walletOpts.length > 0) {
-            setSelectedWallet(walletOpts[0].key)
-          }
         }
 
         const levelsJson = await levelsRes?.json().catch(() => ({})) ?? {}
