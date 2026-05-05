@@ -57,7 +57,7 @@ const maskPixKey = (value: string) => {
  * T0 = bloqueado (sem opcoes).
  */
 const WITHDRAW_OPTIONS_BY_LEVEL: Record<string, number[]> = {
-  T1: [200, 300, 500, 1000],
+  T1: [30, 200, 300, 500, 1000],
   T2: [500, 700, 1000],
   T3: [1000, 2000, 3000],
   T4: [1000, 2000, 3000],
