@@ -49,6 +49,7 @@ export default function VipCheckout() {
   const [activeVipName, setActiveVipName] = useState<string | null>(null)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null)
   const [wallets, setWallets] = useState<WalletOption[]>([])
+  const [selectedWallet, setSelectedWallet] = useState<WalletKey>('balance')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -457,24 +458,22 @@ export default function VipCheckout() {
                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2" /><line x1="1" y1="10" x2="23" y2="10" />
                   </svg>
-                  Saldo disponivel para pagamento
+                  Selecione a carteira para pagamento
                 </label>
-                <div className="vip-checkout-select-wrap" style={{ background: '#f0f0f0', borderRadius: '8px', padding: '12px 16px' }}>
+                <select
+                  className="vip-checkout-select-wrap"
+                  style={{ background: '#f0f0f0', borderRadius: '8px', padding: '12px 16px', width: '100%', fontSize: '16px', border: '1px solid #ccc' }}
+                  value={selectedWallet}
+                  onChange={(e) => setSelectedWallet(e.target.value as WalletKey)}
+                >
                   {wallets.map((wallet) => (
-                    <div key={wallet.key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0' }}>
-                      <span style={{ color: WALLET_COLORS[wallet.key], fontWeight: 600 }}>{wallet.label}</span>
-                      <span style={{ fontWeight: 700, color: '#333' }}>{formatBRL(wallet.value)}</span>
-                    </div>
+                    <option key={wallet.key} value={wallet.key}>
+                      {wallet.label}: {formatBRL(wallet.value)}
+                    </option>
                   ))}
-                  <div style={{ borderTop: '1px solid #ddd', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 700 }}>Total disponivel</span>
-                    <span style={{ fontWeight: 700, color: '#16a34a' }}>
-                      {formatBRL(wallets.reduce((sum, w) => sum + w.value, 0))}
-                    </span>
-                  </div>
-                </div>
+                </select>
                 <p className="vip-checkout-wallet-hint" style={{ color: '#555' }}>
-                  O pagamento sera realizado utilizando o saldo de todas as carteiras automaticamente, priorizando da carteira de recarga ate o saldo geral.
+                  Seu saldo disponivel nesta carteira: <strong>{formatBRL(wallets.find(w => w.key === selectedWallet)?.value ?? 0)}</strong>
                 </p>
               </div>
             )}
