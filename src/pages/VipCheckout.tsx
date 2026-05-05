@@ -49,7 +49,6 @@ export default function VipCheckout() {
   const [activeVipName, setActiveVipName] = useState<string | null>(null)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null)
   const [wallets, setWallets] = useState<WalletOption[]>([])
-  const [selectedWallet, setSelectedWallet] = useState<WalletKey>('recharge_balance')
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
