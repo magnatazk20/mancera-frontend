@@ -349,6 +349,10 @@ export default function Profile() {
                   <p className="profile-stat-label">Depósitos acumulados(R$)</p>
                 </div>
                 <div className="profile-stat-card">
+                  <p className="profile-stat-value">{formatBRL(rechargeBalance)}</p>
+                  <p className="profile-stat-label">Total recargas(R$)</p>
+                </div>
+                <div className="profile-stat-card">
                   <p className="profile-stat-value">{formatBRL(totalWithdrawals)}</p>
                   <p className="profile-stat-label">Saques acumulados(R$)</p>
                 </div>
