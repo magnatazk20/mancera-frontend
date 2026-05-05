@@ -182,6 +182,26 @@ export default function AdminUserHistory() {
     load()
   }, [id])
 
+  const handleRemoveVip = async (item: PurchaseItem) => {
+    if (!id) return
+    if (!confirm(`Remover VIP '${item.planName}' deste usuário?`)) return
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/vip`, {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = await res.json()
+      if (res.ok && data?.ok) {
+        alert(`VIP '${item.planName}' removido.`)
+        window.location.reload()
+      } else {
+        alert(data?.error || 'Erro ao remover VIP.')
+      }
+    } catch {
+      alert('Erro de conexão.')
+    }
+  }
+
   return (
     <main className='admin-page'>
       <AdminSidebar />
@@ -224,24 +244,7 @@ export default function AdminUserHistory() {
                           <span>{formatBRL(item.amountPaid)}</span>
                           <button
                             type='button'
-                            onClick={async () => {
-                              if (!confirm(`Remover VIP '${item.planName}' deste usuário?')) return
-                              try {
-                                const res = await fetch(`${API_URL}/api/admin/users/${id}/vip`, {
-                                  method: 'DELETE',
-                                  headers: token ? { Authorization: `Bearer ${token}` } : {},
-                                })
-                                const data = await res.json()
-                                if (res.ok && data?.ok) {
-                                  alert(`VIP '${item.planName}' removido.`)
-                                  window.location.reload()
-                                } else {
-                                  alert(data?.error || 'Erro ao remover VIP.')
-                                }
-                              } catch {
-                                alert('Erro de conexão.')
-                              }
-                            }}
+                            onClick={() => handleRemoveVip(item)}
                             style={{
                               padding: '3px 10px',
                               borderRadius: '8px',
