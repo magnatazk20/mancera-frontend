@@ -16,7 +16,7 @@ export default function Support() {
               <h2 className="support-card__title">Gerente Amy</h2>
               <p className="support-card__desc">Fale diretamente com a gerente responsável pelo seu atendimento.</p>
               <a
-                href="https://wa.me/17825094179"
+                href="https://wa.me/351938180486"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="support-card__btn support-card__btn--gerente"
