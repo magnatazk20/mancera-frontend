@@ -27,12 +27,6 @@ type WalletOption = {
   value: number
 }
 
-const WALLET_COLORS: Record<string, string> = {
-  balance: '#0066cc',
-  commission_balance: '#16a34a',
-  recharge_balance: '#7c3aed',
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
