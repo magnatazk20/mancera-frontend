@@ -67,6 +67,8 @@ type UserDetailsResponse = {
     created_at?: string
     balance: number
     shopBalance: number
+    rechargeBalance: number
+    commissionBalance: number
     telegramConectado?: number | boolean
     telegramConnection?: {
       telegramChatId: string
@@ -910,6 +912,14 @@ export default function AdminUserDetails() {
               <article className="admin-kpi-card">
                 <p>Saldo atual</p>
                 <strong>{formatBRL(user.balance)}</strong>
+              </article>
+              <article className="admin-kpi-card">
+                <p>Saldo de recarga</p>
+                <strong>{formatBRL(user.rechargeBalance ?? 0)}</strong>
+              </article>
+              <article className="admin-kpi-card">
+                <p>Saldo de comissão</p>
+                <strong>{formatBRL(user.commissionBalance ?? 0)}</strong>
               </article>
               <article className="admin-kpi-card">
                 <p>Saldo da loja (gift cards)</p>
