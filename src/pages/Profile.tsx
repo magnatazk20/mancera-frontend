@@ -78,6 +78,7 @@ export default function Profile() {
   const [balance, setBalance] = useState(0)
   const [totalDeposits, setTotalDeposits] = useState(0)
   const [withdrawableBalance, setWithdrawableBalance] = useState(0)
+  const [rechargeBalance, setRechargeBalance] = useState(0)
   const [todayIncome, setTodayIncome] = useState(0)
   const [teamTotal, setTeamTotal] = useState(0)
   const [totalWithdrawals, setTotalWithdrawals] = useState(0)
@@ -119,6 +120,7 @@ export default function Profile() {
     setBalance(data.balance)
     setWithdrawableBalance(data.commissionBalance)
     setTotalDeposits(data.totalDeposits)
+    setRechargeBalance(data.rechargeBalance)
   }, [])
 
   useBalanceSocket(user?.id, handleBalanceUpdate)
@@ -328,7 +330,7 @@ export default function Profile() {
                 </div>
                 <div className="profile-wallet-divider" />
                 <div className="profile-wallet-item">
-                  <div className="profile-wallet-value">{formatBRL(totalDeposits)}</div>
+                  <div className="profile-wallet-value">{formatBRL(rechargeBalance)}</div>
                   <div className="profile-wallet-label">Recarga (R$)</div>
                 </div>
               </section>
