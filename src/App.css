@@ -750,8 +750,32 @@ body::before {
   }
 }
 
-@media (max-width: 680px) {
-  .social-links-grid {
-    grid-template-columns: 1fr;
-  }
+/* ═══════════════════════════════════════
+   FLOATING SUPPORT BUTTON
+═══════════════════════════════════════ */
+.support-float-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #25d366, #128c7e);
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  z-index: 999;
+}
+
+.support-float-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.support-float-btn:active {
+  transform: scale(0.95);
 }
