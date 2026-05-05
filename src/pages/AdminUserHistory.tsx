@@ -186,13 +186,12 @@ export default function AdminUserHistory() {
     if (!id) return
     if (!confirm(`Remover VIP '${item.planName}' deste usuário?`)) return
     try {
-      const res = await fetch(`${API_URL}/api/admin/users/${id}/vip`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/vip?vipId=${item.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ vipId: item.id }),
       })
       const data = await res.json()
       if (res.ok && data?.ok) {
