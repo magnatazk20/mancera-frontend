@@ -112,6 +112,7 @@ export default function AdminUserDetails() {
   const [adjustAmount, setAdjustAmount] = useState('')
   const [adjustOperation, setAdjustOperation] = useState<'add' | 'subtract'>('add')
   const [adjustReason, setAdjustReason] = useState('')
+  const [adjustWallet, setAdjustWallet] = useState<'balance' | 'commission_balance' | 'recharge_balance'>('balance')
   const [adjustLoading, setAdjustLoading] = useState(false)
   const [adjustFeedback, setAdjustFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -375,6 +376,7 @@ export default function AdminUserDetails() {
           amount: parsedAmount,
           operation: adjustOperation,
           reason: adjustReason.trim() || undefined,
+          wallet: adjustWallet,
         }),
       })
 
@@ -828,6 +830,18 @@ export default function AdminUserDetails() {
                     >
                       <option value="add">Adicionar saldo</option>
                       <option value="subtract">Retirar saldo</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    <span>Carteira</span>
+                    <select
+                      value={adjustWallet}
+                      onChange={(e) => setAdjustWallet(e.target.value as 'balance' | 'commission_balance' | 'recharge_balance')}
+                    >
+                      <option value="balance">Saldo geral</option>
+                      <option value="commission_balance">Carteira de comissão</option>
+                      <option value="recharge_balance">Carteira de recarga</option>
                     </select>
                   </label>
 
