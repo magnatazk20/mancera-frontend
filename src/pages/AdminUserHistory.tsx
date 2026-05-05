@@ -188,7 +188,11 @@ export default function AdminUserHistory() {
     try {
       const res = await fetch(`${API_URL}/api/admin/users/${id}/vip`, {
         method: 'DELETE',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ vipId: item.id }),
       })
       const data = await res.json()
       if (res.ok && data?.ok) {
