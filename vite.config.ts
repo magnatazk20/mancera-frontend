@@ -2,6 +2,8 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import fs from 'node:fs'
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { ViteDevServer } from 'vite'
 
 // ── OG-tag injection plugin ──────────────────────────────────────────────────
 function ogTagsPlugin() {
@@ -17,8 +19,8 @@ function ogTagsPlugin() {
 
   return {
     name: 'og-tags-inject',
-    configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
         const url = req.url ?? '/'
         // Only intercept the register page with a ref param
         if (!url.startsWith('/register?ref=')) {
