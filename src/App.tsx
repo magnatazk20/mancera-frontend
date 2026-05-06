@@ -67,6 +67,7 @@ import AdminShopProducts from './pages/AdminShopProducts'
 import AdminCorrectionLogs from './pages/AdminCorrectionLogs'
 import AdminVipLevels from './pages/AdminVipLevels'
 import AdminTaskCommissions from './pages/AdminTaskCommissions'
+import AdminCommissionReversal from './pages/AdminCommissionReversal'
 import AdminVipRefunds from './pages/AdminVipRefunds'
 import AdminVipPhotos from './pages/AdminVipPhotos'
 import About from './pages/About'
@@ -432,6 +433,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCorrectionLogs />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/commission-reversal"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCommissionReversal />
             </RequireMaxAdmin>
           )}
         />

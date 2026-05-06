@@ -133,6 +133,7 @@ export default function AdminSidebar() {
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/security-logs'); setMenuOpen(false) }}>🛡️ Logs de Segurança</button>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/correction-logs'); setMenuOpen(false) }}>🔧 Correções de Saldo</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-reversal'); setMenuOpen(false) }}>🔄 Estorno de Comissões</button>
         </nav>
 
         <button
