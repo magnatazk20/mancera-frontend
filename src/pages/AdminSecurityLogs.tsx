@@ -81,6 +81,7 @@ export default function AdminSecurityLogs() {
   const [query, setQuery] = useState('')
   const [eventFilter, setEventFilter] = useState('all')
   const [selectedExtra, setSelectedExtra] = useState<{ id: number; extra: Record<string, unknown> | null } | null>(null)
+  const [selectedLog, setSelectedLog] = useState<SecurityLog | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -223,6 +224,7 @@ export default function AdminSecurityLogs() {
                   <th>Usuário Alvo</th>
                   <th>Motivo</th>
                   <th>Extra</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,6 +268,16 @@ export default function AdminSecurityLogs() {
                           </button>
                         ) : <span style={{ color: '#cbd5e1', fontSize: 12 }}>—</span>}
                       </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="admin-toggle-logs-btn"
+                          style={{ background: '#1e3a5f', color: '#93c5fd', fontSize: 11, padding: '3px 10px' }}
+                          onClick={() => setSelectedLog(row)}
+                        >
+                          Ver detalhes
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -291,6 +303,98 @@ export default function AdminSecurityLogs() {
               <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 13 }}>
                 {JSON.stringify(selectedExtra.extra, null, 2)}
               </pre>
+            </section>
+          </div>
+        ) : null}
+
+        {/* Modal de detalhes completos do log */}
+        {selectedLog ? (
+          <div
+            onClick={() => setSelectedLog(null)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(2,6,23,0.82)', zIndex: 1300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          >
+            <section
+              className="admin-panel admin-panel-wide"
+              onClick={(e) => e.stopPropagation()}
+              style={{ marginTop: 0, width: '100%', maxWidth: 680, maxHeight: '88vh', overflow: 'auto' }}
+            >
+              <div className="admin-panel-head">
+                <h2>📋 Detalhes do Log #{selectedLog.id}</h2>
+                <button type="button" className="admin-toggle-logs-btn" onClick={() => setSelectedLog(null)}>Fechar</button>
+              </div>
+
+              <div style={{ display: 'grid', gap: 12, padding: '0 0 1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>EVENTO</div>
+                    <EventBadge eventType={selectedLog.eventType} />
+                  </div>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>DATA / HORA</div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{formatDateTime(selectedLog.createdAt)}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>IP</div>
+                    <div style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 600 }}>{selectedLog.ip}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 80px', gap: 10 }}>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>MÉTODO</div>
+                    <div style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: '#0369a1' }}>{selectedLog.method}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>ENDPOINT</div>
+                    <div style={{ fontSize: 12, fontFamily: 'monospace', wordBreak: 'break-all' }}>{selectedLog.endpoint}</div>
+                  </div>
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>STATUS</div>
+                    <StatusBadge status={selectedLog.httpStatus} />
+                  </div>
+                </div>
+
+                <div style={{ background: '#eff6ff', border: '1px solid #93c5fd', borderRadius: 8, padding: '10px 14px' }}>
+                  <div style={{ fontSize: 11, color: '#1e40af', fontWeight: 600, marginBottom: 6 }}>USUÁRIO LOGADO</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 13 }}>
+                    <div><div style={{ fontSize: 11, color: '#64748b' }}>ID</div><div style={{ fontWeight: 600 }}>{selectedLog.userId ?? '—'}</div></div>
+                    <div><div style={{ fontSize: 11, color: '#64748b' }}>Nome</div><div style={{ fontWeight: 600 }}>{selectedLog.userName ?? '—'}</div></div>
+                    <div><div style={{ fontSize: 11, color: '#64748b' }}>Telefone</div><div style={{ fontWeight: 600 }}>{selectedLog.userPhone ?? '—'}</div></div>
+                  </div>
+                </div>
+
+                {selectedLog.attemptedUserId ? (
+                  <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#991b1b', fontWeight: 600, marginBottom: 6 }}>USUÁRIO ALVO</div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, fontSize: 13 }}>
+                      <div><div style={{ fontSize: 11, color: '#64748b' }}>ID</div><div style={{ fontWeight: 600, color: '#991b1b' }}>{selectedLog.attemptedUserId}</div></div>
+                      <div><div style={{ fontSize: 11, color: '#64748b' }}>Nome</div><div style={{ fontWeight: 600, color: '#991b1b' }}>{selectedLog.attemptedUserName ?? '—'}</div></div>
+                      <div><div style={{ fontSize: 11, color: '#64748b' }}>Telefone</div><div style={{ fontWeight: 600, color: '#ef4444' }}>{selectedLog.attemptedUserPhone ?? '—'}</div></div>
+                    </div>
+                  </div>
+                ) : null}
+
+                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                  <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>MOTIVO</div>
+                  <div style={{ fontSize: 13, color: '#334155' }}>{selectedLog.reason}</div>
+                </div>
+
+                {selectedLog.userAgent ? (
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>USER AGENT</div>
+                    <div style={{ fontSize: 12, color: '#475569', wordBreak: 'break-all' }}>{selectedLog.userAgent}</div>
+                  </div>
+                ) : null}
+
+                {selectedLog.extra ? (
+                  <div style={{ background: '#f8fafc', borderRadius: 8, padding: '10px 14px' }}>
+                    <div style={{ fontSize: 11, color: '#64748b', fontWeight: 600, marginBottom: 4 }}>EXTRA (JSON)</div>
+                    <pre style={{ margin: 0, fontSize: 12, whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: '#1e293b' }}>
+                      {JSON.stringify(selectedLog.extra, null, 2)}
+                    </pre>
+                  </div>
+                ) : null}
+              </div>
             </section>
           </div>
         ) : null}
