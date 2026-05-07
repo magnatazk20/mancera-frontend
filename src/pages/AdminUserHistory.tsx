@@ -620,14 +620,14 @@ export default function AdminUserHistory() {
                               {taskInfo ? <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{taskInfo}</p> : null}
                               <small style={{ color: '#64748b' }}>{walletLabel}</small>
                               <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
+                              <small style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo: {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor: {log.amount == null ? '-' : formatBRL(log.amount)}
+                              </small>
                             </div>
                             <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <strong style={{ color: '#22c55e' }}>
+                              <strong style={{ color: '#22c55e', fontSize: '1rem' }}>
                                 {log.amount != null ? `+${formatBRL(log.amount)}` : '-'}
                               </strong>
-                              <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                                {log.old_balance != null ? formatBRL(log.old_balance) : '-'} → {log.new_balance != null ? formatBRL(log.new_balance) : '-'}
-                              </p>
                             </div>
                           </article>
                         )
@@ -658,16 +658,16 @@ export default function AdminUserHistory() {
                         <article key={`log-${log.id}`} className='admin-user-log-item'>
                           <div>
                             <strong>{formatLogActionLabel(log.action)}</strong>
-                            <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
                             <small style={{ color: '#64748b' }}>{walletLabel}</small>
+                            <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
+                            <small style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                              anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo: {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor: {log.amount == null ? '-' : formatBRL(log.amount)}
+                            </small>
                           </div>
                           <div style={{ textAlign: 'right', flexShrink: 0 }}>
                             <strong style={{ color: amountColor, fontSize: '1rem' }}>
                               {log.amount != null ? formatBRLSigned(log.amount, log.action) : '-'}
                             </strong>
-                            <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                              {log.old_balance != null ? formatBRL(log.old_balance) : '-'} → {log.new_balance != null ? formatBRL(log.new_balance) : '-'}
-                            </p>
                           </div>
                         </article>
                       )
