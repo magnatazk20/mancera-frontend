@@ -6,6 +6,9 @@ import './AdminUserWithdrawals.css'
 type AdminWithdrawalRow = {
   id: number
   amount: number
+  feePercent: number
+  feeAmount: number
+  netAmount: number
   status: string
   holderName?: string
   holderCpf?: string
@@ -122,8 +125,16 @@ function WithdrawalDetailModal({
             <p className="auw-modal-section-title">Dados do Saque</p>
             <div className="auw-modal-grid">
               <div className="auw-modal-field">
-                <span className="auw-modal-label">Valor</span>
+                <span className="auw-modal-label">Valor Bruto</span>
                 <span className="auw-modal-value auw-value-highlight">{formatBRL(row.amount)}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Taxa ({row.feePercent}%)</span>
+                <span className="auw-modal-value">{formatBRL(row.feeAmount)}</span>
+              </div>
+              <div className="auw-modal-field">
+                <span className="auw-modal-label">Valor Líquido</span>
+                <span className="auw-modal-value auw-value-highlight" style={{ color: '#4ade80' }}>{formatBRL(row.netAmount)}</span>
               </div>
               <div className="auw-modal-field">
                 <span className="auw-modal-label">Status</span>
@@ -379,7 +390,9 @@ export default function AdminUserWithdrawals() {
                   <th>ID</th>
                   <th>Usuário</th>
                   <th>Telefone</th>
-                  <th>Valor</th>
+                  <th>Valor Bruto</th>
+                  <th>Taxa</th>
+                  <th>Valor Líquido</th>
                   <th>Status</th>
                   <th>Data</th>
                   <th></th>
@@ -388,15 +401,15 @@ export default function AdminUserWithdrawals() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={7}>Carregando saques...</td>
+                    <td colSpan={9}>Carregando saques...</td>
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={7}>{error}</td>
+                    <td colSpan={9}>{error}</td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={7}>Nenhum saque encontrado com os filtros aplicados.</td>
+                    <td colSpan={9}>Nenhum saque encontrado com os filtros aplicados.</td>
                   </tr>
                 ) : (
                   filteredRows.map((row) => (
@@ -405,6 +418,8 @@ export default function AdminUserWithdrawals() {
                       <td>{row.user?.name || `Usuário #${row.user?.id ?? ''}`}</td>
                       <td>{row.user?.phone || '-'}</td>
                       <td>{formatBRL(row.amount)}</td>
+                      <td>{formatBRL(row.feeAmount)} ({row.feePercent}%)</td>
+                      <td style={{ color: '#4ade80', fontWeight: 600 }}>{formatBRL(row.netAmount)}</td>
                       <td>
                         <span className={`status ${mapStatusClass(row.status)}`}>{mapStatusLabel(row.status)}</span>
                       </td>
@@ -448,8 +463,16 @@ export default function AdminUserWithdrawals() {
                     <span>{row.user?.phone || '-'}</span>
                   </div>
                   <div className="admin-withdraw-row">
-                    <strong>Valor</strong>
+                    <strong>Valor Bruto</strong>
                     <span>{formatBRL(row.amount)}</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Taxa</strong>
+                    <span>{formatBRL(row.feeAmount)} ({row.feePercent}%)</span>
+                  </div>
+                  <div className="admin-withdraw-row">
+                    <strong>Valor Líquido</strong>
+                    <span style={{ color: '#4ade80', fontWeight: 600 }}>{formatBRL(row.netAmount)}</span>
                   </div>
                   <div className="admin-withdraw-row">
                     <strong>Status</strong>
