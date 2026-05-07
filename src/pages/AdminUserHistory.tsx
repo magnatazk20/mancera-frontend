@@ -30,10 +30,12 @@ const formatLogActionLabel = (actionRaw: string) => {
   return actionRaw
 }
 
-const formatWalletName = (creditedTo: string | undefined) => {
+const formatWalletName = (creditedTo: string | undefined, action?: string) => {
+  const actionLower = (action ?? '').toLowerCase()
   if (creditedTo === 'commission_balance') return '🪙 Carteira de Comissao'
   if (creditedTo === 'recharge_balance') return '📱 Carteira de Recarga'
   if (creditedTo === 'shop_balance') return '🏪 Saldo Loja'
+  if (actionLower === 'task_commission_credit' || actionLower === 'vip_commission_credit' || actionLower === 'commission_reversal') return '🪙 Carteira de Comissao'
   return '💰 Saldo Geral'
 }
 
@@ -608,7 +610,7 @@ export default function AdminUserHistory() {
                           if (log.metadata) {
                             const meta = JSON.parse(log.metadata)
                             taskInfo = `Tarefa #${meta.taskId ?? '-'}${meta.vipName ? ` · ${meta.vipName}` : ''}`
-                            walletLabel = formatWalletName(meta.creditedTo)
+                            walletLabel = formatWalletName(meta.creditedTo, log.action)
                           }
                         } catch {
                           taskInfo = ''
@@ -651,7 +653,7 @@ export default function AdminUserHistory() {
                     {(user.accountLogs ?? []).map((log) => {
                       let meta: Record<string, any> = {}
                       try { if (log.metadata) meta = JSON.parse(log.metadata) } catch { /* ignore */ }
-                      const walletLabel = formatWalletName(meta.creditedTo)
+                      const walletLabel = formatWalletName(meta.creditedTo, log.action)
                       const isPositive = (log.amount ?? 0) >= 0
                       const amountColor = log.action?.includes('commission') ? '#fbbf24' : isPositive ? '#22c55e' : '#f87171'
                       return (
