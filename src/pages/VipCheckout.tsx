@@ -159,7 +159,7 @@ export default function VipCheckout() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id }),
+        body: JSON.stringify({ userId: user.id, vipLevelId: plan.id, wallet: selectedWallet }),
       })
 
       const data = await response.json().catch(() => ({}))
