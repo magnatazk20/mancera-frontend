@@ -17,11 +17,30 @@ type UserLogItem = {
 const formatLogActionLabel = (actionRaw: string) => {
   const action = String(actionRaw ?? '').toLowerCase().trim()
 
-  if (action === 'withdraw_request_created' || action === 'withdraw_request_auto_processed') {
-    return 'Solicitacao de saque'
-  }
+  if (action === 'withdraw_request_created' || action === 'withdraw_request_auto_processed') return 'Solicitacao de saque'
+  if (action === 'admin_balance_adjustment') return 'Ajuste admin'
+  if (action === 'admin_withdraw_approved') return 'Saque aprovado'
+  if (action === 'admin_withdraw_cancelled') return 'Saque cancelado'
+  if (action === 'vip_activation') return 'Ativacao VIP'
+  if (action === 'daily_checkin_claimed') return 'Check-in diario'
+  if (action === 'roulette_spin') return 'Giro roleta'
+  if (action === 'shop_gift_card_purchase') return 'Compra gift card'
+  if (action === 'cycle_product_purchase') return 'Compra ciclo'
 
   return actionRaw
+}
+
+const formatWalletName = (creditedTo: string | undefined) => {
+  if (creditedTo === 'commission_balance') return '🪙 Carteira de Comissao'
+  if (creditedTo === 'recharge_balance') return '📱 Carteira de Recarga'
+  if (creditedTo === 'shop_balance') return '🏪 Saldo Loja'
+  return '💰 Saldo Geral'
+}
+
+const formatBRLSigned = (value: number, action: string) => {
+  const absVal = Math.abs(value)
+  if (action.includes('commission')) return `+${formatBRL(absVal)}`
+  return value >= 0 ? `+${formatBRL(absVal)}` : `-${formatBRL(absVal)}`
 }
 
 type PurchaseItem = {
@@ -584,10 +603,12 @@ export default function AdminUserHistory() {
                     <div className='admin-user-list'>
                       {taskLogs.map((log) => {
                         let taskInfo = ''
+                        let walletLabel = '💰 Saldo Geral'
                         try {
                           if (log.metadata) {
                             const meta = JSON.parse(log.metadata)
                             taskInfo = `Tarefa #${meta.taskId ?? '-'}${meta.vipName ? ` · ${meta.vipName}` : ''}`
+                            walletLabel = formatWalletName(meta.creditedTo)
                           }
                         } catch {
                           taskInfo = ''
@@ -597,12 +618,16 @@ export default function AdminUserHistory() {
                             <div>
                               <strong style={{ color: '#22c55e' }}>✅ Tarefa concluída</strong>
                               {taskInfo ? <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{taskInfo}</p> : null}
+                              <small style={{ color: '#64748b' }}>{walletLabel}</small>
                               <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
-                              <small>
-                                anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo:{' '}
-                                {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor:{' '}
-                                {log.amount == null ? '-' : formatBRL(log.amount)}
-                              </small>
+                            </div>
+                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                              <strong style={{ color: '#22c55e' }}>
+                                {log.amount != null ? `+${formatBRL(log.amount)}` : '-'}
+                              </strong>
+                              <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                                {log.old_balance != null ? formatBRL(log.old_balance) : '-'} → {log.new_balance != null ? formatBRL(log.new_balance) : '-'}
+                              </p>
                             </div>
                           </article>
                         )
@@ -623,19 +648,30 @@ export default function AdminUserHistory() {
               {showLogs ? (
                 (user.accountLogs ?? []).length ? (
                   <div className='admin-user-list'>
-                    {(user.accountLogs ?? []).map((log) => (
-                      <article key={`log-${log.id}`} className='admin-user-log-item'>
-                        <div>
-                          <strong>{formatLogActionLabel(log.action)}</strong>
-                          <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
-                          <small>
-                            anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo:{' '}
-                            {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor:{' '}
-                            {log.amount == null ? '-' : formatBRL(log.amount)}
-                          </small>
-                        </div>
-                      </article>
-                    ))}
+                    {(user.accountLogs ?? []).map((log) => {
+                      let meta: Record<string, any> = {}
+                      try { if (log.metadata) meta = JSON.parse(log.metadata) } catch { /* ignore */ }
+                      const walletLabel = formatWalletName(meta.creditedTo)
+                      const isPositive = (log.amount ?? 0) >= 0
+                      const amountColor = log.action?.includes('commission') ? '#fbbf24' : isPositive ? '#22c55e' : '#f87171'
+                      return (
+                        <article key={`log-${log.id}`} className='admin-user-log-item'>
+                          <div>
+                            <strong>{formatLogActionLabel(log.action)}</strong>
+                            <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
+                            <small style={{ color: '#64748b' }}>{walletLabel}</small>
+                          </div>
+                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                            <strong style={{ color: amountColor, fontSize: '1rem' }}>
+                              {log.amount != null ? formatBRLSigned(log.amount, log.action) : '-'}
+                            </strong>
+                            <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                              {log.old_balance != null ? formatBRL(log.old_balance) : '-'} → {log.new_balance != null ? formatBRL(log.new_balance) : '-'}
+                            </p>
+                          </div>
+                        </article>
+                      )
+                    })}
                   </div>
                 ) : <p>Nenhum log encontrado.</p>
               ) : <p className='admin-log-hint'>Clique em Mostrar logs para visualizar o historico da conta.</p>}
