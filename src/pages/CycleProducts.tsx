@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
@@ -56,6 +55,7 @@ export default function CycleProducts() {
   const [userInviteCount, setUserInviteCount] = useState<{ level1: number; level2: number; level3: number } | null>(null)
   const [myPurchases, setMyPurchases] = useState<Record<number, number>>({})
   const [investAmounts, setInvestAmounts] = useState<Record<number, string>>({})
+  const [userVipLevel, setUserVipLevel] = useState<number | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
@@ -72,6 +72,27 @@ export default function CycleProducts() {
       navigate('/')
     }
   }, [navigate])
+
+  useEffect(() => {
+    if (!user?.id) return
+
+    const loadUserVipLevel = async () => {
+      try {
+        const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+        const res = await fetch(`${API_URL}/api/user/summary/${user.id}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
+        const data = await res.json().catch(() => ({})) as { vipLevelId?: number }
+        if (res.ok && data?.vipLevelId != null) {
+          setUserVipLevel(Number(data.vipLevelId))
+        }
+      } catch {
+        // silencioso
+      }
+    }
+
+    loadUserVipLevel()
+  }, [user?.id])
 
   useEffect(() => {
     if (!user?.id) return
@@ -241,6 +262,9 @@ export default function CycleProducts() {
 
   if (!user) return null
 
+  // T0 não pode ver nem comprar planos — mostra mensagem de bloqueio
+  const isT0User = userVipLevel === 6
+
   return (
     <main className="dash-app">
       <section className="dash-main">
@@ -255,108 +279,141 @@ export default function CycleProducts() {
 
           <h2 className="cycle-storage-title">Período de armazenamento</h2>
 
-          {/* ── Categoria tabs ── */}
-          <div className="cycle-category-tabs" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <button
-              type="button"
-              className={`cycle-category-tab${activeCategory === 'normal' ? ' active' : ''}`}
-              onClick={() => setActiveCategory('normal')}
-            >
-              Essencial
-            </button>
-            <button
-              type="button"
-              className={`cycle-category-tab${activeCategory === 'vip' ? ' active' : ''}`}
-              onClick={() => setActiveCategory('vip')}
-            >
-              Fundo de ouro
-            </button>
-          </div>
-
-          {loading ? (
-            <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Carregando produtos...</p>
-          ) : filteredCyclePlans.length === 0 ? (
-            <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Nenhum plano disponível nesta categoria.</p>
+          {/* ── Bloqueio T0 ── */}
+          {isT0User ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#4b5a64' }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+              <h3 style={{ color: '#2d3b44', marginBottom: 8 }}>Planos exclusivos para membros T1+</h3>
+              <p style={{ fontSize: 14, maxWidth: 320, margin: '0 auto 16px' }}>
+                Os planos de ciclo são destinados a membros que já fizeram pelo menos um depósito (T1 em diante).
+              </p>
+              <p style={{ fontSize: 13, color: '#6b7280' }}>
+                Faça um depósito na aba <strong>Depositar</strong> para desbloquear os planos de investimento.
+              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/cashin')}
+                style={{
+                  marginTop: 20,
+                  padding: '10px 24px',
+                  background: 'linear-gradient(180deg, #0798cb 0%, #0b80b2 100%)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 700,
+                  fontSize: 14,
+                  cursor: 'pointer',
+                }}
+              >
+                Ir para Depósito
+              </button>
+            </div>
           ) : (
-            filteredCyclePlans.map((plan) => {
-              const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
-              const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
-              const vendidos = Math.max(0, estoqueInicial - estoque)
-              const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
-              const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
-              const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
-              const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
-              const isUnavailable = estoque <= 0 || limitReached
-              const effectivePercent = plan.profitPercent > 0 ? plan.profitPercent : plan.profit
-              const totalPercent = Number((effectivePercent * plan.cycleDays).toFixed(2))
-
-              return (
-                <article
-                  key={plan.id}
-                  className={`cycle-product-card${isUnavailable ? ' unavailable' : ''}`}
-                  onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
+            <>
+              {/* ── Categoria tabs ── */}
+              <div className="cycle-category-tabs" style={{ gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <button
+                  type="button"
+                  className={`cycle-category-tab${activeCategory === 'normal' ? ' active' : ''}`}
+                  onClick={() => setActiveCategory('normal')}
                 >
-                  {/* ── Imagem no topo com badges ── */}
-                  <div className="cycle-product-image-wrap">
-                    <img src={plan.imageUrl} alt={plan.name} />
-                    <span className="cycle-percent-overlay">{totalPercent}%</span>
-                    <span className="cycle-days-overlay">{plan.cycleDays} dias</span>
-                  </div>
+                  Essencial
+                </button>
+                <button
+                  type="button"
+                  className={`cycle-category-tab${activeCategory === 'vip' ? ' active' : ''}`}
+                  onClick={() => setActiveCategory('vip')}
+                >
+                  Fundo de ouro
+                </button>
+              </div>
 
-                  {/* ── Corpo do card ── */}
-                  <div className="cycle-product-body">
-                    <div className="cycle-product-title">{plan.name}</div>
+              {loading ? (
+                <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Carregando produtos...</p>
+              ) : filteredCyclePlans.length === 0 ? (
+                <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Nenhum plano disponível nesta categoria.</p>
+              ) : (
+                filteredCyclePlans.map((plan) => {
+                  const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
+                  const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
+                  const vendidos = Math.max(0, estoqueInicial - estoque)
+                  const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
+                  const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
+                  const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
+                  const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
+                  const isUnavailable = estoque <= 0 || limitReached
+                  const effectivePercent = plan.profitPercent > 0 ? plan.profitPercent : plan.profit
+                  const totalPercent = Number((effectivePercent * plan.cycleDays).toFixed(2))
 
-                    <div className="cycle-details-list">
-                      <div>Lucro diário: <strong>{effectivePercent}%</strong></div>
-                      <div>Lucro total no ciclo: <strong>{totalPercent}%</strong></div>
-                      <div>Ciclo: <strong>{plan.cycleDays} dias</strong></div>
-                      <div>Mín. depósito: <strong>{formatBRL(plan.minAmount)}</strong></div>
-                    </div>
+                  return (
+                    <article
+                      key={plan.id}
+                      className={`cycle-product-card${isUnavailable ? ' unavailable' : ''}`}
+                      onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
+                    >
+                      {/* ── Imagem no topo com badges ── */}
+                      <div className="cycle-product-image-wrap">
+                        <img src={plan.imageUrl} alt={plan.name} />
+                        <span className="cycle-percent-overlay">{totalPercent}%</span>
+                        <span className="cycle-days-overlay">{plan.cycleDays} dias</span>
+                      </div>
 
-                    {/* ── Badge circular de progresso ── */}
-                    <div className="cycle-percentage-badge">{progresso}%</div>
+                      {/* ── Corpo do card ── */}
+                      <div className="cycle-product-body">
+                        <div className="cycle-product-title">{plan.name}</div>
 
-                    {/* ── Info compras / estoque ── */}
-                    <div className="cycle-stock-info">
-                      <span>Compras: <strong>{userPurchaseCount}</strong></span>
-                      <span>Estoque: <strong>{estoque}</strong></span>
-                    </div>
+                        <div className="cycle-details-list">
+                          <div>Lucro diário: <strong>{effectivePercent}%</strong></div>
+                          <div>Lucro total no ciclo: <strong>{totalPercent}%</strong></div>
+                          <div>Ciclo: <strong>{plan.cycleDays} dias</strong></div>
+                          <div>Mín. depósito: <strong>{formatBRL(plan.minAmount)}</strong></div>
+                        </div>
 
-                    {/* ── Tag reinvestimento ── */}
-                    <span className={`cycle-reinvest-tag${isUnavailable ? ' closed' : ''}`}>
-                      {isUnavailable ? 'Não é mais possível investir' : 'Pode ser reinvestido'}
-                    </span>
+                        {/* ── Badge circular de progresso ── */}
+                        <div className="cycle-percentage-badge">{progresso}%</div>
 
-                    {/* ── Botão ── */}
-                    {isUnavailable ? (
-                      <button
-                        type="button"
-                        className="cycle-product-button disabled"
-                        disabled
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        Esgotado <span className="arrow">✕</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="cycle-product-button"
-                        onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan) }}
-                      >
-                        Invista agora <span className="arrow">➜</span>
-                      </button>
-                    )}
-                  </div>
-                </article>
-              )
-            })
+                        {/* ── Info compras / estoque ── */}
+                        <div className="cycle-stock-info">
+                          <span>Compras: <strong>{userPurchaseCount}</strong></span>
+                          <span>Estoque: <strong>{estoque}</strong></span>
+                        </div>
+
+                        {/* ── Tag reinvestimento ── */}
+                        <span className={`cycle-reinvest-tag${isUnavailable ? ' closed' : ''}`}>
+                          {isUnavailable ? 'Não é mais possível investir' : 'Pode ser reinvestido'}
+                        </span>
+
+                        {/* ── Botão ── */}
+                        {isUnavailable ? (
+                          <button
+                            type="button"
+                            className="cycle-product-button disabled"
+                            disabled
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Esgotado <span className="arrow">✕</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="cycle-product-button"
+                            onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan) }}
+                          >
+                            Invista agora <span className="arrow">➜</span>
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  )
+                })
+              )}
+            </>
           )}
         </div>
       </section>
 
       {/* ── Modal de investimento ── */}
-      {selectedPlan ? (
+      {!isT0User && selectedPlan ? (
         <div
           style={{
             position: 'fixed',
@@ -471,7 +528,7 @@ export default function CycleProducts() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                     {userInviteCount !== null && userInviteCount.level1 >= selectedPlan.requireCommissionLevel1Count
                       ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
-                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✕</span>}
                     <span>
                       Nível 1: {userInviteCount !== null ? `${userInviteCount.level1}/` : ''}{selectedPlan.requireCommissionLevel1Count} indicados com depósito
                     </span>
@@ -481,7 +538,7 @@ export default function CycleProducts() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                     {userInviteCount !== null && userInviteCount.level2 >= selectedPlan.requireCommissionLevel2Count
                       ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
-                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✕</span>}
                     <span>
                       Nível 2: {userInviteCount !== null ? `${userInviteCount.level2}/` : ''}{selectedPlan.requireCommissionLevel2Count} indicados com depósito
                     </span>
@@ -491,7 +548,7 @@ export default function CycleProducts() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {userInviteCount !== null && userInviteCount.level3 >= selectedPlan.requireCommissionLevel3Count
                       ? <span style={{ color: '#16a34a', fontWeight: 700 }}>✓</span>
-                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✗</span>}
+                      : <span style={{ color: '#dc2626', fontWeight: 700 }}>✕</span>}
                     <span>
                       Nível 3: {userInviteCount !== null ? `${userInviteCount.level3}/` : ''}{selectedPlan.requireCommissionLevel3Count} indicados com depósito
                     </span>
