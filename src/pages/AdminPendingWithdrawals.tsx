@@ -126,6 +126,9 @@ export default function AdminPendingWithdrawals() {
 
   useEffect(() => {
     fetchPending()
+    // Auto-refresh a cada 10 segundos
+    const interval = setInterval(fetchPending, 10_000)
+    return () => clearInterval(interval)
   }, [])
 
   const setActing = (withdrawalId: number, value: boolean) => {

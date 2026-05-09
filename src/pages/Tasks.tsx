@@ -32,6 +32,16 @@ type StoredUser = {
   phone: string
 }
 
+type TaskResponse = {
+  ok: boolean
+  tasks: ApiTask[]
+  vip: VipInfo
+  totalCompletedToday: number
+  remainingByVip: number
+  isSunday: boolean
+  tasksLocked: boolean
+}
+
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -44,6 +54,7 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<ApiTask[]>([])
   const [vip, setVip] = useState<VipInfo | null>(null)
   const [remainingByVip, setRemainingByVip] = useState(0)
+  const [tasksLocked, setTasksLocked] = useState(false)
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -107,6 +118,7 @@ export default function Tasks() {
       setTasks(Array.isArray(data.tasks) ? data.tasks : [])
       setVip(data.vip ?? null)
       setRemainingByVip(Number(data.remainingByVip ?? 0))
+      setTasksLocked(Boolean(data.tasksLocked))
 
       // DEBUG: mostra TODAS as tasks com completedToday e visibleSlots
       const allTasks = (data.tasks as any[]).map((t: any) => ({ id: t.id, name: t.name.slice(0, 30), completedToday: t.completedToday }))
@@ -302,18 +314,28 @@ export default function Tasks() {
                 </article>
               </section>
 
+              {/* Aviso de domingo para T1+ */}
+              {tasksLocked ? (
+                <section className="tasks-blocked">
+                  <div className="tasks-blocked__body">
+                    <strong>Tarefas suspensas aos domingos</strong>
+                    <p>As tarefas são realizadas de <strong>segunda a sábado</strong>. Retornamos segunda-feira!</p>
+                  </div>
+                </section>
+              ) : null}
+
               {/* Grid de tarefas */}
               <section className="tasks-grid">
                 {visibleSlots.map((slot) => {
                   const jaConcluidaHoje = Number(slot.completedToday ?? 0) > 0
-                  const bloquearInicio = remainingByVip <= 0 || jaConcluidaHoje
+                  const bloquearInicio = remainingByVip <= 0 || jaConcluidaHoje || tasksLocked
                   const videoTitle = videoTitles[slot.videoId] || slot.name
                   const thumbUrl = getYouTubeThumbnail(slot.videoId)
 
                   return (
                     <article
                       key={`slot-${slot.slotIndex}-${slot.id}`}
-                      className={`tasks-card ${jaConcluidaHoje ? 'tasks-card--done' : ''}`}
+                      className={`tasks-card ${jaConcluidaHoje ? 'tasks-card--done' : ''} ${tasksLocked ? 'tasks-card--locked' : ''}`}
                     >
                       <div className="tasks-card__img-wrap">
                         <img
@@ -333,10 +355,16 @@ export default function Tasks() {
                           </svg>
                           Vídeo
                         </span>
-                        {jaConcluidaHoje && (
+                        {jaConcluidaHoje && !tasksLocked && (
                           <span className="tasks-card__badge-done">
                             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                             Concluída
+                          </span>
+                        )}
+                        {tasksLocked && (
+                          <span className="tasks-card__badge-done" style={{ background: '#ff9800' }}>
+                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                            Domingo - Sem tarefas
                           </span>
                         )}
                       </div>
@@ -351,20 +379,13 @@ export default function Tasks() {
                             {formatBRL(slot.rewardAmount)}
                           </span>
                           <button
-                            className={`tasks-btn ${jaConcluidaHoje ? 'tasks-btn--done' : 'tasks-btn--primary'}`}
                             onClick={() =>
                               navigate(`/tasks/mining/${slot.id}?video=${encodeURIComponent(slot.videoId)}&slot=${slot.slotIndex}`)
                             }
                             disabled={bloquearInicio}
-                            title={
-                              jaConcluidaHoje
-                                ? 'Tarefa já concluída hoje. Disponível novamente às 00:00 (São Paulo).'
-                                : remainingByVip <= 0
-                                  ? 'Limite diário do VIP atingido.'
-                                  : 'Iniciar Trabalho'
-                            }
+                            className={`tasks-btn ${jaConcluidaHoje || tasksLocked ? 'tasks-btn--done' : 'tasks-btn--primary'}`}
                           >
-                            {jaConcluidaHoje ? 'Concluída hoje' : 'Iniciar Trabalho'}
+                            {jaConcluidaHoje ? 'Concluída hoje' : tasksLocked ? 'Indisponível domingo' : 'Iniciar Trabalho'}
                           </button>
                         </div>
                       </div>

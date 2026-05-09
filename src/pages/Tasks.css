@@ -350,6 +350,11 @@
   border-color: rgba(45, 122, 58, 0.35);
 }
 
+.tasks-card--locked {
+  border-color: rgba(255, 152, 0, 0.45);
+  opacity: 0.75;
+}
+
 .tasks-card__img-wrap {
   position: relative;
   width: 100%;
