@@ -32,16 +32,6 @@ type StoredUser = {
   phone: string
 }
 
-type TaskResponse = {
-  ok: boolean
-  tasks: ApiTask[]
-  vip: VipInfo
-  totalCompletedToday: number
-  remainingByVip: number
-  isSunday: boolean
-  tasksLocked: boolean
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -102,6 +92,9 @@ export default function Tasks() {
       if (!response.ok || !data?.ok) {
         if (response.status === 403 || data?.code === 'VIP_REQUIRED') {
           setError('Você não possui VIP ativo. Ative um VIP para acessar as tarefas.')
+        } else if (data?.code === 'SUNDAY_BLOCKED') {
+          // Domingo: T1+ bloqueado — já cai aqui, mas o banner será shown pelo tasksLocked=true
+          setTasksLocked(true)
         } else {
           setError(data?.error ?? 'Não foi possível carregar suas tarefas.')
         }
