@@ -55,7 +55,7 @@ export default function AdminPendingWithdrawals() {
   const [cancelModal, setCancelModal] = useState<CancelModalState>({ open: false, withdrawalId: null })
   const [approveModal, setApproveModal] = useState<ApproveModalState>({ open: false, withdrawalId: null })
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing' | 'paid' | 'failed'>('all')
   const [minAmountFilter, setMinAmountFilter] = useState('')
   const [maxAmountFilter, setMaxAmountFilter] = useState('')
 
@@ -82,7 +82,10 @@ export default function AdminPendingWithdrawals() {
     })
   }, [withdrawals, searchTerm, statusFilter, minAmountFilter, maxAmountFilter])
 
-  const pendingCount = useMemo(() => filteredWithdrawals.length, [filteredWithdrawals])
+  const pendingCount = useMemo(
+    () => withdrawals.filter((w) => ['pending', 'processing'].includes(String(w.status ?? '').toLowerCase())).length,
+    [withdrawals]
+  )
 
   const totalAmount = useMemo(
     () => filteredWithdrawals.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
@@ -203,15 +206,15 @@ export default function AdminPendingWithdrawals() {
           <div className="apw-summary">
             <div className="apw-summary-card">
               <span className="apw-summary-label">Saques pendentes</span>
-              <strong className="apw-summary-value">{withdrawals.length}</strong>
-              {pendingCount !== withdrawals.length ? (
-                <small className="apw-summary-sub">{pendingCount} com filtros</small>
+              <strong className="apw-summary-value">{pendingCount}</strong>
+              {filteredWithdrawals.length !== withdrawals.length ? (
+                <small className="apw-summary-sub">{filteredWithdrawals.length} com filtros</small>
               ) : null}
             </div>
             <div className="apw-summary-card apw-summary-card--amount">
               <span className="apw-summary-label">Total a pagar</span>
               <strong className="apw-summary-value">{formatBRL(totalAmountAll)}</strong>
-              {pendingCount !== withdrawals.length ? (
+              {filteredWithdrawals.length !== withdrawals.length ? (
                 <small className="apw-summary-sub">{formatBRL(totalAmount)} com filtros</small>
               ) : null}
             </div>
@@ -236,11 +239,13 @@ export default function AdminPendingWithdrawals() {
                 id="pending-withdraw-status"
                 className="admin-withdraw-filter-input"
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing')}
+                onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing' | 'paid' | 'failed')}
               >
                 <option value="all">Todos</option>
                 <option value="pending">Pendente</option>
                 <option value="processing">Processando</option>
+                <option value="paid">Pago</option>
+                <option value="failed">Falhou</option>
               </select>
             </div>
 
@@ -339,29 +344,46 @@ export default function AdminPendingWithdrawals() {
                             : '-'}
                         </td>
                         <td>{typeof item.netAmount === 'number' ? formatBRL(item.netAmount) : '-'}</td>
-                        <td>{String(item.status ?? 'pending').toUpperCase()}</td>
+                        <td>
+                          {(() => {
+                            const s = String(item.status ?? 'pending').toLowerCase()
+                            const color =
+                              s === 'paid' ? '#16a34a' :
+                              s === 'failed' || s === 'cancelled' || s === 'canceled' ? '#dc2626' :
+                              s === 'processing' ? '#d97706' : '#475569'
+                            return (
+                              <span style={{ color, fontWeight: 600, fontSize: 12 }}>
+                                {s.toUpperCase()}
+                              </span>
+                            )
+                          })()}
+                        </td>
                         <td>{formatDate(item.createdAt)}</td>
                         <td>
-                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                            <button
-                              type="button"
-                              className="btn primary"
-                              disabled={isActing}
-                              onClick={() => {
-                                setApproveModal({ open: true, withdrawalId: item.id })
-                              }}
-                            >
-                              {isActing ? 'Processando...' : 'Aprovar'}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn ghost"
-                              disabled={isActing}
-                              onClick={() => setCancelModal({ open: true, withdrawalId: item.id })}
-                            >
-                              Cancelar
-                            </button>
-                          </div>
+                          {['pending', 'processing'].includes(String(item.status ?? '').toLowerCase()) ? (
+                            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                className="btn primary"
+                                disabled={isActing}
+                                onClick={() => {
+                                  setApproveModal({ open: true, withdrawalId: item.id })
+                                }}
+                              >
+                                {isActing ? 'Processando...' : 'Aprovar'}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn ghost"
+                                disabled={isActing}
+                                onClick={() => setCancelModal({ open: true, withdrawalId: item.id })}
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontSize: 12 }}>—</span>
+                          )}
                         </td>
                       </tr>
                     )
