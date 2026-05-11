@@ -55,7 +55,7 @@ export default function AdminPendingWithdrawals() {
   const [cancelModal, setCancelModal] = useState<CancelModalState>({ open: false, withdrawalId: null })
   const [approveModal, setApproveModal] = useState<ApproveModalState>({ open: false, withdrawalId: null })
   const [searchTerm, setSearchTerm] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing' | 'paid' | 'failed'>('all')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'processing'>('all')
   const [minAmountFilter, setMinAmountFilter] = useState('')
   const [maxAmountFilter, setMaxAmountFilter] = useState('')
 
@@ -239,13 +239,11 @@ export default function AdminPendingWithdrawals() {
                 id="pending-withdraw-status"
                 className="admin-withdraw-filter-input"
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing' | 'paid' | 'failed')}
+                onChange={(event) => setStatusFilter(event.target.value as 'all' | 'pending' | 'processing')}
               >
                 <option value="all">Todos</option>
                 <option value="pending">Pendente</option>
                 <option value="processing">Processando</option>
-                <option value="paid">Pago</option>
-                <option value="failed">Falhou</option>
               </select>
             </div>
 
