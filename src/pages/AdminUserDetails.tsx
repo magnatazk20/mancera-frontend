@@ -143,6 +143,10 @@ export default function AdminUserDetails() {
   const [withdrawPwdDeleteFeedback, setWithdrawPwdDeleteFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [withdrawPwdModalOpen, setWithdrawPwdModalOpen] = useState(false)
 
+  const [loginAsModalOpen, setLoginAsModalOpen] = useState(false)
+  const [loginAsLoading, setLoginAsLoading] = useState(false)
+  const [loginAsFeedback, setLoginAsFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
@@ -316,6 +320,41 @@ export default function AdminUserDetails() {
       setBanFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
       setBanLoading(false)
+    }
+  }
+
+  const handleLoginAs = async () => {
+    if (!id || !user) return
+    setLoginAsLoading(true)
+    setLoginAsFeedback(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users/${id}/login-as`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string; token?: string; user?: { id: number; name: string; phone: string } }
+
+      if (!res.ok || !data?.ok || !data.token || !data.user) {
+        setLoginAsFeedback({ type: 'error', message: data?.error ?? 'Falha ao gerar acesso.' })
+        return
+      }
+
+      // Salva sessão admin para restauração posterior
+      const adminToken = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
+      const adminUser = localStorage.getItem('user') ?? sessionStorage.getItem('user') ?? ''
+      sessionStorage.setItem('admin_restore_token', adminToken)
+      sessionStorage.setItem('admin_restore_user', adminUser)
+
+      // Substitui sessão pelo usuário alvo
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+
+      setLoginAsModalOpen(false)
+      navigate('/dashboard')
+    } catch {
+      setLoginAsFeedback({ type: 'error', message: 'Erro de conexão.' })
+    } finally {
+      setLoginAsLoading(false)
     }
   }
 
@@ -577,6 +616,78 @@ export default function AdminUserDetails() {
         </div>
       ) : null}
 
+      {/* ── Modal entrar na conta do usuário ── */}
+      {loginAsModalOpen ? (
+        <div style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(15,23,42,0.6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 2000, padding: 16,
+        }}>
+          <div style={{
+            width: '100%', maxWidth: 420,
+            background: 'linear-gradient(180deg,#fff 0%,#f8fafc 100%)',
+            borderRadius: 16,
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 20px 48px rgba(2,6,23,.18)',
+            padding: 24,
+          }}>
+            <h3 style={{ margin: '0 0 6px', color: '#0f172a', fontSize: 18 }}>
+              🔑 Entrar na conta
+            </h3>
+            <p style={{ margin: '0 0 14px', color: '#64748b', fontSize: 14 }}>
+              Você será redirecionado para o dashboard como o usuário abaixo. Sua sessão admin ficará salva para restauração.
+            </p>
+            <div style={{
+              background: '#f1f5f9', borderRadius: 10,
+              padding: '14px 16px', marginBottom: 20,
+              border: '1px solid #e2e8f0',
+            }}>
+              <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: '#0f172a' }}>
+                {user?.name}
+              </p>
+              <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>
+                #{user?.id} · {user?.phone}
+              </p>
+            </div>
+            {loginAsFeedback ? (
+              <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: loginAsFeedback.type === 'success' ? '#16a34a' : '#dc2626' }}>
+                {loginAsFeedback.message}
+              </p>
+            ) : null}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={() => { setLoginAsModalOpen(false); setLoginAsFeedback(null) }}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: '1.5px solid #e2e8f0', background: 'transparent',
+                  fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                disabled={loginAsLoading}
+                onClick={handleLoginAs}
+                style={{
+                  padding: '8px 18px', borderRadius: 9,
+                  border: 'none',
+                  background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+                  color: '#fff',
+                  fontWeight: 700, fontSize: 14,
+                  cursor: loginAsLoading ? 'not-allowed' : 'pointer',
+                  opacity: loginAsLoading ? 0.7 : 1,
+                }}
+              >
+                {loginAsLoading ? 'Acessando...' : '🚀 Confirmar acesso'}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <section className="admin-content admin-user-details-page">
         <header className="admin-header">
           <div>
@@ -802,6 +913,32 @@ export default function AdminUserDetails() {
               </p>
               <p><strong>Contrato ativo:</strong> {String(user.activeContract ?? '').trim() || 'Sem contrato ativo'}</p>
               <p><strong>Cadastrado em:</strong> {user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</p>
+
+              <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
+                <button
+                  type="button"
+                  onClick={() => { setLoginAsFeedback(null); setLoginAsModalOpen(true) }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '10px 20px',
+                    borderRadius: 10,
+                    border: 'none',
+                    background: 'linear-gradient(135deg,#6366f1,#4f46e5)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(99,102,241,0.35)',
+                  }}
+                >
+                  🔑 Entrar na conta
+                </button>
+                <p style={{ margin: '6px 0 0', fontSize: 12, color: '#94a3b8' }}>
+                  Acessa o dashboard como este usuário. Sua sessão admin fica salva.
+                </p>
+              </div>
             </section>
 
             <section className="admin-panel admin-user-list-panel">

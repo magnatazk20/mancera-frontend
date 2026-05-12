@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -77,6 +77,71 @@ import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
 
+function AdminRestoreBanner() {
+  const [visible, setVisible] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const check = () => setVisible(!!sessionStorage.getItem('admin_restore_token'))
+    check()
+    window.addEventListener('storage', check)
+    const id = setInterval(check, 1500)
+    return () => { window.removeEventListener('storage', check); clearInterval(id) }
+  }, [])
+
+  if (!visible) return null
+
+  const handleRestore = () => {
+    const adminToken = sessionStorage.getItem('admin_restore_token') ?? ''
+    const adminUser = sessionStorage.getItem('admin_restore_user') ?? ''
+    localStorage.setItem('token', adminToken)
+    if (adminUser) localStorage.setItem('user', adminUser)
+    sessionStorage.removeItem('admin_restore_token')
+    sessionStorage.removeItem('admin_restore_user')
+    setVisible(false)
+    navigate('/adf/users')
+  }
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 72,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      zIndex: 9999,
+      background: 'linear-gradient(135deg,#4f46e5,#6366f1)',
+      color: '#fff',
+      borderRadius: 12,
+      padding: '10px 18px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      boxShadow: '0 6px 24px rgba(99,102,241,0.5)',
+      fontSize: 13,
+      fontWeight: 700,
+      whiteSpace: 'nowrap',
+    }}>
+      <span>👁️ Modo Admin</span>
+      <button
+        type="button"
+        onClick={handleRestore}
+        style={{
+          background: 'rgba(255,255,255,0.22)',
+          border: '1px solid rgba(255,255,255,0.4)',
+          color: '#fff',
+          borderRadius: 8,
+          padding: '5px 12px',
+          fontWeight: 700,
+          fontSize: 12,
+          cursor: 'pointer',
+        }}
+      >
+        Voltar ao Admin
+      </button>
+    </div>
+  )
+}
+
 export default function App() {
   useEffect(() => {
     const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -102,6 +167,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <AdminRestoreBanner />
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
