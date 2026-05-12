@@ -87,10 +87,45 @@ export default function AdminCycleProducts() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [commissionLevels, setCommissionLevels] = useState<CommissionLevel[]>([])
 
+  type FixUser = { userId: number; userName: string; userPhone: string; purchasesCount: number; totalCapital: number }
+  type FixResult = { message: string; fixed: number; totalCredited: number; correctedPurchases?: number; users: FixUser[]; dryRun: boolean }
+  const [fixLoading, setFixLoading] = useState(false)
+  const [fixResult, setFixResult] = useState<FixResult | null>(null)
+  const [fixError, setFixError] = useState('')
+
   const token = useMemo(
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
   )
+
+  const handleRetroactiveFix = async (dryRun: boolean) => {
+    setFixLoading(true)
+    setFixError('')
+    setFixResult(null)
+    try {
+      const res = await fetch(`${API_URL}/api/admin/cycles/retroactive-capital-fix?dryRun=${dryRun}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = (await res.json()) as { ok?: boolean; error?: string } & Partial<FixResult>
+      if (!res.ok || !data?.ok) {
+        setFixError(data?.error ?? 'Falha ao executar correção.')
+        return
+      }
+      setFixResult({
+        message: data.message ?? '',
+        fixed: data.fixed ?? 0,
+        totalCredited: data.totalCredited ?? 0,
+        correctedPurchases: data.correctedPurchases,
+        users: data.users ?? [],
+        dryRun,
+      })
+    } catch {
+      setFixError('Erro de conexão.')
+    } finally {
+      setFixLoading(false)
+    }
+  }
 
   const resetForm = () => {
     setForm(emptyForm)
@@ -409,6 +444,99 @@ export default function AdminCycleProducts() {
             <span className="admin-chip">Total: {products.length}</span>
           </div>
         </header>
+
+        {/* ── Correção retroativa de capital ── */}
+        <section className="admin-panel" style={{ marginBottom: 20, border: '1px solid #fbbf24', background: '#fffbeb' }}>
+          <div className="admin-log-header" style={{ marginBottom: 10 }}>
+            <h3 style={{ color: '#92400e' }}>⚠️ Correção retroativa de capital (ciclos já encerrados)</h3>
+          </div>
+          <p style={{ fontSize: 13, color: '#78350f', margin: '0 0 12px' }}>
+            Ciclos encerrados antes da correção não devolveram o capital investido. Use <strong>Prévia</strong> primeiro para ver quem será afetado, depois <strong>Aplicar correção</strong> para creditar o capital.
+          </p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+            <button
+              type="button"
+              disabled={fixLoading}
+              onClick={() => handleRetroactiveFix(true)}
+              style={{
+                padding: '8px 16px', borderRadius: 8,
+                border: '1.5px solid #d97706', background: 'transparent',
+                color: '#92400e', fontWeight: 700, fontSize: 13,
+                cursor: fixLoading ? 'not-allowed' : 'pointer',
+                opacity: fixLoading ? 0.6 : 1,
+              }}
+            >
+              {fixLoading ? '...' : '🔍 Prévia (sem alterar)'}
+            </button>
+            <button
+              type="button"
+              disabled={fixLoading}
+              onClick={() => {
+                if (!window.confirm('Isso creditará o capital de volta para todos os usuários afetados. Confirmar?')) return
+                handleRetroactiveFix(false)
+              }}
+              style={{
+                padding: '8px 16px', borderRadius: 8,
+                border: 'none', background: '#d97706',
+                color: '#fff', fontWeight: 700, fontSize: 13,
+                cursor: fixLoading ? 'not-allowed' : 'pointer',
+                opacity: fixLoading ? 0.6 : 1,
+              }}
+            >
+              {fixLoading ? 'Processando...' : '✅ Aplicar correção'}
+            </button>
+          </div>
+
+          {fixError ? (
+            <p style={{ color: '#dc2626', fontWeight: 600, fontSize: 13, margin: 0 }}>{fixError}</p>
+          ) : null}
+
+          {fixResult ? (
+            <div>
+              <p style={{
+                fontSize: 13, fontWeight: 700,
+                color: fixResult.dryRun ? '#92400e' : '#166534',
+                margin: '0 0 8px',
+                padding: '8px 12px',
+                background: fixResult.dryRun ? '#fef3c7' : '#dcfce7',
+                borderRadius: 8,
+              }}>
+                {fixResult.dryRun ? '📋 PRÉVIA — ' : '✅ APLICADO — '}{fixResult.message}
+              </p>
+
+              {fixResult.users.length > 0 ? (
+                <div style={{ maxHeight: 260, overflowY: 'auto', border: '1px solid #fde68a', borderRadius: 8 }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                    <thead>
+                      <tr style={{ background: '#fef3c7' }}>
+                        <th style={{ padding: '6px 10px', textAlign: 'left', color: '#78350f' }}>ID</th>
+                        <th style={{ padding: '6px 10px', textAlign: 'left', color: '#78350f' }}>Nome / Telefone</th>
+                        <th style={{ padding: '6px 10px', textAlign: 'right', color: '#78350f' }}>Ciclos</th>
+                        <th style={{ padding: '6px 10px', textAlign: 'right', color: '#78350f' }}>Capital a devolver</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {fixResult.users.map((u) => (
+                        <tr key={u.userId} style={{ borderTop: '1px solid #fde68a' }}>
+                          <td style={{ padding: '5px 10px', color: '#78350f' }}>#{u.userId}</td>
+                          <td style={{ padding: '5px 10px', color: '#78350f' }}>{u.userName} · {u.userPhone}</td>
+                          <td style={{ padding: '5px 10px', textAlign: 'right', color: '#78350f' }}>{u.purchasesCount}</td>
+                          <td style={{ padding: '5px 10px', textAlign: 'right', fontWeight: 700, color: '#166534' }}>
+                            {Number(u.totalCapital).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p style={{ fontSize: 13, color: '#166534', fontWeight: 600, margin: 0 }}>
+                  ✅ Nenhum ciclo pendente de correção. Todos os capitais já foram devolvidos.
+                </p>
+              )}
+            </div>
+          ) : null}
+        </section>
 
         <section className="admin-panel admin-cycle-form-panel">
           <h3 className="admin-cycle-form-title">{editingId ? 'Editar Produto' : 'Novo Produto'}</h3>
