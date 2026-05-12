@@ -363,11 +363,11 @@ export default function Profile() {
               </section>
 
               <section className="profile-menu-grid">
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/cycle-products')}>
+                <button type="button" className="profile-menu-item" onClick={() => navigate('/investment-orders')}>
                   <div className="profile-menu-icon-wrap">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M12 6v2M12 16v2M8.5 8.5l1.4 1.4M14.1 14.1l1.4 1.4M6 12h2M16 12h2M8.5 15.5l1.4-1.4M14.1 9.9l1.4-1.4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M3 3v18h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M7 16l4-4 4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </div>
                   <span className="profile-menu-label">Fundo de Riqueza</span>
