@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AppSidebar from '../components/AppSidebar'
+import './Dashboard.css'
 import './InvestmentOrders.css'
 
 type StoredUser = {
@@ -40,7 +42,6 @@ const formatDate = (value: string | null) => {
   return d.toLocaleDateString('pt-BR')
 }
 
-/** Calcula o progresso de 0 a 100 baseado no tempo decorrido */
 function calcProgress(order: OrderItem): number {
   if (order.uiStatus === 'completed') return 100
   if (!order.startedAt || !order.endsAt) return 0
@@ -52,7 +53,6 @@ function calcProgress(order: OrderItem): number {
   return Math.round(((now - start) / (end - start)) * 100)
 }
 
-/** Dias restantes para encerrar o ciclo */
 function calcDaysLeft(order: OrderItem): number {
   if (order.uiStatus === 'completed') return 0
   if (!order.endsAt) return order.cycleDays
@@ -60,7 +60,6 @@ function calcDaysLeft(order: OrderItem): number {
   return Math.max(0, Math.ceil(diff / 86_400_000))
 }
 
-/** Lucro acumulado proporcional ao progresso */
 function calcEarnedSoFar(order: OrderItem): number {
   const pct = calcProgress(order) / 100
   return Math.round(order.expectedProfit * pct * 100) / 100
@@ -107,7 +106,7 @@ export default function InvestmentOrders() {
 
         setOrders(Array.isArray(data.orders) ? data.orders : [])
       } catch {
-        setError('Erro de conexao ao carregar pedidos.')
+        setError('Erro de conexão ao carregar pedidos.')
         setOrders([])
       } finally {
         setLoading(false)
@@ -123,7 +122,6 @@ export default function InvestmentOrders() {
     return orders.filter((o) => o.uiStatus === 'completed')
   }, [filter, orders])
 
-  /* totais para o resumo no topo */
   const summary = useMemo(() => {
     const ongoing = orders.filter((o) => o.uiStatus === 'ongoing')
     const completed = orders.filter((o) => o.uiStatus === 'completed')
@@ -133,113 +131,96 @@ export default function InvestmentOrders() {
   }, [orders])
 
   return (
-    <div className='gradient-backdrop-shell lw-page-shell min-h-screen-safe theme-page-bg investment-orders-page'>
-      <div className='lw-gradient-fx layer-one' />
-      <div className='lw-gradient-fx layer-two'>
-        <div className='orb orb-left' />
-        <div className='orb orb-right' />
-        <div className='orb orb-center' />
-      </div>
-      <div className='lw-gradient-fx layer-three'>
-        <div className='overlay-a' />
-        <div className='overlay-b' />
-      </div>
+    <main className="dash-app">
+      <section className="dash-main">
+        <AppSidebar />
 
-      <div className='relative-content'>
-        {/* header */}
-        <div className='orders-sticky-header-wrap'>
-          <div className='orders-sticky-header'>
-            <button className='orders-back-btn' onClick={() => navigate('/profile')} type='button' aria-label='Voltar'>
-              <svg viewBox='0 0 24 24' aria-hidden='true'>
-                <path d='M5 12l14 0' />
-                <path d='M5 12l6 6' />
-                <path d='M5 12l6 -6' />
+        <div className="dash-content">
+          <a href="/support" className="support-float-btn" title="Suporte">
+            <img src="/icon-support.png" alt="Suporte" width="26" height="26" />
+          </a>
+
+          {/* cabeçalho */}
+          <div className="inv-page-header">
+            <button type="button" className="inv-back-btn" onClick={() => navigate('/profile')} aria-label="Voltar">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M5 12l6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <path d="M5 12l6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
-            <div className='orders-title-wrap'>
-              <h1><span>Fundo de Riqueza</span></h1>
-            </div>
+            <h2 className="inv-page-title">Fundo de Riqueza</h2>
             <button
-              type='button'
-              className='orders-new-invest-btn'
+              type="button"
+              className="inv-new-btn"
               onClick={() => navigate('/cycle-products')}
-              title='Novo investimento'
+              title="Novo investimento"
             >
-              <svg viewBox='0 0 24 24' aria-hidden='true'>
-                <path d='M12 5v14M5 12h14' stroke='currentColor' strokeWidth='2' strokeLinecap='round' />
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </button>
           </div>
-        </div>
 
-        {/* resumo de totais */}
-        {!loading && !error && orders.length > 0 && (
-          <div className='orders-summary-grid'>
-            <div className='orders-summary-card'>
-              <span className='orders-summary-label'>Em andamento</span>
-              <strong className='orders-summary-value'>{summary.ongoing}</strong>
+          {/* resumo */}
+          {!loading && !error && orders.length > 0 && (
+            <div className="inv-summary-grid">
+              <div className="inv-summary-card">
+                <span className="inv-summary-label">Em andamento</span>
+                <strong className="inv-summary-value">{summary.ongoing}</strong>
+              </div>
+              <div className="inv-summary-card">
+                <span className="inv-summary-label">Concluídos</span>
+                <strong className="inv-summary-value">{summary.completed}</strong>
+              </div>
+              <div className="inv-summary-card">
+                <span className="inv-summary-label">Total investido</span>
+                <strong className="inv-summary-value">{formatBRL(summary.totalInvested)}</strong>
+              </div>
+              <div className="inv-summary-card inv-summary-card--highlight">
+                <span className="inv-summary-label">Lucro recebido</span>
+                <strong className="inv-summary-value">{formatBRL(summary.totalProfit)}</strong>
+              </div>
             </div>
-            <div className='orders-summary-card'>
-              <span className='orders-summary-label'>Concluidos</span>
-              <strong className='orders-summary-value'>{summary.completed}</strong>
-            </div>
-            <div className='orders-summary-card'>
-              <span className='orders-summary-label'>Total investido</span>
-              <strong className='orders-summary-value'>{formatBRL(summary.totalInvested)}</strong>
-            </div>
-            <div className='orders-summary-card highlight'>
-              <span className='orders-summary-label'>Lucro recebido</span>
-              <strong className='orders-summary-value'>{formatBRL(summary.totalProfit)}</strong>
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* filtros */}
-        <div className='orders-filters-panel'>
-          <div className='orders-filters-row'>
-            <button className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')} type='button'>
+          {/* filtros */}
+          <div className="inv-filters">
+            <button type="button" className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>
               Todos
             </button>
-            <button className={filter === 'ongoing' ? 'active' : ''} onClick={() => setFilter('ongoing')} type='button'>
+            <button type="button" className={filter === 'ongoing' ? 'active' : ''} onClick={() => setFilter('ongoing')}>
               Em Andamento
             </button>
-            <button className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')} type='button'>
-              Concluido
+            <button type="button" className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>
+              Concluído
             </button>
           </div>
-        </div>
 
-        <div className='orders-content'>
+          {/* conteúdo */}
           {loading ? (
-            <div className='orders-empty'>
-              <div className='orders-spinner' />
-              <div className='orders-empty-title'>Carregando pedidos...</div>
+            <div className="inv-empty">
+              <div className="inv-spinner" />
+              <p>Carregando investimentos...</p>
             </div>
           ) : error ? (
-            <div className='orders-empty'>
-              <div className='orders-empty-title'>{error}</div>
+            <div className="inv-empty">
+              <p className="inv-empty-title">{error}</p>
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className='orders-empty'>
-              <svg viewBox='0 0 24 24' aria-hidden='true'>
-                <path d='M12 3l8 4.5l0 9l-8 4.5l-8 -4.5l0 -9l8 -4.5' />
-                <path d='M12 12l8 -4.5' />
-                <path d='M12 12l0 9' />
-                <path d='M12 12l-8 -4.5' />
-                <path d='M16 5.25l-8 4.5' />
+            <div className="inv-empty">
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="inv-empty-icon">
+                <path d="M12 3l8 4.5v9l-8 4.5-8-4.5v-9L12 3z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 12l8-4.5M12 12v9M12 12L4 7.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
-              <div className='orders-empty-title'>Nenhum investimento encontrado</div>
-              <div className='orders-empty-subtitle'>Inicie seu primeiro investimento no Fundo de Riqueza</div>
-              <button
-                type='button'
-                className='orders-start-btn'
-                onClick={() => navigate('/cycle-products')}
-              >
+              <p className="inv-empty-title">Nenhum investimento encontrado</p>
+              <p className="inv-empty-sub">Inicie seu primeiro investimento no Fundo de Riqueza</p>
+              <button type="button" className="inv-start-btn" onClick={() => navigate('/cycle-products')}>
                 Investir agora
               </button>
             </div>
           ) : (
-            <div className='orders-list'>
+            <div className="inv-list">
               {filteredOrders.map((order) => {
                 const progress = calcProgress(order)
                 const daysLeft = calcDaysLeft(order)
@@ -247,31 +228,29 @@ export default function InvestmentOrders() {
                 const isCompleted = order.uiStatus === 'completed'
 
                 return (
-                  <article key={order.id} className={`order-card ${isCompleted ? 'order-card--done' : ''}`}>
-                    {/* topo do card */}
-                    <div className='order-card-top'>
-                      <div className='order-card-info'>
-                        <h3 className='order-card-name'>{order.productName}</h3>
-                        <span className='order-card-id'>#{order.id}</span>
+                  <article key={order.id} className={`inv-card${isCompleted ? ' inv-card--done' : ''}`}>
+                    <div className="inv-card-top">
+                      <div className="inv-card-info">
+                        <h3 className="inv-card-name">{order.productName}</h3>
+                        <span className="inv-card-id">#{order.id}</span>
                       </div>
-                      <span className={`order-status ${order.uiStatus}`}>
-                        {isCompleted ? 'Concluido' : 'Em Andamento'}
+                      <span className={`inv-status inv-status--${order.uiStatus}`}>
+                        {isCompleted ? 'Concluído' : 'Em Andamento'}
                       </span>
                     </div>
 
-                    {/* barra de progresso */}
-                    <div className='order-progress-wrap'>
-                      <div className='order-progress-header'>
-                        <span className='order-progress-label'>Progresso do ciclo</span>
-                        <span className='order-progress-pct'>{progress}%</span>
+                    <div className="inv-progress-wrap">
+                      <div className="inv-progress-header">
+                        <span className="inv-progress-label">Progresso do ciclo</span>
+                        <span className={`inv-progress-pct${isCompleted ? ' done' : ''}`}>{progress}%</span>
                       </div>
-                      <div className='order-progress-track'>
+                      <div className="inv-progress-track">
                         <div
-                          className={`order-progress-fill ${isCompleted ? 'done' : ''}`}
+                          className={`inv-progress-fill${isCompleted ? ' done' : ''}`}
                           style={{ width: `${progress}%` }}
                         />
                       </div>
-                      <div className='order-progress-footer'>
+                      <div className="inv-progress-footer">
                         <span>{formatDate(order.startedAt)}</span>
                         <span>
                           {isCompleted
@@ -284,25 +263,24 @@ export default function InvestmentOrders() {
                       </div>
                     </div>
 
-                    {/* metricas */}
-                    <div className='order-metrics'>
-                      <div className='order-metric'>
-                        <span className='order-metric-label'>Investido</span>
-                        <strong className='order-metric-value'>{formatBRL(order.amountPaid)}</strong>
+                    <div className="inv-metrics">
+                      <div className="inv-metric">
+                        <span className="inv-metric-label">Investido</span>
+                        <strong className="inv-metric-value">{formatBRL(order.amountPaid)}</strong>
                       </div>
-                      <div className='order-metric'>
-                        <span className='order-metric-label'>{isCompleted ? 'Lucro total' : 'Lucro acumulado'}</span>
-                        <strong className={`order-metric-value ${isCompleted ? 'green' : 'cyan'}`}>
+                      <div className="inv-metric">
+                        <span className="inv-metric-label">{isCompleted ? 'Lucro total' : 'Lucro acumulado'}</span>
+                        <strong className={`inv-metric-value${isCompleted ? ' green' : ' orange'}`}>
                           {formatBRL(isCompleted ? order.expectedProfit : earned)}
                         </strong>
                       </div>
-                      <div className='order-metric'>
-                        <span className='order-metric-label'>Lucro esperado</span>
-                        <strong className='order-metric-value'>{formatBRL(order.expectedProfit)}</strong>
+                      <div className="inv-metric">
+                        <span className="inv-metric-label">Lucro esperado</span>
+                        <strong className="inv-metric-value">{formatBRL(order.expectedProfit)}</strong>
                       </div>
-                      <div className='order-metric'>
-                        <span className='order-metric-label'>Duracao</span>
-                        <strong className='order-metric-value'>{order.cycleDays} dias</strong>
+                      <div className="inv-metric">
+                        <span className="inv-metric-label">Duração</span>
+                        <strong className="inv-metric-value">{order.cycleDays} dias</strong>
                       </div>
                     </div>
                   </article>
@@ -311,7 +289,7 @@ export default function InvestmentOrders() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
