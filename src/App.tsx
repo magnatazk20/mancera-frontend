@@ -71,6 +71,7 @@ import AdminCommissionReversal from './pages/AdminCommissionReversal'
 import AdminVipRefunds from './pages/AdminVipRefunds'
 import AdminVipUsers from './pages/AdminVipUsers'
 import AdminVipPhotos from './pages/AdminVipPhotos'
+import AdminCycleOrders from './pages/AdminCycleOrders'
 import About from './pages/About'
 import Introduction from './pages/Introduction'
 import RequireAuth from './components/RequireAuth'
@@ -548,6 +549,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminVipPhotos />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/cycle-orders"
+          element={(
+            <RequireMaxAdmin>
+              <AdminCycleOrders />
             </RequireMaxAdmin>
           )}
         />
