@@ -65,8 +65,6 @@ export default function LimitedAdminSidebar() {
 
           <p className="dash-nav-group-title">Operações Permitidas</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/users'); setMenuOpen(false) }}>Usuários</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/withdrawals/pending'); setMenuOpen(false) }}>Saques Pendentes</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/deposits'); setMenuOpen(false) }}>Depósitos</button>
         </nav>
 
         <button
