@@ -840,31 +840,36 @@ export default function AdminUserDetails() {
                   </span>
                 ) : null}
               </p>
-              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <p className="admin-referral-toggle-row">
                 <strong>Link de convite:</strong>
-                <span style={{ color: Number(user.allow_referral_link ?? 1) === 1 ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                <span
+                  className={`admin-referral-status ${Number(user.allow_referral_link ?? 1) === 1 ? 'on' : 'off'}`}
+                >
                   {Number(user.allow_referral_link ?? 1) === 1 ? '✅ Liberado' : '❌ Bloqueado'}
                 </span>
+
                 <button
                   type="button"
+                  className={`admin-referral-switch ${Number(user.allow_referral_link ?? 1) === 1 ? 'on' : 'off'}`}
                   disabled={referralLinkLoading}
                   onClick={handleReferralLinkToggle}
-                  style={{
-                    padding: '3px 10px',
-                    borderRadius: 8,
-                    border: '1.5px solid #6366f1',
-                    background: 'transparent',
-                    color: '#6366f1',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    cursor: referralLinkLoading ? 'not-allowed' : 'pointer',
-                    opacity: referralLinkLoading ? 0.6 : 1,
-                  }}
+                  aria-label={Number(user.allow_referral_link ?? 1) === 1 ? 'Bloquear link de convite' : 'Liberar link de convite'}
+                  aria-pressed={Number(user.allow_referral_link ?? 1) === 1}
                 >
-                  {referralLinkLoading ? '...' : Number(user.allow_referral_link ?? 1) === 1 ? '🔒 Bloquear' : '🔓 Liberar'}
+                  <span className="admin-referral-switch-track" />
+                  <span className="admin-referral-switch-thumb" />
                 </button>
+
+                <span className="admin-referral-switch-label">
+                  {referralLinkLoading
+                    ? 'Atualizando...'
+                    : Number(user.allow_referral_link ?? 1) === 1
+                      ? 'Bloquear'
+                      : 'Liberar'}
+                </span>
+
                 {referralLinkFeedback ? (
-                  <span style={{ fontSize: 12, color: referralLinkFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                  <span className={`admin-referral-feedback ${referralLinkFeedback.type}`}>
                     {referralLinkFeedback.message}
                   </span>
                 ) : null}
