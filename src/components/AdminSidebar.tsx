@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 type AdminUser = {
   id?: number
@@ -14,6 +14,7 @@ type AdminUsersResponse = {
 
 export default function AdminSidebar() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const user = useMemo(() => {
@@ -52,6 +53,8 @@ export default function AdminSidebar() {
   }, [])
 
   const usersLabel = usersCount == null ? 'Usuários' : `Usuários (${usersCount})`
+  const isLimitedRoute = location.pathname.startsWith('/athorng')
+  const basePath = isLimitedRoute ? '/athorng' : '/adf'
 
   return (
     <>
@@ -94,48 +97,61 @@ export default function AdminSidebar() {
 
         <nav className="dash-nav">
           <p className="dash-nav-group-title">Visão Geral</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf'); setMenuOpen(false) }}>Dashboard Admin</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate(basePath); setMenuOpen(false) }}>
+            {isLimitedRoute ? 'Dashboard' : 'Dashboard Admin'}
+          </button>
 
           <p className="dash-nav-group-title">Usuários e Rede</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/users'); setMenuOpen(false) }}>{usersLabel}</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/users`); setMenuOpen(false) }}>{usersLabel}</button>
 
-          <p className="dash-nav-group-title">Saques</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdraw-config'); setMenuOpen(false) }}>Configuração de Saque</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/users'); setMenuOpen(false) }}>Saques Usuários</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/pending'); setMenuOpen(false) }}>Saques Pendentes</button>
+          {isLimitedRoute ? (
+            <>
+              <p className="dash-nav-group-title">Operações Permitidas</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/withdrawals/pending`); setMenuOpen(false) }}>Saques Pendentes</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/deposits`); setMenuOpen(false) }}>Depósitos</button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
 
-          <p className="dash-nav-group-title">Depósitos e Comissão</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Configuração de Depósitos</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Configuração de Comissão</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/monthly-salary'); setMenuOpen(false) }}>Salário Mensal</button>
+              <p className="dash-nav-group-title">Saques</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdraw-config'); setMenuOpen(false) }}>Configuração de Saque</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/users'); setMenuOpen(false) }}>Saques Usuários</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/withdrawals/pending'); setMenuOpen(false) }}>Saques Pendentes</button>
 
-          <p className="dash-nav-group-title">VIP</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-levels'); setMenuOpen(false) }}>Gerenciar VIPs</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-users'); setMenuOpen(false) }}>👑 Usuários VIP</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-refunds'); setMenuOpen(false) }}>Estornos VIP</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-photos'); setMenuOpen(false) }}>Fotos VIP</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/task-commissions'); setMenuOpen(false) }}>Comissões de Tarefas</button>
+              <p className="dash-nav-group-title">Depósitos e Comissão</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposits'); setMenuOpen(false) }}>Depósitos</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/deposit-config'); setMenuOpen(false) }}>Configuração de Depósitos</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-config'); setMenuOpen(false) }}>Configuração de Comissão</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/monthly-salary'); setMenuOpen(false) }}>Salário Mensal</button>
 
-          <p className="dash-nav-group-title">Promoções</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-probabilities'); setMenuOpen(false) }}>Probabilidades da Roleta</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/caixas-box'); setMenuOpen(false) }}>Caixas Box</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-products'); setMenuOpen(false) }}>Produtos (Cycle)</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-orders'); setMenuOpen(false) }}>📊 Ciclos — Pedidos</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/mini-tasks'); setMenuOpen(false) }}>Mini Tasks</button>
+              <p className="dash-nav-group-title">VIP</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-levels'); setMenuOpen(false) }}>Gerenciar VIPs</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-users'); setMenuOpen(false) }}>👑 Usuários VIP</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-refunds'); setMenuOpen(false) }}>Estornos VIP</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-photos'); setMenuOpen(false) }}>Fotos VIP</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/task-commissions'); setMenuOpen(false) }}>Comissões de Tarefas</button>
 
-          <p className="dash-nav-group-title">Sistema</p>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-settings'); setMenuOpen(false) }}>⚙️ Configurações do Site</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-branding'); setMenuOpen(false) }}>Título e Foto do Site</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/community-links'); setMenuOpen(false) }}>Links da Comunidade</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/security-logs'); setMenuOpen(false) }}>🛡️ Logs de Segurança</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/correction-logs'); setMenuOpen(false) }}>🔧 Correções de Saldo</button>
-          <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-reversal'); setMenuOpen(false) }}>🔄 Estorno de Comissões</button>
+              <p className="dash-nav-group-title">Promoções</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/gift-codes'); setMenuOpen(false) }}>Gift Codes</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-code'); setMenuOpen(false) }}>Código da Roleta</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/roulette-probabilities'); setMenuOpen(false) }}>Probabilidades da Roleta</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/caixas-box'); setMenuOpen(false) }}>Caixas Box</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-products'); setMenuOpen(false) }}>Produtos (Cycle)</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/cycle-orders'); setMenuOpen(false) }}>📊 Ciclos — Pedidos</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/mini-tasks'); setMenuOpen(false) }}>Mini Tasks</button>
+
+              <p className="dash-nav-group-title">Sistema</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-settings'); setMenuOpen(false) }}>⚙️ Configurações do Site</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/site-branding'); setMenuOpen(false) }}>Título e Foto do Site</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/telegram-config'); setMenuOpen(false) }}>Bot Telegram</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/community-links'); setMenuOpen(false) }}>Links da Comunidade</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/logs'); setMenuOpen(false) }}>Logs</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/security-logs'); setMenuOpen(false) }}>🛡️ Logs de Segurança</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/correction-logs'); setMenuOpen(false) }}>🔧 Correções de Saldo</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/commission-reversal'); setMenuOpen(false) }}>🔄 Estorno de Comissões</button>
+            </>
+          )}
         </nav>
 
         <button

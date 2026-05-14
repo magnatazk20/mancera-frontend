@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import socketIO from 'socket.io-client'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
@@ -21,6 +22,7 @@ type AdminUser = {
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function AdminUsers() {
+  const location = useLocation()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [users, setUsers] = useState<AdminUser[]>([])
@@ -203,6 +205,9 @@ export default function AdminUsers() {
     })
   }, [users, searchTerm])
 
+  const isLimitedRoute = location.pathname.startsWith('/athorng')
+  const userDetailsPathPrefix = isLimitedRoute ? '/athorng/users' : '/adf/users'
+
   const totalUsers = users.length
   const usersCreatedToday = users.filter((user) => {
     if (!user.created_at) return false
@@ -352,12 +357,16 @@ export default function AdminUsers() {
                                 </>
                               ) : (
                                 <>
-                                  <button type='button' className='soft' onClick={() => window.location.assign(`/adf/users/${user.id}`)}>Ver</button>
+                                  <button type='button' className='soft' onClick={() => window.location.assign(`${userDetailsPathPrefix}/${user.id}`)}>Ver</button>
                                   <button type='button' onClick={() => startEdit(user)}>Editar</button>
-                                  <button type='button' className='warn' onClick={() => deleteUser(user.id)}>Apagar</button>
-                                  <button type='button' className='soft' onClick={() => toggleBan(user)}>
-                                    {user.is_banned ? 'Desbanir' : 'Banir'}
-                                  </button>
+                                  {!isLimitedRoute ? (
+                                    <>
+                                      <button type='button' className='warn' onClick={() => deleteUser(user.id)}>Apagar</button>
+                                      <button type='button' className='soft' onClick={() => toggleBan(user)}>
+                                        {user.is_banned ? 'Desbanir' : 'Banir'}
+                                      </button>
+                                    </>
+                                  ) : null}
                                 </>
                               )}
                             </div>
