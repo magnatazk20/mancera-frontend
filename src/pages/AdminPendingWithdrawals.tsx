@@ -20,11 +20,23 @@ type PendingWithdrawal = {
   walletType?: string
   sourceWallet?: string
   source?: string
+  wallet?: string
+  type?: string
+  withdrawType?: string
+  withdrawalType?: string
+  origin?: string
+  origem?: string
   metadata?: {
     walletField?: string
     walletType?: string
     sourceWallet?: string
     source?: string
+    wallet?: string
+    type?: string
+    withdrawType?: string
+    withdrawalType?: string
+    origin?: string
+    origem?: string
     [key: string]: unknown
   }
   user: {
@@ -62,18 +74,47 @@ const getWithdrawalTypeLabel = (item: PendingWithdrawal) => {
       item.walletType ??
       item.sourceWallet ??
       item.source ??
+      item.wallet ??
+      item.type ??
+      item.withdrawType ??
+      item.withdrawalType ??
+      item.origin ??
+      item.origem ??
       item.metadata?.walletField ??
       item.metadata?.walletType ??
       item.metadata?.sourceWallet ??
       item.metadata?.source ??
+      item.metadata?.wallet ??
+      item.metadata?.type ??
+      item.metadata?.withdrawType ??
+      item.metadata?.withdrawalType ??
+      item.metadata?.origin ??
+      item.metadata?.origem ??
       ''
   )
     .trim()
     .toLowerCase()
 
-  if (rawWallet.includes('commission')) return 'Comissão'
-  if (rawWallet.includes('balance')) return 'Saldo normal'
-  if (rawWallet.includes('recharge')) return 'Saldo normal'
+  const normalized = rawWallet
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+
+  if (
+    normalized.includes('commission') ||
+    normalized.includes('comissao') ||
+    normalized.includes('comission')
+  ) {
+    return 'Comissão'
+  }
+
+  if (
+    normalized.includes('balance') ||
+    normalized.includes('saldo') ||
+    normalized.includes('recharge') ||
+    normalized.includes('normal')
+  ) {
+    return 'Saldo normal'
+  }
 
   return 'Saldo normal'
 }
