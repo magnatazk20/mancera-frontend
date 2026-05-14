@@ -828,35 +828,37 @@ export default function AdminUserDetails() {
                   </span>
                 ) : null}
               </p>
-              <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <strong>Link de convite:</strong>
-                <span style={{ color: Number(user.allow_referral_link ?? 1) === 1 ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
-                  {Number(user.allow_referral_link ?? 1) === 1 ? '✅ Liberado' : '❌ Bloqueado'}
-                </span>
-                <button
-                  type="button"
-                  disabled={referralLinkLoading}
-                  onClick={handleReferralLinkToggle}
-                  style={{
-                    padding: '3px 10px',
-                    borderRadius: 8,
-                    border: '1.5px solid #6366f1',
-                    background: 'transparent',
-                    color: '#6366f1',
-                    fontWeight: 700,
-                    fontSize: 12,
-                    cursor: referralLinkLoading ? 'not-allowed' : 'pointer',
-                    opacity: referralLinkLoading ? 0.6 : 1,
-                  }}
-                >
-                  {referralLinkLoading ? '...' : Number(user.allow_referral_link ?? 1) === 1 ? '🔒 Bloquear' : '🔓 Liberar'}
-                </button>
-                {referralLinkFeedback ? (
-                  <span style={{ fontSize: 12, color: referralLinkFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
-                    {referralLinkFeedback.message}
+              {!isLimitedRoute ? (
+                <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                  <strong>Link de convite:</strong>
+                  <span style={{ color: Number(user.allow_referral_link ?? 1) === 1 ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {Number(user.allow_referral_link ?? 1) === 1 ? '✅ Liberado' : '❌ Bloqueado'}
                   </span>
-                ) : null}
-              </p>
+                  <button
+                    type="button"
+                    disabled={referralLinkLoading}
+                    onClick={handleReferralLinkToggle}
+                    style={{
+                      padding: '3px 10px',
+                      borderRadius: 8,
+                      border: '1.5px solid #6366f1',
+                      background: 'transparent',
+                      color: '#6366f1',
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: referralLinkLoading ? 'not-allowed' : 'pointer',
+                      opacity: referralLinkLoading ? 0.6 : 1,
+                    }}
+                  >
+                    {referralLinkLoading ? '...' : Number(user.allow_referral_link ?? 1) === 1 ? '🔒 Bloquear' : '🔓 Liberar'}
+                  </button>
+                  {referralLinkFeedback ? (
+                    <span style={{ fontSize: 12, color: referralLinkFeedback.type === 'success' ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                      {referralLinkFeedback.message}
+                    </span>
+                  ) : null}
+                </p>
+              ) : null}
               <p style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <strong>Telegram conectado:</strong>
                 <span>{Number(user.telegramConectado ?? 0) === 1 ? 'Sim' : 'Não'}</span>
