@@ -32,7 +32,8 @@ export default function RequireAdminLevelTwo({ children }: RequireAdminLevelTwoP
     const fromCamel = normalizeToNumber(user.isAdmin)
     const adminLevel = Math.max(fromSnake, fromCamel)
 
-    if (adminLevel >= 1) {
+    // /athorng pode ser acessado por nível 2 e também pelo dono (nível 1)
+    if (adminLevel === 1 || adminLevel === 2) {
       return children
     }
 

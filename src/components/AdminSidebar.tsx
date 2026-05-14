@@ -5,6 +5,8 @@ type AdminUser = {
   id?: number
   name?: string
   phone?: string
+  is_admin?: number | string
+  isAdmin?: number | string | boolean
 }
 
 type AdminUsersResponse = {
@@ -54,6 +56,21 @@ export default function AdminSidebar() {
 
   const usersLabel = usersCount == null ? 'Usuários' : `Usuários (${usersCount})`
   const isLimitedRoute = location.pathname.startsWith('/athorng')
+
+  const normalizeToNumber = (value: unknown) => {
+    if (typeof value === 'boolean') return value ? 1 : 0
+    const asNumber = Number(value)
+    return Number.isFinite(asNumber) ? asNumber : 0
+  }
+
+  const adminLevel = Math.max(
+    normalizeToNumber(user?.is_admin),
+    normalizeToNumber(user?.isAdmin),
+  )
+
+  const isAdminLevelTwo = adminLevel === 2
+  const isLimitedOnlyView = isLimitedRoute && isAdminLevelTwo
+
   const basePath = isLimitedRoute ? '/athorng' : '/adf'
 
   return (
@@ -104,7 +121,7 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Usuários e Rede</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/users`); setMenuOpen(false) }}>{usersLabel}</button>
 
-          {isLimitedRoute ? null : (
+          {isLimitedOnlyView ? null : (
             <>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
 

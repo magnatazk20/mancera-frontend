@@ -35,7 +35,8 @@ export default function RequireMaxAdmin({ children }: RequireMaxAdminProps) {
     const fromCamel = normalizeToNumber(user.isAdmin)
     const isAdminNumeric = Math.max(fromSnake, fromCamel)
 
-    if (isAdminNumeric >= 1) {
+    // /adf é exclusivo do dono (nível 1)
+    if (isAdminNumeric === 1) {
       return children
     }
 
