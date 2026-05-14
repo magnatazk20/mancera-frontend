@@ -283,41 +283,21 @@ export default function AdminUserDetails() {
 
   const handleReferralLinkToggle = async () => {
     if (!id || !user) return
-
-    const currentAllow = Number(user.allow_referral_link ?? 1) === 1 ? 1 : 0
-    const nextAllow = currentAllow === 1 ? 0 : 1
-
     setReferralLinkLoading(true)
     setReferralLinkFeedback(null)
-
     try {
       const res = await fetch(`${API_URL}/api/admin/users/${id}/referral-link`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ allow_referral_link: nextAllow }),
+        body: JSON.stringify({ allow_referral_link: user.allow_referral_link ? 0 : 1 }),
       })
-
-      const data = (await res.json()) as {
-        ok?: boolean
-        error?: string
-        message?: string
-        allow_referral_link?: number | string | boolean
-      }
-
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
       if (!res.ok || !data?.ok) {
-        setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar link de convite.' })
+        setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar status do link de convite.' })
         return
       }
-
-      const refreshedUser = await loadUserDetails()
-
-      const persistedAllow =
-        Number(refreshedUser?.allow_referral_link ?? data.allow_referral_link ?? nextAllow) === 1 ? 1 : 0
-
-      setReferralLinkFeedback({
-        type: 'success',
-        message: persistedAllow === 1 ? 'Ativado' : 'Desativado',
-      })
+      setReferralLinkFeedback({ type: 'success', message: data?.message ?? 'Atualizado.' })
+      await loadUserDetails()
     } catch {
       setReferralLinkFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
