@@ -289,13 +289,24 @@ export default function AdminUserDetails() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ allow_referral_link: user.allow_referral_link ? 0 : 1 }),
       })
-      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
+      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string; allow_referral_link?: number | string | boolean }
       if (!res.ok || !data?.ok) {
         setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar.' })
         return
       }
-      setReferralLinkFeedback({ type: 'success', message: data?.message ?? 'Atualizado com sucesso.' })
-      await loadUserDetails()
+
+      const persistedAllow =
+        typeof data?.allow_referral_link === 'boolean'
+          ? (data.allow_referral_link ? 1 : 0)
+          : Number(data?.allow_referral_link) === 1
+            ? 1
+            : 0
+
+      setUser((prev) => (prev ? { ...prev, allow_referral_link: persistedAllow } : prev))
+      setReferralLinkFeedback({
+        type: 'success',
+        message: persistedAllow === 1 ? 'Link de convite ativado.' : 'Link de convite desativado.',
+      })
     } catch {
       setReferralLinkFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
