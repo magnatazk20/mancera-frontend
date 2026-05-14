@@ -16,6 +16,17 @@ type PendingWithdrawal = {
   pixKeyType?: string
   pixKey?: string
   holderName?: string
+  walletField?: string
+  walletType?: string
+  sourceWallet?: string
+  source?: string
+  metadata?: {
+    walletField?: string
+    walletType?: string
+    sourceWallet?: string
+    source?: string
+    [key: string]: unknown
+  }
   user: {
     id: number
     name: string
@@ -43,6 +54,28 @@ const formatDate = (value?: string | null) => {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return '-'
   return date.toLocaleString('pt-BR')
+}
+
+const getWithdrawalTypeLabel = (item: PendingWithdrawal) => {
+  const rawWallet = String(
+    item.walletField ??
+      item.walletType ??
+      item.sourceWallet ??
+      item.source ??
+      item.metadata?.walletField ??
+      item.metadata?.walletType ??
+      item.metadata?.sourceWallet ??
+      item.metadata?.source ??
+      ''
+  )
+    .trim()
+    .toLowerCase()
+
+  if (rawWallet.includes('commission')) return 'Comissão'
+  if (rawWallet.includes('balance')) return 'Saldo normal'
+  if (rawWallet.includes('recharge')) return 'Saldo normal'
+
+  return 'Saldo normal'
 }
 
 export default function AdminPendingWithdrawals() {
@@ -310,6 +343,7 @@ export default function AdminPendingWithdrawals() {
                     <th>CPF</th>
                     <th>Chave PIX</th>
                     <th>Tipo PIX</th>
+                    <th>Tipo de saque</th>
                     <th>Valor bruto</th>
                     <th>Taxa</th>
                     <th>Valor líquido</th>
@@ -335,6 +369,7 @@ export default function AdminPendingWithdrawals() {
                         <td style={{ fontSize: 12 }}>
                           {item.pixKeyType ? item.pixKeyType : '-'}
                         </td>
+                        <td>{getWithdrawalTypeLabel(item)}</td>
                         <td>{formatBRL(item.amount)}</td>
                         <td>
                           {typeof item.feeAmount === 'number'
