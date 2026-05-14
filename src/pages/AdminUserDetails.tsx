@@ -281,31 +281,44 @@ export default function AdminUserDetails() {
 
   const handleReferralLinkToggle = async () => {
     if (!id || !user) return
+
+    const currentAllow = Number(user.allow_referral_link ?? 1) === 1 ? 1 : 0
+    const nextAllow = currentAllow === 1 ? 0 : 1
+
     setReferralLinkLoading(true)
     setReferralLinkFeedback(null)
+
     try {
       const res = await fetch(`${API_URL}/api/admin/users/${id}/referral-link`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ allow_referral_link: user.allow_referral_link ? 0 : 1 }),
+        body: JSON.stringify({ allow_referral_link: nextAllow }),
       })
-      const data = (await res.json()) as { ok?: boolean; error?: string; message?: string; allow_referral_link?: number | string | boolean }
+
+      const data = (await res.json()) as {
+        ok?: boolean
+        error?: string
+        message?: string
+        allow_referral_link?: number | string | boolean
+      }
+
       if (!res.ok || !data?.ok) {
-        setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar.' })
+        setReferralLinkFeedback({ type: 'error', message: data?.error ?? 'Falha ao alterar link de convite.' })
         return
       }
 
+      await loadUserDetails()
+
       const persistedAllow =
-        typeof data?.allow_referral_link === 'boolean'
+        typeof data.allow_referral_link === 'boolean'
           ? (data.allow_referral_link ? 1 : 0)
-          : Number(data?.allow_referral_link) === 1
+          : Number(data.allow_referral_link) === 1
             ? 1
             : 0
 
-      setUser((prev) => (prev ? { ...prev, allow_referral_link: persistedAllow } : prev))
       setReferralLinkFeedback({
         type: 'success',
-        message: persistedAllow === 1 ? 'Link de convite ativado.' : 'Link de convite desativado.',
+        message: persistedAllow === 1 ? 'Ativado' : 'Desativado',
       })
     } catch {
       setReferralLinkFeedback({ type: 'error', message: 'Erro de conexão.' })
@@ -845,7 +858,7 @@ export default function AdminUserDetails() {
                 <span
                   className={`admin-referral-status ${Number(user.allow_referral_link ?? 1) === 1 ? 'on' : 'off'}`}
                 >
-                  {Number(user.allow_referral_link ?? 1) === 1 ? '✅ Liberado' : '❌ Bloqueado'}
+                  {Number(user.allow_referral_link ?? 1) === 1 ? 'Ativado' : 'Desativado'}
                 </span>
 
                 <button
@@ -864,8 +877,8 @@ export default function AdminUserDetails() {
                   {referralLinkLoading
                     ? 'Atualizando...'
                     : Number(user.allow_referral_link ?? 1) === 1
-                      ? 'Bloquear'
-                      : 'Liberar'}
+                      ? 'Ativado'
+                      : 'Desativado'}
                 </span>
 
                 {referralLinkFeedback ? (
