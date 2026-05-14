@@ -74,6 +74,7 @@ import AdminVipPhotos from './pages/AdminVipPhotos'
 import AdminCycleOrders from './pages/AdminCycleOrders'
 import About from './pages/About'
 import Introduction from './pages/Introduction'
+import LimitedAdmin from './pages/LimitedAdmin'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import './App.css'
@@ -557,6 +558,38 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminCycleOrders />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/athorng"
+          element={(
+            <RequireMaxAdmin>
+              <LimitedAdmin />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/athorng/users"
+          element={(
+            <RequireMaxAdmin>
+              <AdminUsers />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/athorng/withdrawals/pending"
+          element={(
+            <RequireMaxAdmin>
+              <AdminPendingWithdrawals />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/athorng/deposits"
+          element={(
+            <RequireMaxAdmin>
+              <AdminDeposits />
             </RequireMaxAdmin>
           )}
         />
