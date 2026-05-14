@@ -159,7 +159,7 @@ export default function AdminUserDetails() {
   const loadUserDetails = async () => {
     if (!id) {
       setError('ID de usuário inválido.')
-      return
+      return null
     }
 
     setLoading(true)
@@ -173,12 +173,14 @@ export default function AdminUserDetails() {
       if (!res.ok || !data?.ok || !data.user) {
         setError(data?.error ?? 'Falha ao carregar detalhes do usuário.')
         setUser(null)
-        return
+        return null
       }
 
       setUser(data.user)
+      return data.user
     } catch {
       setError('Erro de conexão ao carregar detalhes do usuário.')
+      return null
     } finally {
       setLoading(false)
     }
@@ -307,14 +309,10 @@ export default function AdminUserDetails() {
         return
       }
 
-      await loadUserDetails()
+      const refreshedUser = await loadUserDetails()
 
       const persistedAllow =
-        typeof data.allow_referral_link === 'boolean'
-          ? (data.allow_referral_link ? 1 : 0)
-          : Number(data.allow_referral_link) === 1
-            ? 1
-            : 0
+        Number(refreshedUser?.allow_referral_link ?? data.allow_referral_link ?? nextAllow) === 1 ? 1 : 0
 
       setReferralLinkFeedback({
         type: 'success',
