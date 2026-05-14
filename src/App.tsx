@@ -587,6 +587,14 @@ export default function App() {
           )}
         />
         <Route
+          path="/athorng/users/:id/history"
+          element={(
+            <RequireAdminLevelTwo>
+              <AdminUserHistory />
+            </RequireAdminLevelTwo>
+          )}
+        />
+        <Route
           path="/athorng/withdrawals/pending"
           element={(
             <RequireAdminLevelTwo>
