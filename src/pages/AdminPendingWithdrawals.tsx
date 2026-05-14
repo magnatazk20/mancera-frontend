@@ -156,19 +156,51 @@ export default function AdminPendingWithdrawals() {
     })
   }, [withdrawals, searchTerm, statusFilter, minAmountFilter, maxAmountFilter])
 
-  const pendingCount = useMemo(
-    () => withdrawals.filter((w) => ['pending', 'processing'].includes(String(w.status ?? '').toLowerCase())).length,
+  const isPendingStatus = (status?: string | null) =>
+    ['pending', 'processing'].includes(String(status ?? '').toLowerCase())
+
+  const calculateNetAmount = (item: PendingWithdrawal) => {
+    if (typeof item.netAmount === 'number' && Number.isFinite(item.netAmount)) {
+      return Number(item.netAmount)
+    }
+
+    const amount = Number(item.amount ?? 0)
+    const fee = Number(item.feeAmount ?? 0)
+    return amount - (Number.isFinite(fee) ? fee : 0)
+  }
+
+  const pendingWithdrawalsAll = useMemo(
+    () => withdrawals.filter((w) => isPendingStatus(w.status)),
     [withdrawals]
   )
 
-  const totalAmount = useMemo(
-    () => filteredWithdrawals.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
+  const pendingWithdrawalsFiltered = useMemo(
+    () => filteredWithdrawals.filter((w) => isPendingStatus(w.status)),
     [filteredWithdrawals]
   )
 
+  const pendingCount = useMemo(() => pendingWithdrawalsAll.length, [pendingWithdrawalsAll])
+
+  const pendingCountFiltered = useMemo(() => pendingWithdrawalsFiltered.length, [pendingWithdrawalsFiltered])
+
+  const totalAmount = useMemo(
+    () => pendingWithdrawalsFiltered.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
+    [pendingWithdrawalsFiltered]
+  )
+
   const totalAmountAll = useMemo(
-    () => withdrawals.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
-    [withdrawals]
+    () => pendingWithdrawalsAll.reduce((acc, item) => acc + Number(item.amount ?? 0), 0),
+    [pendingWithdrawalsAll]
+  )
+
+  const totalNetAmount = useMemo(
+    () => pendingWithdrawalsFiltered.reduce((acc, item) => acc + calculateNetAmount(item), 0),
+    [pendingWithdrawalsFiltered]
+  )
+
+  const totalNetAmountAll = useMemo(
+    () => pendingWithdrawalsAll.reduce((acc, item) => acc + calculateNetAmount(item), 0),
+    [pendingWithdrawalsAll]
   )
 
   const fetchPending = async () => {
@@ -282,7 +314,7 @@ export default function AdminPendingWithdrawals() {
               <span className="apw-summary-label">Saques pendentes</span>
               <strong className="apw-summary-value">{pendingCount}</strong>
               {filteredWithdrawals.length !== withdrawals.length ? (
-                <small className="apw-summary-sub">{filteredWithdrawals.length} com filtros</small>
+                <small className="apw-summary-sub">{pendingCountFiltered} com filtros</small>
               ) : null}
             </div>
             <div className="apw-summary-card apw-summary-card--amount">
@@ -290,6 +322,13 @@ export default function AdminPendingWithdrawals() {
               <strong className="apw-summary-value">{formatBRL(totalAmountAll)}</strong>
               {filteredWithdrawals.length !== withdrawals.length ? (
                 <small className="apw-summary-sub">{formatBRL(totalAmount)} com filtros</small>
+              ) : null}
+            </div>
+            <div className="apw-summary-card apw-summary-card--amount">
+              <span className="apw-summary-label">Total líquido pendente (com taxa)</span>
+              <strong className="apw-summary-value">{formatBRL(totalNetAmountAll)}</strong>
+              {filteredWithdrawals.length !== withdrawals.length ? (
+                <small className="apw-summary-sub">{formatBRL(totalNetAmount)} com filtros</small>
               ) : null}
             </div>
           </div>
