@@ -835,7 +835,7 @@ export default function AdminUserDetails() {
                 </span>
                 <button
                   type="button"
-                  disabled={referralLinkLoading || isLimitedRoute}
+                  disabled={referralLinkLoading}
                   onClick={handleReferralLinkToggle}
                   style={{
                     padding: '3px 10px',
@@ -845,10 +845,9 @@ export default function AdminUserDetails() {
                     color: '#6366f1',
                     fontWeight: 700,
                     fontSize: 12,
-                    cursor: referralLinkLoading || isLimitedRoute ? 'not-allowed' : 'pointer',
-                    opacity: referralLinkLoading || isLimitedRoute ? 0.6 : 1,
+                    cursor: referralLinkLoading ? 'not-allowed' : 'pointer',
+                    opacity: referralLinkLoading ? 0.6 : 1,
                   }}
-                  title={isLimitedRoute ? 'Nível 2 não pode alterar link de convite' : undefined}
                 >
                   {referralLinkLoading ? '...' : Number(user.allow_referral_link ?? 1) === 1 ? '🔒 Bloquear' : '🔓 Liberar'}
                 </button>
