@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 import './AdminUserDetails.css'
@@ -103,6 +103,7 @@ const formatBRL = (value: number) =>
 
 export default function AdminUserDetails() {
   const { id } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
 
   const [loading, setLoading] = useState(false)
@@ -151,6 +152,8 @@ export default function AdminUserDetails() {
     () => localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? '',
     []
   )
+  const isLimitedRoute = location.pathname.startsWith('/athorng')
+  const userBasePath = isLimitedRoute ? '/athorng/users' : '/adf/users'
 
   const loadUserDetails = async () => {
     if (!id) {
@@ -393,7 +396,10 @@ export default function AdminUserDetails() {
 
   const handleBalanceAdjust = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!id) return
+    if (!id || isLimitedRoute) {
+      setAdjustFeedback({ type: 'error', message: 'Ajuste de saldo não permitido para este nível de admin.' })
+      return
+    }
 
     const parsedAmount = Number(String(adjustAmount).replace(',', '.'))
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
@@ -694,7 +700,7 @@ export default function AdminUserDetails() {
             <h1>Detalhes do Usuário</h1>
             <p className="admin-subtitle">Informações completas para gestão administrativa.</p>
           </div>
-          <button type="button" className="admin-back-btn" onClick={() => navigate('/adf/users')}>
+          <button type="button" className="admin-back-btn" onClick={() => navigate(userBasePath)}>
             Voltar
           </button>
         </header>
@@ -941,69 +947,71 @@ export default function AdminUserDetails() {
               </div>
             </section>
 
-            <section className="admin-panel admin-user-list-panel">
-              <div className="admin-log-header">
-                <h3>Ajuste de saldo (admin)</h3>
-              </div>
-
-              <form className="admin-balance-adjust-form" onSubmit={handleBalanceAdjust}>
-                <div className="admin-balance-adjust-grid">
-                  <label>
-                    <span>Valor</span>
-                    <input
-                      type="text"
-                      value={adjustAmount}
-                      onChange={(e) => setAdjustAmount(e.target.value)}
-                      placeholder="0,00"
-                      inputMode="decimal"
-                    />
-                  </label>
-
-                  <label>
-                    <span>Operação</span>
-                    <select
-                      value={adjustOperation}
-                      onChange={(e) => setAdjustOperation(e.target.value as 'add' | 'subtract')}
-                    >
-                      <option value="add">Adicionar saldo</option>
-                      <option value="subtract">Retirar saldo</option>
-                    </select>
-                  </label>
-
-                  <label>
-                    <span>Carteira</span>
-                    <select
-                      value={adjustWallet}
-                      onChange={(e) => setAdjustWallet(e.target.value as 'balance' | 'commission_balance' | 'recharge_balance')}
-                    >
-                      <option value="balance">Saldo geral</option>
-                      <option value="commission_balance">Carteira de comissão</option>
-                      <option value="recharge_balance">Carteira de recarga</option>
-                    </select>
-                  </label>
-
-                  <label className="admin-balance-adjust-reason">
-                    <span>Motivo (opcional)</span>
-                    <input
-                      type="text"
-                      value={adjustReason}
-                      onChange={(e) => setAdjustReason(e.target.value)}
-                      placeholder="Ex: correção manual"
-                    />
-                  </label>
+            {!isLimitedRoute ? (
+              <section className="admin-panel admin-user-list-panel">
+                <div className="admin-log-header">
+                  <h3>Ajuste de saldo (admin)</h3>
                 </div>
 
-                <button type="submit" className="admin-toggle-logs-btn" disabled={adjustLoading}>
-                  {adjustLoading ? 'Salvando...' : 'Confirmar ajuste'}
-                </button>
+                <form className="admin-balance-adjust-form" onSubmit={handleBalanceAdjust}>
+                  <div className="admin-balance-adjust-grid">
+                    <label>
+                      <span>Valor</span>
+                      <input
+                        type="text"
+                        value={adjustAmount}
+                        onChange={(e) => setAdjustAmount(e.target.value)}
+                        placeholder="0,00"
+                        inputMode="decimal"
+                      />
+                    </label>
 
-                {adjustFeedback ? (
-                  <p className={adjustFeedback.type === 'success' ? 'admin-balance-feedback-success' : 'admin-balance-feedback-error'}>
-                    {adjustFeedback.message}
-                  </p>
-                ) : null}
-              </form>
-            </section>
+                    <label>
+                      <span>Operação</span>
+                      <select
+                        value={adjustOperation}
+                        onChange={(e) => setAdjustOperation(e.target.value as 'add' | 'subtract')}
+                      >
+                        <option value="add">Adicionar saldo</option>
+                        <option value="subtract">Retirar saldo</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>Carteira</span>
+                      <select
+                        value={adjustWallet}
+                        onChange={(e) => setAdjustWallet(e.target.value as 'balance' | 'commission_balance' | 'recharge_balance')}
+                      >
+                        <option value="balance">Saldo geral</option>
+                        <option value="commission_balance">Carteira de comissão</option>
+                        <option value="recharge_balance">Carteira de recarga</option>
+                      </select>
+                    </label>
+
+                    <label className="admin-balance-adjust-reason">
+                      <span>Motivo (opcional)</span>
+                      <input
+                        type="text"
+                        value={adjustReason}
+                        onChange={(e) => setAdjustReason(e.target.value)}
+                        placeholder="Ex: correção manual"
+                      />
+                    </label>
+                  </div>
+
+                  <button type="submit" className="admin-toggle-logs-btn" disabled={adjustLoading}>
+                    {adjustLoading ? 'Salvando...' : 'Confirmar ajuste'}
+                  </button>
+
+                  {adjustFeedback ? (
+                    <p className={adjustFeedback.type === 'success' ? 'admin-balance-feedback-success' : 'admin-balance-feedback-error'}>
+                      {adjustFeedback.message}
+                    </p>
+                  ) : null}
+                </form>
+              </section>
+            ) : null}
 
             {Number(user.telegramConectado ?? 0) === 1 ? (
               <section className="admin-panel admin-user-list-panel">
@@ -1133,7 +1141,7 @@ export default function AdminUserDetails() {
               <button
                 type="button"
                 className="admin-toggle-logs-btn"
-                onClick={() => navigate(`/adf/users/${user.id}/history`)}
+                onClick={() => navigate(`${userBasePath}/${user.id}/history`)}
               >
                 Abrir histórico detalhado
               </button>
