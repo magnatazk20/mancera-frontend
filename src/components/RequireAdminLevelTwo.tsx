@@ -32,7 +32,7 @@ export default function RequireAdminLevelTwo({ children }: RequireAdminLevelTwoP
     const fromCamel = normalizeToNumber(user.isAdmin)
     const adminLevel = Math.max(fromSnake, fromCamel)
 
-    if (adminLevel >= 2) {
+    if (adminLevel >= 1) {
       return children
     }
 
