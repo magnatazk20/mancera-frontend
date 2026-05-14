@@ -104,13 +104,7 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Usuários e Rede</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/users`); setMenuOpen(false) }}>{usersLabel}</button>
 
-          {isLimitedRoute ? (
-            <>
-              <p className="dash-nav-group-title">Operações Permitidas</p>
-              <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/withdrawals/pending`); setMenuOpen(false) }}>Saques Pendentes</button>
-              <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/deposits`); setMenuOpen(false) }}>Depósitos</button>
-            </>
-          ) : (
+          {isLimitedRoute ? null : (
             <>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>
 
