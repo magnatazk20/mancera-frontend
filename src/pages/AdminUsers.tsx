@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import socketIO from 'socket.io-client'
 import AdminSidebar from '../components/AdminSidebar'
+import LimitedAdminSidebar from '../components/LimitedAdminSidebar'
 import './Admin.css'
 import './AdminUsers.css'
 
@@ -222,7 +223,7 @@ export default function AdminUsers() {
 
   return (
     <main className='admin-page'>
-      <AdminSidebar />
+      {isLimitedRoute ? <LimitedAdminSidebar /> : <AdminSidebar />}
       <section className='admin-content admin-users-page'>
         <header className='admin-header'>
           <div>

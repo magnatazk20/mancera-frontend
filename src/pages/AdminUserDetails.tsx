@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import AdminSidebar from '../components/AdminSidebar'
+import LimitedAdminSidebar from '../components/LimitedAdminSidebar'
 import './Admin.css'
 import './AdminUserDetails.css'
 
@@ -492,7 +493,7 @@ export default function AdminUserDetails() {
 
   return (
     <main className="admin-page">
-      <AdminSidebar />
+      {isLimitedRoute ? <LimitedAdminSidebar /> : <AdminSidebar />}
 
       {/* ── Modal confirmação desconectar Telegram ── */}
       {telegramModalOpen ? (
