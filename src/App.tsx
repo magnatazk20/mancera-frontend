@@ -77,6 +77,7 @@ import Introduction from './pages/Introduction'
 import LimitedAdmin from './pages/LimitedAdmin'
 import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
+import RequireAdminLevelTwo from './components/RequireAdminLevelTwo'
 import './App.css'
 
 function AdminRestoreBanner() {
@@ -564,33 +565,33 @@ export default function App() {
         <Route
           path="/athorng"
           element={(
-            <RequireMaxAdmin>
+            <RequireAdminLevelTwo>
               <LimitedAdmin />
-            </RequireMaxAdmin>
+            </RequireAdminLevelTwo>
           )}
         />
         <Route
           path="/athorng/users"
           element={(
-            <RequireMaxAdmin>
+            <RequireAdminLevelTwo>
               <AdminUsers />
-            </RequireMaxAdmin>
+            </RequireAdminLevelTwo>
           )}
         />
         <Route
           path="/athorng/withdrawals/pending"
           element={(
-            <RequireMaxAdmin>
+            <RequireAdminLevelTwo>
               <AdminPendingWithdrawals />
-            </RequireMaxAdmin>
+            </RequireAdminLevelTwo>
           )}
         />
         <Route
           path="/athorng/deposits"
           element={(
-            <RequireMaxAdmin>
+            <RequireAdminLevelTwo>
               <AdminDeposits />
-            </RequireMaxAdmin>
+            </RequireAdminLevelTwo>
           )}
         />
         <Route path="*" element={<NotFound />} />
