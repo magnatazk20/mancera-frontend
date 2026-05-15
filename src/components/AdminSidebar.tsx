@@ -121,7 +121,7 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Usuários e Rede</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/users`); setMenuOpen(false) }}>{usersLabel}</button>
 
-          {isLimitedOnlyView ? (
+          {isLimitedRoute ? (
             <>
               <p className="dash-nav-group-title">VIP</p>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button>
@@ -146,7 +146,7 @@ export default function AdminSidebar() {
               <p className="dash-nav-group-title">VIP</p>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-levels'); setMenuOpen(false) }}>Gerenciar VIPs</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-users'); setMenuOpen(false) }}>👑 Usuários VIP</button>
-              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button>
+              {!isLimitedRoute ? <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button> : null}
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-refunds'); setMenuOpen(false) }}>Estornos VIP</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-photos'); setMenuOpen(false) }}>Fotos VIP</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/task-commissions'); setMenuOpen(false) }}>Comissões de Tarefas</button>
