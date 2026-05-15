@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import AdminSidebar from '../components/AdminSidebar'
+import LimitedAdminSidebar from '../components/LimitedAdminSidebar'
 import './Admin.css'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -45,6 +46,8 @@ const levelColor = (levelId: number) => {
 
 export default function AdminVipReferrals() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const isLimitedRoute = location.pathname.startsWith('/athorng')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [referrals, setReferrals] = useState<VipReferral[]>([])
@@ -99,7 +102,7 @@ export default function AdminVipReferrals() {
 
   return (
     <main className="admin-page">
-      <AdminSidebar />
+      {isLimitedRoute ? <LimitedAdminSidebar /> : <AdminSidebar />}
       <section className="admin-content admin-users-page">
         <header className="admin-header">
           <div>
@@ -228,7 +231,7 @@ export default function AdminVipReferrals() {
                               type="button"
                               className="admin-btn"
                               style={{ fontSize: 11, padding: '3px 8px' }}
-                              onClick={() => navigate(`/adf/users/${r.vipUserId}`)}
+                              onClick={() => navigate(`${isLimitedRoute ? '/athorng' : '/adf'}/users/${r.vipUserId}`)}
                             >
                               VIP
                             </button>
@@ -236,7 +239,7 @@ export default function AdminVipReferrals() {
                               type="button"
                               className="admin-btn"
                               style={{ fontSize: 11, padding: '3px 8px', background: '#334155' }}
-                              onClick={() => navigate(`/adf/users/${r.invitedUserId}`)}
+                              onClick={() => navigate(`${isLimitedRoute ? '/athorng' : '/adf'}/users/${r.invitedUserId}`)}
                             >
                               Convidado
                             </button>
