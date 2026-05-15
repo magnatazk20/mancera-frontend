@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { io } from 'socket.io-client'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 
@@ -235,9 +236,32 @@ export default function AdminPendingWithdrawals() {
 
   useEffect(() => {
     fetchPending()
-    // Auto-refresh a cada 10 segundos
-    const interval = setInterval(fetchPending, 10_000)
-    return () => clearInterval(interval)
+
+    const token = localStorage.getItem('token') ?? sessionStorage.getItem('token')
+    if (!token) return
+
+    const socket = io(API_URL, {
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000,
+    })
+
+    socket.on('connect', () => {
+      socket.emit('withdrawals:admin:subscribe', { token })
+    })
+
+    socket.on('withdrawals:pending:update', (data: { ok: boolean; withdrawals: PendingWithdrawal[] }) => {
+      if (data?.ok && Array.isArray(data.withdrawals)) {
+        setWithdrawals(data.withdrawals)
+        setLoading(false)
+        setError('')
+      }
+    })
+
+    return () => {
+      socket.disconnect()
+    }
   }, [])
 
   const setActing = (withdrawalId: number, value: boolean) => {
