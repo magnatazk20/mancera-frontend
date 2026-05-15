@@ -121,6 +121,13 @@ export default function AdminSidebar() {
           <p className="dash-nav-group-title">Usuários e Rede</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate(`${basePath}/users`); setMenuOpen(false) }}>{usersLabel}</button>
 
+          {isLimitedOnlyView ? (
+            <>
+              <p className="dash-nav-group-title">VIP</p>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button>
+            </>
+          ) : null}
+
           {isLimitedOnlyView ? null : (
             <>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/rankings'); setMenuOpen(false) }}>Rankings</button>

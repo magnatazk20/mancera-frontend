@@ -619,6 +619,14 @@ export default function App() {
             </RequireAdminLevelTwo>
           )}
         />
+        <Route
+          path="/athorng/vip-referrals"
+          element={(
+            <RequireAdminLevelTwo>
+              <AdminVipReferrals />
+            </RequireAdminLevelTwo>
+          )}
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
