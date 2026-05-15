@@ -70,6 +70,7 @@ import AdminTaskCommissions from './pages/AdminTaskCommissions'
 import AdminCommissionReversal from './pages/AdminCommissionReversal'
 import AdminVipRefunds from './pages/AdminVipRefunds'
 import AdminVipUsers from './pages/AdminVipUsers'
+import AdminVipReferrals from './pages/AdminVipReferrals'
 import AdminVipPhotos from './pages/AdminVipPhotos'
 import AdminCycleOrders from './pages/AdminCycleOrders'
 import About from './pages/About'
@@ -543,6 +544,14 @@ export default function App() {
           element={(
             <RequireMaxAdmin>
               <AdminVipUsers />
+            </RequireMaxAdmin>
+          )}
+        />
+        <Route
+          path="/adf/vip-referrals"
+          element={(
+            <RequireMaxAdmin>
+              <AdminVipReferrals />
             </RequireMaxAdmin>
           )}
         />

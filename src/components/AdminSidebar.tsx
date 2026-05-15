@@ -139,6 +139,7 @@ export default function AdminSidebar() {
               <p className="dash-nav-group-title">VIP</p>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-levels'); setMenuOpen(false) }}>Gerenciar VIPs</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-users'); setMenuOpen(false) }}>👑 Usuários VIP</button>
+              <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-refunds'); setMenuOpen(false) }}>Estornos VIP</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/vip-photos'); setMenuOpen(false) }}>Fotos VIP</button>
               <button type="button" className="dash-nav-item" onClick={() => { navigate('/adf/task-commissions'); setMenuOpen(false) }}>Comissões de Tarefas</button>
