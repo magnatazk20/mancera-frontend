@@ -65,6 +65,9 @@ export default function LimitedAdminSidebar() {
 
           <p className="dash-nav-group-title">Operações Permitidas</p>
           <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/users'); setMenuOpen(false) }}>Usuários</button>
+
+          <p className="dash-nav-group-title">VIP</p>
+          <button type="button" className="dash-nav-item" onClick={() => { navigate('/athorng/vip-referrals'); setMenuOpen(false) }}>🌟 VIPs que Indicaram</button>
         </nav>
 
         <button
