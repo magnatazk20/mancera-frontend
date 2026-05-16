@@ -1,7 +1,7 @@
-# TODO - Correção parse error App.tsx
+# TODO: Adicionar navbar inferior na página VIP
 
-- [x] Identificar causa do erro de parse no `src/App.tsx`
-- [x] Corrigir fechamento incorreto de `<Route>` no bloco `MainLayout`
-- [x] Revisar estrutura JSX de rotas adjacentes
-- [x] Validar com build/typecheck
-- [ ] Commit e push das correções
+- [ ] Criar TODO.md ✅
+- [ ] Editar src/pages/Vip.tsx: adicionar import AppBottomNav e renderizar no final do main ✅
+- [ ] Completar AppBottomNav.css com estilos ✅
+- [ ] Verificar no browser localhost:5173/vip ✅ (Browser tool disabled; recarregue a página)
+- [ ] Completar tarefa ✅

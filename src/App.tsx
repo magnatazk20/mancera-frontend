@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, useNavigate, Outlet } from 'react-router-dom'
-import AppBottomNav from './components/AppBottomNav'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
@@ -81,15 +80,6 @@ import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import RequireAdminLevelTwo from './components/RequireAdminLevelTwo'
 import './App.css'
-
-function MainLayout() {
-  return (
-    <>
-      <Outlet />
-      <AppBottomNav />
-    </>
-  )
-}
 
 function AdminRestoreBanner() {
   const [visible, setVisible] = useState(false)
@@ -185,53 +175,51 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/roleta" element={<Roleta />} />
-          <Route path="/roleta-test" element={<RoletaTestAutoSpin />} />
-          <Route path="/sinuca" element={<Sinuca />} />
-          <Route path="/cashin" element={<CashIn />} />
-          <Route path="/cashin/checkout" element={<CashInCheckout />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
-          <Route path="/vip" element={<Vip />} />
-          <Route path="/vip/checkout/:id" element={<VipCheckout />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/introducao" element={<Introduction />} />
-          <Route path="/invite" element={<Invite />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/mini-tasks" element={<MiniTasks />} />
-          <Route path="/vip-rules" element={<VipRules />} />
-          <Route path="/statement" element={<Statement />} />
-          <Route path="/manual" element={<Manual />} />
-          <Route path="/investment-orders" element={<InvestmentOrders />} />
-          <Route
-            path="/monthly-salary"
-            element={(
-              <RequireAuth>
-                <MonthlySalary />
-              </RequireAuth>
-            )}
-          />
-          <Route
-            path="/salario-mensal"
-            element={(
-              <RequireAuth>
-                <MonthlySalary />
-              </RequireAuth>
-            )}
-          />
-          <Route path="/bank-cards" element={<BankCards />} />
-          <Route
-            path="/registro-do-dia"
-            element={(
-              <RequireAuth>
-                <RegistroDoDia />
-              </RequireAuth>
-            )}
-          />
-        </Route>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/roleta" element={<Roleta />} />
+        <Route path="/roleta-test" element={<RoletaTestAutoSpin />} />
+        <Route path="/sinuca" element={<Sinuca />} />
+        <Route path="/cashin" element={<CashIn />} />
+        <Route path="/cashin/checkout" element={<CashInCheckout />} />
+        <Route path="/tasks" element={<Tasks />} />
+        <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
+        <Route path="/vip" element={<Vip />} />
+        <Route path="/vip/checkout/:id" element={<VipCheckout />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/introducao" element={<Introduction />} />
+        <Route path="/invite" element={<Invite />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/mini-tasks" element={<MiniTasks />} />
+        <Route path="/vip-rules" element={<VipRules />} />
+        <Route path="/statement" element={<Statement />} />
+        <Route path="/manual" element={<Manual />} />
+        <Route path="/investment-orders" element={<InvestmentOrders />} />
+        <Route
+          path="/monthly-salary"
+          element={(
+            <RequireAuth>
+              <MonthlySalary />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/salario-mensal"
+          element={(
+            <RequireAuth>
+              <MonthlySalary />
+            </RequireAuth>
+          )}
+        />
+        <Route path="/bank-cards" element={<BankCards />} />
+        <Route
+          path="/registro-do-dia"
+          element={(
+            <RequireAuth>
+              <RegistroDoDia />
+            </RequireAuth>
+          )}
+        />
         <Route
           path="/registros-tarefas"
           element={(
