@@ -1,5 +1,6 @@
+import { API_URL } from './apiUrl'
+
 const DEFAULT_TITLE = 'Mancera'
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export type SiteBrandingConfig = {
   siteTitle?: string
@@ -25,7 +26,7 @@ export const applySiteBranding = (config: SiteBrandingConfig) => {
 
 export const loadAndApplySiteBranding = async () => {
   try {
-    const response = await fetch(`${API_BASE}/api/site-settings`)
+    const response = await fetch(`${API_URL}/api/site-settings`)
     const data = await response.json().catch(() => ({}))
 
     if (!response.ok || !data?.ok) {

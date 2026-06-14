@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminUsers.css'
+import { API_URL } from '../utils/apiUrl'
 
 type WithdrawConfigResponse = {
   ok?: boolean
@@ -19,7 +20,6 @@ type WithdrawConfigResponse = {
   message?: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const weekDays = [
   { value: 0, label: 'Domingo' },

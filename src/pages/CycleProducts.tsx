@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
 import './CycleProducts.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -42,7 +43,6 @@ const normalizePlanType = (value: unknown): PlanCategory => {
   return 'normal'
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function CycleProducts() {
   const navigate = useNavigate()

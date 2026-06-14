@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminMiniTasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 /* ── Tipos ── */
 
@@ -37,7 +38,6 @@ type LevelSummary = {
   totalAmount: number
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

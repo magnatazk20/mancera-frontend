@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminMiniTasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type MiniTaskItem = {
   id: number
@@ -23,7 +24,6 @@ type FormState = {
   sortOrder: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const defaultForm: FormState = {
   title: '',

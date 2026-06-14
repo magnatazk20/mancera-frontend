@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
 import './Invite.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id?: number | string
@@ -18,7 +19,6 @@ type CommissionLevel = {
   isActive: boolean
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function Invite() {
   const navigate = useNavigate()

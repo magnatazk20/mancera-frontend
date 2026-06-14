@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 import './AdminCycleOrders.css'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (v: number) =>
   Number(v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

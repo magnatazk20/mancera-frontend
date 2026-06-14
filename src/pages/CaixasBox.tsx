@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './CaixasBox.css'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 type StoredUser = { id: number; name: string; phone: string }
 

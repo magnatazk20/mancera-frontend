@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminMiniTasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type VipLevelItem = {
   id: number
@@ -37,7 +38,6 @@ type FormState = {
   requireCommissionLevel3Count: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const defaultForm: FormState = {
   name: '',

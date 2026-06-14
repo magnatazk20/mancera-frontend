@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './CashIn.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StorageUser = {
   id: number
@@ -9,7 +10,6 @@ type StorageUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function CashIn() {
   const navigate = useNavigate()

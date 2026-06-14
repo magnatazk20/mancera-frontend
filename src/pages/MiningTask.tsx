@@ -4,6 +4,7 @@ import AppSidebar from '../components/AppSidebar'
 import { YOUTUBE_IDS, fetchYouTubeTitle } from '../utils/miningVideos'
 import './Dashboard.css'
 import './Tasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -11,7 +12,6 @@ type StoredUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 const REQUIRED_SECONDS = 30
 
 const formatBRL = (value: number) =>

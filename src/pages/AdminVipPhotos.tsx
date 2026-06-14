@@ -4,6 +4,7 @@ import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminMiniTasks.css'
 import './AdminVipPhotos.css'
+import { API_URL } from '../utils/apiUrl'
 
 type VipLevelItem = {
   id: number
@@ -13,7 +14,6 @@ type VipLevelItem = {
   isActive: boolean
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

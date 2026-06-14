@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
 import './MiniTasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type MiniTask = {
   id: number
@@ -24,7 +25,6 @@ type StoredUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const getBadgeTheme = (badgeText: string) => {
   const normalized = String(badgeText ?? '').toLowerCase()

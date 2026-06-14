@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBalanceSocket } from '../hooks/useBalanceSocket'
 import AppSidebar from '../components/AppSidebar'
+import { API_URL } from '../utils/apiUrl'
 
 import './Dashboard.css'
 
@@ -33,7 +34,6 @@ type CommissionLevel = {
   isActive: boolean
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

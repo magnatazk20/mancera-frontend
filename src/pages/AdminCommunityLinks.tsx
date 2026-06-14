@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function AdminCommunityLinks() {
   const [loading, setLoading] = useState(true)

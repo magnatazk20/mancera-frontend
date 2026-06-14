@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 type ReversalResponse = {
   ok?: boolean

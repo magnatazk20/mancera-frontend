@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 import './AdminUserWithdrawals.css'
+import { API_URL } from '../utils/apiUrl'
 
 type AdminWithdrawalRow = {
   id: number
@@ -31,7 +32,6 @@ type ApiResponse = {
   withdrawals?: AdminWithdrawalRow[]
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

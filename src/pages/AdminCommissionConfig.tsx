@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
+import { API_URL } from '../utils/apiUrl'
 
 type CommissionLevel = {
   id?: number
@@ -11,7 +12,6 @@ type CommissionLevel = {
   isActive: boolean
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function AdminCommissionConfig() {
   const [loading, setLoading] = useState(true)

@@ -4,6 +4,7 @@ import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminSiteBranding.css'
 import { applySiteBranding } from '../utils/siteBranding'
+import { API_URL } from '../utils/apiUrl'
 
 type BrandingConfig = {
   title: string
@@ -12,7 +13,6 @@ type BrandingConfig = {
 }
 
 const DEFAULT_TITLE = 'Mancera'
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const readToken = () => {
   const fromLocal = String(localStorage.getItem('token') ?? '').trim()
@@ -49,7 +49,7 @@ export default function AdminSiteBranding() {
           throw new Error('Token de admin não encontrado.')
         }
 
-        const response = await fetch(`${API_BASE}/api/admin/site-settings`, {
+        const response = await fetch(`${API_URL}/api/admin/site-settings`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -98,7 +98,7 @@ export default function AdminSiteBranding() {
         throw new Error('Token de admin não encontrado.')
       }
 
-      const response = await fetch(`${API_BASE}/api/admin/site-settings`, {
+      const response = await fetch(`${API_URL}/api/admin/site-settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

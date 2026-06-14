@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Community.css'
 import './Tasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type CommunityLinksResponse = {
   ok?: boolean
@@ -28,7 +29,6 @@ type StoredUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function Community() {
   const navigate = useNavigate()

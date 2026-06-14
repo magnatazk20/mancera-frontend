@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Checkin.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -21,7 +22,6 @@ type CheckinStatusResponse = {
   error?: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 
 export default function Checkin() {

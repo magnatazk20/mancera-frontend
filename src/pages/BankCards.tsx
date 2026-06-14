@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
 import './BankCards.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -25,7 +26,6 @@ type PixKeyResponse = {
   error?: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const PIX_TYPE_OPTIONS: Array<{ value: PixKeyType; label: string; placeholder: string; disabled?: boolean }> = [
   { value: 'CPF', label: 'CPF', placeholder: 'Apenas números' },

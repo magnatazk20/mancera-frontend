@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
 import './Position.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -37,7 +38,6 @@ type TeamMember = {
   vipLevelName: string | null
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function Position() {
   const navigate = useNavigate()

@@ -5,6 +5,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import LimitedAdminSidebar from '../components/LimitedAdminSidebar'
 import './Admin.css'
 import './AdminUsers.css'
+import { API_URL } from '../utils/apiUrl'
 
 type AdminUser = {
   id: number
@@ -20,7 +21,6 @@ type AdminUser = {
   created_at?: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function AdminUsers() {
   const location = useLocation()

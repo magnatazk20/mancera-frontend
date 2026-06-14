@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Statement.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = { id: number; name: string; phone: string }
 
@@ -51,7 +52,6 @@ type CashinHistoryResponse = {
   history?: CashinHistoryItem[]
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (v: number) =>
   Number(v ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

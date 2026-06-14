@@ -8,6 +8,7 @@ import {
 } from '../utils/miningVideos'
 import './Dashboard.css'
 import './Tasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type ApiTask = {
   id: number
@@ -32,7 +33,6 @@ type StoredUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

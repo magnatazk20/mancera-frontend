@@ -4,6 +4,7 @@ import AppSidebar from '../components/AppSidebar'
 import { useBalanceSocket, type BalanceData } from '../hooks/useBalanceSocket'
 import './Dashboard.css'
 import './Profile.css'
+import { API_URL } from '../utils/apiUrl'
 
 type StoredUser = {
   id: number
@@ -54,7 +55,6 @@ type ProfileMetricsResponse = {
   }
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatNum = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })

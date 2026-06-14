@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Vip.css'
+import { API_URL } from '../utils/apiUrl'
 
 type VipLevel = {
   id: number
@@ -25,7 +26,6 @@ type StoredUser = {
   phone: string
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

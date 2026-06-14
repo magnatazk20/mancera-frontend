@@ -83,6 +83,7 @@ import RequireAuth from './components/RequireAuth'
 import RequireMaxAdmin from './components/RequireMaxAdmin'
 import RequireAdminLevelTwo from './components/RequireAdminLevelTwo'
 import './App.css'
+import { API_URL } from './utils/apiUrl'
 
 function AdminRestoreBanner() {
   const [visible, setVisible] = useState(false)
@@ -151,8 +152,7 @@ function AdminRestoreBanner() {
 
 export default function App() {
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
-    const sendHeartbeat = () => {
+        const sendHeartbeat = () => {
       try {
         const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
         if (!raw) return // nao envia se nao estiver logado

@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Dashboard.css'
 import './CashInCheckout.css'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 type CheckoutState = {
   amount?: number

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { API_URL } from '../utils/apiUrl'
 
 type AdminUser = {
   id?: number
@@ -33,8 +34,7 @@ export default function AdminSidebar() {
 
   useEffect(() => {
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
-    const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
-
+    
     const loadUsersCount = async () => {
       try {
         const res = await fetch(`${API_URL}/api/admin/users`, {

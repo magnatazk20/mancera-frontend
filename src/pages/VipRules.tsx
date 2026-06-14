@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Tasks.css'
+import { API_URL } from '../utils/apiUrl'
 
 type CycleProduct = {
   id: number
@@ -19,7 +20,6 @@ type CycleProduct = {
   expiresAt: string | null
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

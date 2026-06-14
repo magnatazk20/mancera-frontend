@@ -3,6 +3,7 @@ import AdminSidebar from '../components/AdminSidebar'
 import FloatingToast from '../components/FloatingToast'
 import './Admin.css'
 import './AdminShopProducts.css'
+import { API_URL } from '../utils/apiUrl'
 
 type Product = {
   id: number
@@ -45,7 +46,6 @@ type StockInfo = {
 
 const CATEGORIES = ['games', 'streaming', 'musica', 'compras', 'social', 'outros']
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const defaultForm: FormState = {
   name: '',

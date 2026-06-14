@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppSidebar from '../components/AppSidebar'
 import './Profile.css'
+import { API_URL } from '../utils/apiUrl'
 
 type VipLevel = {
   id: number
@@ -23,7 +24,6 @@ type SiteSettings = {
   vipLevels?: VipLevel[]
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 type Category = 'saque' | 'vip' | 'duvidas' | 'recarga'
 

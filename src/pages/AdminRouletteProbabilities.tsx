@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './AdminRouletteProbabilities.css'
-
-const API_URL = (import.meta.env.VITE_API_URL as string | undefined)?.trim() || 'http://localhost:3333'
+import { API_URL } from '../utils/apiUrl'
 
 type ProbabilityItem = {
   label: string

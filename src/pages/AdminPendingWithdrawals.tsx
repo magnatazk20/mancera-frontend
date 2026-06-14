@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { io } from 'socket.io-client'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
+import { API_URL } from '../utils/apiUrl'
 
 type PendingWithdrawal = {
   id: number
@@ -57,7 +58,6 @@ type ApproveModalState = {
   withdrawalId: number | null
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })

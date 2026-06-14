@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { API_URL } from '../utils/apiUrl'
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export type BalanceData = {
   userId: number

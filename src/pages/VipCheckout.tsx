@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import './VipCheckout.css'
+import { API_URL } from '../utils/apiUrl'
 
 type VipLevel = {
   id: number
@@ -27,7 +28,6 @@ type WalletOption = {
   value: number
 }
 
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
