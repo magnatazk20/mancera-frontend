@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   CASHIN / RECARGA — tema laranja TRK
+   CASHIN / RECARGA — tema branco padrao
 ═══════════════════════════════════════════════════════════════ */
 
 .cashin-page {
@@ -7,91 +7,41 @@
   display: grid;
   place-items: start center;
   padding: 20px 14px 40px;
-  color: #5a3d1a;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  background-attachment: fixed;
+  color: #333333;
+  background: #ffffff;
   position: relative;
   z-index: 2;
 }
 
-.cashin-page::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  background-attachment: fixed;
-  z-index: -1;
-  pointer-events: none;
+
+.cashin-top-banner {
+  width: min(980px, 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 12px;
+}
+
+.cashin-top-banner img {
+  width: 100%;
+  height: clamp(150px, 25vw, 260px);
+  object-fit: cover;
+  display: block;
 }
 
 .cashin-card {
-  width: min(960px, 100%);
-  background: #ffffff;
-  border: 1px solid rgba(255, 138, 3, 0.25);
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(255, 138, 3, 0.22);
-  padding: 22px;
-  color: #5a3d1a;
-  position: relative;
-  overflow: hidden;
+  width: min(980px, 100%);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  color: #333333;
+  position: static;
+  overflow: visible;
 }
 
-.cashin-card::before {
-  content: none;
-}
-
-.cashin-header {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 0 0 20px;
-  color: #ffffff;
-}
-
-.cashin-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  color: #ffffff;
-  text-shadow: 0 2px 6px rgba(180, 83, 9, 0.35);
-}
-
-.cashin-header p {
-  margin: 6px 0 0;
-  color: rgba(255, 255, 255, 0.92);
-  font-size: 0.92rem;
-  max-width: 70%;
-  text-shadow: 0 1px 2px rgba(120, 53, 15, 0.25);
-}
-
-.cashin-back-link {
-  text-decoration: none;
-  color: #ff8a03;
-  background: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-weight: 700;
-  font-size: 0.82rem;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.25);
-  transition: transform 0.15s ease, filter 0.15s ease;
-}
-
-.cashin-back-link:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.05);
-}
 
 .cashin-layout {
   position: relative;
@@ -104,10 +54,70 @@
 .cashin-form {
   display: grid;
   gap: 14px;
-  background: #fff5eb;
-  border: 1px solid rgba(255, 138, 3, 0.2);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 16px;
   padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.cashin-form-head h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.1;
+  color: #d4af37;
+  font-weight: 800;
+}
+
+.cashin-kicker {
+  margin: 0;
+  display: inline-flex;
+  width: fit-content;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.1);
+  color: #d4af37;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.cashin-form-head p {
+  margin: 6px 0 0;
+  color: #666666;
+  font-size: 0.9rem;
+}
+
+.cashin-amount-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cashin-amount-field input {
+  padding-left: 14px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.2;
+  height: 52px;
+}
+
+.cashin-hint {
+  margin-top: -2px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #666666;
+  padding: 10px 12px;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background: rgba(212, 175, 55, 0.05);
+  border-radius: 10px;
+}
+
+.cashin-actions {
+  display: grid;
+  gap: 10px;
 }
 
 .cashin-label-row {
@@ -115,13 +125,13 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  color: #5a3d1a;
+  color: #333333;
   font-size: 0.92rem;
   font-weight: 700;
 }
 
 .cashin-label-row small {
-  color: #ff8a03;
+  color: #d4af37;
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -130,16 +140,16 @@
   display: grid;
   gap: 8px;
   font-size: 0.88rem;
-  color: #8a5300;
+  color: #333333;
   font-weight: 600;
 }
 
 .cashin-form input,
 .cashin-form select {
   width: 100%;
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  border: 1px solid #e0e0e0;
   background: #ffffff;
-  color: #5a3d1a;
+  color: #333333;
   border-radius: 12px;
   padding: 13px 14px;
   font-size: 1rem;
@@ -149,19 +159,19 @@
 }
 
 .cashin-form input::placeholder {
-  color: rgba(138, 107, 63, 0.6);
+  color: #999999;
   font-weight: 500;
 }
 
 .cashin-form input:focus,
 .cashin-form select:focus {
-  border-color: #ff8a03;
-  box-shadow: 0 0 0 3px rgba(255, 138, 3, 0.2);
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
 .cashin-form input:disabled {
-  background: #fff1de;
-  color: #8a6b3f;
+  background: #f5f5f5;
+  color: #999999;
   cursor: not-allowed;
 }
 
@@ -171,96 +181,11 @@
   gap: 8px;
 }
 
-/* Método de pagamento — botão com ícone PIX */
-.cashin-method {
-  display: grid;
-  gap: 8px;
-}
-
-.cashin-method__label {
-  font-size: 0.88rem;
-  color: #8a5300;
-  font-weight: 600;
-}
-
-.cashin-method__btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 2px solid rgba(255, 138, 3, 0.35);
-  background: #ffffff;
-  color: #5a3d1a;
-  cursor: pointer;
-  text-align: left;
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.1);
-}
-
-.cashin-method__btn:hover {
-  transform: translateY(-1px);
-  border-color: #ff8a03;
-  box-shadow: 0 8px 20px rgba(255, 138, 3, 0.22);
-}
-
-.cashin-method__btn.is-active {
-  border-color: #ff8a03;
-  background: linear-gradient(135deg, #ffffff 0%, #fff5eb 100%);
-  box-shadow: 0 8px 20px rgba(255, 138, 3, 0.22);
-}
-
-.cashin-method__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #e6fffb;
-  border: 1px solid rgba(50, 188, 173, 0.3);
-  flex-shrink: 0;
-}
-
-.cashin-method__info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.cashin-method__info strong {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #5a3d1a;
-  letter-spacing: 0.5px;
-}
-
-.cashin-method__info small {
-  font-size: 0.8rem;
-  color: #8a6b3f;
-  font-weight: 500;
-}
-
-.cashin-method__check {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f7d981, #ff8a03);
-  color: #ffffff;
-  flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(255, 138, 3, 0.35);
-}
 
 .quick-chip {
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  border: 1px solid #e0e0e0;
   background: #ffffff;
-  color: #8a5300;
+  color: #333333;
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 0.85rem;
@@ -270,16 +195,16 @@
 }
 
 .quick-chip:hover {
-  border-color: #ff8a03;
+  border-color: #d4af37;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .quick-chip.active {
-  background: linear-gradient(135deg, #f7d981, #ff8a03);
+  background: linear-gradient(135deg, #f7d981, #d4af37);
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 6px 14px rgba(255, 138, 3, 0.35);
+  box-shadow: 0 6px 14px rgba(212, 175, 55, 0.35);
 }
 
 .cashin-submit,
@@ -294,9 +219,9 @@
 }
 
 .cashin-submit {
-  background: linear-gradient(90deg, #f7d981, #ff8a03);
+  background: linear-gradient(90deg, #22c55e, #16a34a);
   color: #ffffff;
-  box-shadow: 0 10px 24px rgba(255, 138, 3, 0.4);
+  box-shadow: 0 12px 26px rgba(34, 197, 94, 0.34);
   letter-spacing: 0.3px;
 }
 
@@ -313,27 +238,28 @@
 }
 
 .cashin-dashboard-btn {
-  background: #ffffff;
-  color: #8a5300;
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: #f5f5f5;
+  color: #333333;
+  border: 1px solid #e0e0e0;
 }
 
 .cashin-dashboard-btn:hover {
   transform: translateY(-1px);
-  background: #fff5eb;
+  background: #eeeeee;
 }
 
 .cashin-side-panel {
-  background: #fff5eb;
-  border: 1px solid rgba(255, 138, 3, 0.2);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 16px;
   padding: 16px;
-  color: #5a3d1a;
+  color: #333333;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .cashin-side-panel h2 {
   margin: 0 0 14px;
-  color: #ff8a03;
+  color: #d4af37;
   font-size: 1.02rem;
   font-weight: 800;
   letter-spacing: 0.3px;
@@ -344,14 +270,14 @@
   justify-content: space-between;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px dashed rgba(255, 138, 3, 0.3);
-  color: #8a5300;
+  border-bottom: 1px dashed #e0e0e0;
+  color: #666666;
   font-size: 0.9rem;
   font-weight: 600;
 }
 
 .summary-row strong {
-  color: #5a3d1a;
+  color: #333333;
   font-weight: 700;
 }
 
@@ -362,7 +288,7 @@
 }
 
 .summary-row.total strong {
-  color: #ff8a03;
+  color: #d4af37;
   font-size: 1.15rem;
   font-weight: 900;
 }
@@ -376,11 +302,11 @@
 
 .cashin-security p {
   margin: 0;
-  background: #ffffff;
-  border: 1px solid rgba(255, 138, 3, 0.2);
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
   border-radius: 10px;
   padding: 10px 12px;
-  color: #5a3d1a;
+  color: #666666;
   font-weight: 600;
 }
 
@@ -393,13 +319,13 @@
 }
 
 .cashin-message.success {
-  background: rgba(255, 138, 3, 0.14);
-  border: 1px solid rgba(255, 138, 3, 0.45);
-  color: #8a5300;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #15803d;
 }
 
 .cashin-message.error {
-  background: rgba(248, 113, 113, 0.14);
+  background: rgba(248, 113, 113, 0.1);
   border: 1px solid rgba(248, 113, 113, 0.4);
   color: #b91c1c;
 }
@@ -408,29 +334,12 @@
   .cashin-layout {
     grid-template-columns: 1fr;
   }
-
-  .cashin-header p {
-    max-width: 100%;
-  }
 }
 
 @media (max-width: 560px) {
   .cashin-card {
     padding: 18px;
     border-radius: 18px;
-  }
-
-  .cashin-card::before {
-    height: 128px;
-  }
-
-  .cashin-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .cashin-back-link {
-    width: fit-content;
   }
 
   .cashin-label-row {

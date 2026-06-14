@@ -202,9 +202,6 @@ export default function Tasks() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte">
-            <img src="/icon-support.png" alt="Suporte" width="26" height="26" />
-          </a>
           {/* ── Banner / Header ── */}
           <div className="tasks-banner">
             <div className="tasks-banner__bg" aria-hidden="true">

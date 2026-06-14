@@ -130,7 +130,6 @@ export default function Manual() {
       <section className="dash-main">
         <AppSidebar />
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
           {loading ? (
             <div className="profile-loading">Carregando...</div>
           ) : (

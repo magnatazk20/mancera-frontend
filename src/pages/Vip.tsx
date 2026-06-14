@@ -92,7 +92,6 @@ export default function Vip() {
 
   return (
     <main className="vip-page">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
       <div className="vip-shell">
         <section className="vip-hero">
           <div className="vip-hero__content">

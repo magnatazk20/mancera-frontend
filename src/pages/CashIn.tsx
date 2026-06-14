@@ -152,30 +152,58 @@ export default function CashIn() {
     }
   }
 
+  const normalizeAmountInput = (rawValue: string) => {
+    const cleaned = rawValue.replace(/[^\d,]/g, '')
+    const firstCommaIndex = cleaned.indexOf(',')
+    if (firstCommaIndex === -1) return cleaned
+    const integerPart = cleaned.slice(0, firstCommaIndex + 1)
+    const decimalPart = cleaned.slice(firstCommaIndex + 1).replace(/,/g, '').slice(0, 2)
+    return `${integerPart}${decimalPart}`
+  }
+
+  const handleAmountChange = (value: string) => {
+    setAmount(normalizeAmountInput(value))
+  }
+
+  const formatAmountOnBlur = () => {
+    const normalizedValue = Number(amount.replace(',', '.'))
+    if (!Number.isFinite(normalizedValue) || normalizedValue <= 0) return
+    setAmount(normalizedValue.toFixed(2).replace('.', ','))
+  }
+
   const normalized = Number(amount.replace(',', '.'))
   const displayValue = Number.isFinite(normalized) && normalized > 0 ? normalized : 0
   const minLabel = minDepositAmount.toFixed(2).replace('.', ',')
 
   return (
     <main className="cashin-page">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
+      <section className="cashin-top-banner" aria-label="Banner Mancera">
+        <img
+          src="https://www.myperfumeshop.com.au/cdn/shop/articles/why-mancera-perfumes-are-the-ultimate-statement-of-luxury-125272.jpg?v=1725513212&width=2000"
+          alt="Mancera luxury banner"
+        />
+      </section>
+
       <section className="cashin-card">
         <div className="cashin-layout">
           <form className="cashin-form" onSubmit={submitCashIn}>
-            <div className="cashin-label-row">
-              <span>Valor do depósito</span>
-              <small>
-                mín. R$ {minLabel}
-              </small>
+            <div className="cashin-form-head">
+              <p className="cashin-kicker">Nova recarga</p>
+              <p>Escolha um valor, revise os detalhes e gere sua cobrança com segurança.</p>
             </div>
 
-            <label>
+            <div className="cashin-label-row">
+              <span>Valor do depósito</span>
+            </div>
+
+            <label className="cashin-amount-field">
               <input
                 type="text"
                 inputMode="decimal"
-                placeholder="Ex.: 50,00"
+                placeholder="0,00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => handleAmountChange(e.target.value)}
+                onBlur={formatAmountOnBlur}
               />
             </label>
 
@@ -192,46 +220,16 @@ export default function CashIn() {
               ))}
             </div>
 
-            <div className="cashin-method">
-              <span className="cashin-method__label">Método de pagamento</span>
-              <button
-                type="button"
-                className="cashin-method__btn is-active"
-                aria-pressed="true"
-                aria-label="Método de pagamento: PIX instantâneo"
-              >
-                <span className="cashin-method__icon" aria-hidden="true">
-                  <svg viewBox="0 0 48 48" width="28" height="28" fill="none">
-                    <path
-                      d="M11.8 16.2 16.2 11.8a4 4 0 0 1 5.7 0L24 13.9l2.1-2.1a4 4 0 0 1 5.7 0l4.4 4.4a4 4 0 0 1 0 5.7L24 34 11.8 21.9a4 4 0 0 1 0-5.7Z"
-                      fill="#32BCAD"
-                    />
-                    <path
-                      d="M24 34 11.8 21.9a4 4 0 0 0 0 5.7l4.4 4.4a4 4 0 0 0 5.7 0L24 29.9l2.1 2.1a4 4 0 0 0 5.7 0l4.4-4.4a4 4 0 0 0 0-5.7L24 34Z"
-                      fill="#32BCAD"
-                      opacity="0.85"
-                    />
-                    <circle cx="24" cy="24" r="2.4" fill="#ffffff" />
-                  </svg>
-                </span>
-                <span className="cashin-method__info">
-                  <strong>VQPAY</strong>
-                </span>
-                <span className="cashin-method__check" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="5 12 10 17 19 8" />
-                  </svg>
-                </span>
-              </button>
+            <div className="cashin-hint">
+              O pagamento é confirmado automaticamente em poucos segundos após a compensação do PIX.
             </div>
 
-            <button type="submit" className="cashin-submit" disabled={loading}>
-              {loading ? 'Gerando cobrança...' : 'Gerar cobrança PIX'}
-            </button>
+            <div className="cashin-actions">
+              <button type="submit" className="cashin-submit" disabled={loading}>
+                {loading ? 'Gerando cobrança...' : 'Gerar cobrança PIX'}
+              </button>
 
-            <button type="button" className="cashin-dashboard-btn" onClick={() => navigate('/dashboard')}>
-              Ir para dashboard
-            </button>
+            </div>
 
             {message ? (
               <p className={`cashin-message ${message.type}`} role="status" aria-live="polite">
@@ -241,15 +239,16 @@ export default function CashIn() {
           </form>
 
           <aside className="cashin-side-panel">
-            <h2>Resumo da operação</h2>
+            <h2>Resumo da cobrança</h2>
             <div className="summary-row">
-              <span>Valor digitado</span>
+              <span>Valor informado</span>
               <strong>
                 {displayValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </strong>
             </div>
             <div className="summary-row">
-             
+              <span>Método</span>
+              <strong>PIX instantâneo</strong>
             </div>
             <div className="summary-row total">
               <span>Total a pagar</span>
@@ -258,6 +257,10 @@ export default function CashIn() {
               </strong>
             </div>
 
+            <div className="cashin-security">
+              <p>✅ Ambiente protegido para geração do QR Code.</p>
+              <p>⚡ Compensação rápida após pagamento.</p>
+            </div>
           </aside>
         </div>
       </section>

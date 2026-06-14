@@ -1,308 +1,362 @@
-/* Check-in — layout básico */
+/* Check-in — tema branco padrão */
 
 .ck-page {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  background-attachment: fixed;
+  background: #f5f5f5;
   display: flex;
   flex-direction: column;
 }
 
+/* ── Topbar ── */
 .ck-topbar {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
   background: #ffffff;
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .ck-topbar-back {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #f5f5f5;
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #333;
+  color: #d4af37;
+  transition: 0.2s ease;
+}
+
+.ck-topbar-back:hover {
+  transform: translateY(-1px);
+  background: #eeeeee;
 }
 
 .ck-topbar-back svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .ck-topbar-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #333333;
 }
 
+/* ── Scroll box ── */
 .ck-scroll-box {
   flex: 1;
-  background: #ffffff;
-}
-
-/* Section blocks */
-.ck-section {
-  background: #ffffff;
-  margin-top: 8px;
-  border-top: 1px solid #f0f0f0;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 14px 16px;
-}
-
-.ck-section-title {
-  font-size: 14px;
-  color: #323233;
-  margin: 0 0 10px;
-  font-weight: 600;
-}
-
-/* Progress */
-.ck-progress-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #323233;
-}
-
-.ck-progress-track {
-  height: 8px;
-  border-radius: 999px;
-  background: #f0f0f0;
-  overflow: hidden;
-}
-
-.ck-progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
-  transition: width 0.3s ease;
-}
-
-.ck-progress-percent {
-  display: block;
-  margin-top: 6px;
-  font-size: 12px;
-  color: #969799;
-}
-
-/* Status pills */
-.ck-status-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.ck-pill {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #f5f5f5;
-  color: #323233;
-}
-
-.ck-pill--ok {
-  background: #fdf3e3;
-  color: #b15c00;
-}
-
-.ck-pill--warn {
-  background: #f5f5f5;
-  color: #969799;
-}
-
-/* Days grid */
-.ck-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.ck-day {
-  border: 1px solid #ebedf0;
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 10px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 14px;
 }
 
-.ck-day-head {
+/* ── Earnings Section ── */
+.ck-earnings-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 20px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-.ck-day-badge {
-  font-size: 12px;
-  color: #969799;
+.ck-earnings-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.ck-day-status {
-  font-size: 11px;
+.ck-earnings-label {
+  font-size: 13px;
+  color: #888888;
   font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
 }
 
-.ck-day-status--done {
-  background: #e8f7ee;
-  color: #1f7a40;
+.ck-earnings-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #2d3b44;
+  letter-spacing: -0.5px;
 }
 
-.ck-day-status--current {
-  background: #fdf3e3;
-  color: #b15c00;
-}
-
-.ck-day-amount {
+.ck-earnings-value::before {
+  content: 'R$ ';
   font-size: 15px;
   font-weight: 600;
-  color: #323233;
+  color: #888888;
 }
 
-.ck-day-hint {
-  font-size: 12px;
-  color: #969799;
-}
-
-.ck-day--current {
-  border-color: rgb(255, 138, 3);
-}
-
-.ck-day--done {
-  border-color: #b6e0c4;
-  background: #f6fbf7;
-}
-
-/* Steps */
-.ck-steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ck-steps li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #323233;
-}
-
-.ck-step-num {
+.ck-coin-img {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  font-size: 12px;
-  font-weight: 700;
+  opacity: 0.95;
 }
 
-/* Buttons */
-.ck-actions {
+/* ── Sign Card ── */
+.ck-sign-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.ck-level-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.ck-level-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5a3d1a;
+}
+
+/* ── 7-Day Grid ── */
+.ck-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ck-day-item {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 2px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  border: 1px solid #e8e8e8;
+  transition: all 0.15s ease;
 }
 
-.ck-btn {
-  width: 100%;
-  height: 44px;
-  border: 0;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  display: inline-flex;
+.ck-day-item.done {
+  background: rgba(249, 213, 74, 0.12);
+  border-color: rgba(249, 213, 74, 0.5);
+}
+
+.ck-day-item.current {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: #d4af37;
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.3);
+}
+
+.ck-day-item.past {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+  opacity: 0.7;
+}
+
+.ck-day-item.pending {
+  background: #f9f9f9;
+  border-color: #e8e8e8;
+}
+
+.ck-day-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ck-day-item.current .ck-day-label {
+  color: #7a5c00;
+}
+
+.ck-day-item.done .ck-day-label {
+  color: #9a7c00;
+}
+
+.ck-day-icon-wrap {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  text-decoration: none;
+  width: 22px;
+  height: 22px;
 }
 
-.ck-btn--primary {
-  color: #ffffff;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
-}
-
-.ck-btn--secondary {
-  color: #323233;
-  background: #f5f5f5;
-  border: 1px solid #ebedf0;
-}
-
-.ck-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.ck-note {
-  margin: 10px 0 0;
-  font-size: 12px;
-  color: #969799;
+.ck-day-reward {
+  font-size: 9px;
+  font-weight: 700;
+  color: #555555;
   text-align: center;
 }
 
-.ck-note a {
-  color: rgb(255, 138, 3);
-  text-decoration: none;
+.ck-day-item.done .ck-day-reward {
+  color: #9a7c00;
 }
 
+.ck-day-item.current .ck-day-reward {
+  color: #7a5c00;
+}
+
+/* ── Claim Button ── */
 .ck-claim-btn {
   width: 100%;
-  height: 44px;
-  margin-top: 14px;
-  border: 0;
-  border-radius: 999px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
-  color: #ffffff;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
-  cursor: pointer;
-  transition: filter 0.18s ease, transform 0.18s ease;
+  color: #7a5c00;
+  background: #cccccc;
+  cursor: not-allowed;
+  transition: all 0.2s ease;
+  opacity: 0.6;
 }
 
-.ck-claim-btn:hover:not(:disabled) {
-  filter: brightness(1.04);
+.ck-claim-btn.ck-claim-active {
+  background: linear-gradient(135deg, #d4af37, #f7d981);
+  color: #3a2e00;
+  cursor: pointer;
+  opacity: 1;
+}
+
+.ck-claim-btn.ck-claim-active:hover {
+  filter: brightness(1.06);
   transform: translateY(-1px);
 }
 
 .ck-claim-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  background: #d8d8d8;
-  color: #ffffff;
 }
 
+/* ── History Section ── */
+.ck-history-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.ck-history-empty {
+  font-size: 13px;
+  color: #aaaaaa;
+  text-align: center;
+  padding: 16px 0 4px;
+  margin: 0;
+}
+
+.ck-history-day {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444444;
+  min-width: 48px;
+}
+
+.ck-history-date {
+  font-size: 12px;
+  color: #888888;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+}
+
+/* ── Criteria Section ── */
+.ck-criteria-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.ck-criteria-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #333333;
+  margin: 0 0 12px;
+}
+
+.ck-reward-table {
+  border: 1px solid #eeeeee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.ck-table-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f9f6ee;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7a5c00;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.ck-table-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.ck-table-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.1s;
+}
+
+.ck-table-row:last-child {
+  border-bottom: none;
+}
+
+.ck-table-row:nth-child(even) {
+  background: #fafafa;
+}
+
+.ck-table-level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ck-lv-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.ck-lv-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #444444;
+}
+
+.ck-table-reward {
+  font-size: 13px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+/* ── Loading ── */
 .ck-loading {
   text-align: center;
-  color: #969799;
-  padding: 24px 16px;
+  color: #666666;
+  padding: 40px 16px;
   font-size: 14px;
+  font-weight: 600;
 }
 
-/* Modal */
+/* ── Modal ── */
 .ck-modal-overlay {
   position: fixed;
   inset: 0;
@@ -323,9 +377,9 @@
   width: 100%;
   max-width: 320px;
   background: #ffffff;
-  border-radius: 14px;
-  padding: 22px 20px 16px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: 24px 20px 18px;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -339,17 +393,17 @@
 }
 
 .ck-modal-icon {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   color: #ffffff;
 }
 
 .ck-modal-icon--success {
-  background: #22c55e;
+  background: linear-gradient(135deg, #d4af37, #f7d981);
 }
 
 .ck-modal-icon--error {
@@ -357,27 +411,48 @@
 }
 
 .ck-modal-icon svg {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
 }
 
 .ck-modal-message {
   font-size: 15px;
-  font-weight: 500;
-  color: #323233;
-  margin: 0 0 16px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 18px;
   line-height: 1.45;
 }
 
 .ck-modal-button {
   width: 100%;
-  height: 42px;
-  border: 0;
-  border-radius: 999px;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  background: linear-gradient(135deg, #d4af37, #f7d981);
   cursor: pointer;
   font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.ck-modal-button:hover {
+  filter: brightness(1.05);
+}
+
+/* ── Responsive ── */
+@media (max-width: 380px) {
+  .ck-days-grid {
+    gap: 4px;
+  }
+
+  .ck-day-label,
+  .ck-day-reward {
+    font-size: 8px;
+  }
+
+  .ck-earnings-value {
+    font-size: 22px;
+  }
 }

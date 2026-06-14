@@ -27,6 +27,7 @@ type SummaryResponse = {
   balance?: number
   totalDeposits?: number
   monthlySalaryContract?: string | null
+  mancecoinBalance?: number
 }
 
 type ProfileMetricsResponse = {
@@ -35,7 +36,11 @@ type ProfileMetricsResponse = {
     teamTotal?: number
     withdrawableBalance?: number
     todayIncome?: number
+    totalIncome?: number
     totalWithdrawals?: number
+    cycleIncome?: number
+    teamIncome?: number
+    otherIncome?: number
     hasActiveCyclePlan?: boolean
     activeCyclePlan?: {
       id?: number
@@ -51,26 +56,13 @@ type ProfileMetricsResponse = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
-const formatBRL = (value: number) =>
-  Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const formatNum = (value: number) =>
+  Number(value ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
-const formatVipExpiry = (raw: string | null): { label: string; status: 'active' | 'expired' | 'none' } => {
-  if (!raw) return { label: 'Sem VIP ativo', status: 'none' }
-  const date = new Date(raw)
-  if (Number.isNaN(date.getTime())) return { label: 'Sem VIP ativo', status: 'none' }
-
-  const now = new Date()
-  const expired = date.getTime() < now.getTime()
-  const formatted = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-
-  if (expired) return { label: `Expirou em ${formatted}`, status: 'expired' }
-
-  const diffMs = date.getTime() - now.getTime()
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-  const suffix = diffDays === 1 ? '1 dia restante' : `${diffDays} dias restantes`
-  return { label: `${formatted} • ${suffix}`, status: 'active' }
+const maskPhone = (phone: string) => {
+  if (!phone || phone.length < 8) return phone
+  return phone.slice(0, 3) + '****' + phone.slice(-4)
 }
-
 
 export default function Profile() {
   const navigate = useNavigate()
@@ -81,41 +73,27 @@ export default function Profile() {
   const [rechargeBalance, setRechargeBalance] = useState(0)
   const [todayIncome, setTodayIncome] = useState(0)
   const [teamTotal, setTeamTotal] = useState(0)
-  const [totalWithdrawals, setTotalWithdrawals] = useState(0)
-  const [userBadge, setUserBadge] = useState('Estagiário')
   const [vipLevelName, setVipLevelName] = useState('')
-  const [vipExpiresAt, setVipExpiresAt] = useState<string | null>(null)
   const [vipImageUrl, setVipImageUrl] = useState('')
-  const [copyFeedback, setCopyFeedback] = useState('')
-  const [inviteCode, setInviteCode] = useState('')
+  const [activeProductName, setActiveProductName] = useState('')
   const [_monthlySalaryContract, setMonthlySalaryContract] = useState('')
-  const [redeemFeedback, _setRedeemFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [showRedeemSuccessModal, setShowRedeemSuccessModal] = useState(false)
   const [redeemSuccessData, _setRedeemSuccessData] = useState<{ message: string; rewardValue: number; code: string } | null>(null)
+  const [mancecoinBalance, setMancecoinBalance] = useState(0)
+  const [totalIncome, setTotalIncome] = useState(0)
+  const [totalWithdrawals, setTotalWithdrawals] = useState(0)
+  const [cycleIncome, setCycleIncome] = useState(0)
+  const [teamIncome, setTeamIncome] = useState(0)
+  const [otherIncome, setOtherIncome] = useState(0)
+  const [commissionLevels, setCommissionLevels] = useState<Array<{ level: number; commissionPercent: number }>>([])
 
-  const normalizedBadge = useMemo(() => userBadge.toLowerCase(), [userBadge])
-
-  const badgeTheme = useMemo(() => {
-    if (normalizedBadge.includes('diam')) return 'diamond'
-    if (normalizedBadge.includes('ouro') || normalizedBadge.includes('gold')) return 'gold'
-    if (normalizedBadge.includes('prata') || normalizedBadge.includes('silver')) return 'silver'
-    if (normalizedBadge.includes('bronze')) return 'bronze'
-    if (normalizedBadge.includes('vip')) return 'vip'
-    if (normalizedBadge.includes('estagiário') || normalizedBadge.includes('estagiario')) return 'regular'
-    return 'regular'
-  }, [normalizedBadge])
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
-    try {
-      return JSON.parse(raw) as StoredUser
-    } catch {
-      return null
-    }
+    try { return JSON.parse(raw) as StoredUser } catch { return null }
   }, [])
 
-  // WebSocket: atualiza saldos em tempo real
   const handleBalanceUpdate = useCallback((data: BalanceData) => {
     setBalance(data.balance)
     setWithdrawableBalance(data.commissionBalance)
@@ -126,22 +104,20 @@ export default function Profile() {
   useBalanceSocket(user?.id, handleBalanceUpdate)
 
   useEffect(() => {
-    if (!user?.id) {
-      navigate('/')
-      return
-    }
+    if (!user?.id) { navigate('/'); return }
 
     const loadProfile = async () => {
       setLoading(true)
       const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
       const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
       try {
-        const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes] = await Promise.all([
+        const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes, commissionRes] = await Promise.all([
           fetch(`${API_URL}/api/user/summary/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/vip/user/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/profile/metrics/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/mining/tasks/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/mini-tasks/${user.id}`, { headers: authHeaders }),
+          fetch(`${API_URL}/api/referral/commission-levels`),
         ])
 
         if (summaryRes.ok) {
@@ -149,6 +125,7 @@ export default function Profile() {
           setBalance(Number(summaryData.balance ?? 0))
           setTotalDeposits(Number(summaryData.totalDeposits ?? 0))
           setMonthlySalaryContract(String(summaryData.monthlySalaryContract ?? '').trim())
+          setMancecoinBalance(Number(summaryData.mancecoinBalance ?? 0))
         }
 
         if (vipRes.ok) {
@@ -156,23 +133,15 @@ export default function Profile() {
           if (vipData?.ok && vipData?.hasVip && vipData.vip) {
             const lvlName = String(vipData.vip.levelName ?? '').trim()
             setVipLevelName(lvlName)
-            setUserBadge(lvlName || 'Estagiário')
-            setVipExpiresAt(vipData.vip.expiresAt ?? null)
             setVipImageUrl(String(vipData.vip.avatarUrl ?? ''))
-            if (typeof vipData.balance === 'number') {
-              setBalance(Number(vipData.balance))
-            }
+            if (typeof vipData.balance === 'number') setBalance(Number(vipData.balance))
           } else {
             setVipLevelName('')
-            setUserBadge('Estagiário')
-            setVipExpiresAt(null)
             setVipImageUrl('')
           }
         }
 
-        if (miniTasksRes.ok) {
-          await miniTasksRes.json().catch(() => null)
-        }
+        if (miniTasksRes.ok) await miniTasksRes.json().catch(() => null)
 
         if (metricsRes.ok) {
           const metricsData = (await metricsRes.json()) as ProfileMetricsResponse
@@ -181,21 +150,27 @@ export default function Profile() {
             setWithdrawableBalance(Number(metrics.withdrawableBalance ?? 0))
             setTodayIncome(Number(metrics.todayIncome ?? 0))
             setTeamTotal(Number(metrics.teamTotal ?? 0))
+            setTotalIncome(Number(metrics.totalIncome ?? 0))
             setTotalWithdrawals(Number(metrics.totalWithdrawals ?? 0))
+            setCycleIncome(Number(metrics.cycleIncome ?? 0))
+            setTeamIncome(Number(metrics.teamIncome ?? 0))
+            setOtherIncome(Number(metrics.otherIncome ?? 0))
+            setActiveProductName(String(metrics.activeCyclePlan?.productName ?? '').trim())
           }
         }
 
-        // miningRes ainda é feito (para não quebrar outros usos), mas todayIncome vem de metrics
-        if (miningRes.ok) {
-          await miningRes.json().catch(() => null)
-        }
+        if (miningRes.ok) await miningRes.json().catch(() => null)
 
-        const referralRes = await fetch(`${API_URL}/api/referral/${user.id}`)
-        const referralData = await referralRes.json()
-        if (referralRes.ok && referralData?.ok) {
-          setInviteCode(String(referralData.referralCode ?? ''))
-        } else {
-          setInviteCode('')
+        if (commissionRes.ok) {
+          const cd = await commissionRes.json().catch(() => null) as { ok?: boolean; levels?: Array<{ level?: number; commissionPercent?: number }> } | null
+          if (cd?.ok && Array.isArray(cd.levels)) {
+            setCommissionLevels(
+              cd.levels
+                .map((l) => ({ level: Number(l.level ?? 0), commissionPercent: Number(l.commissionPercent ?? 0) }))
+                .filter((l) => l.level >= 1 && l.level <= 3)
+                .sort((a, b) => a.level - b.level)
+            )
+          }
         }
       } finally {
         setLoading(false)
@@ -205,22 +180,6 @@ export default function Profile() {
     loadProfile()
   }, [navigate, user?.id])
 
-  const copyInviteCode = async () => {
-    try {
-      if (!inviteCode) {
-        setCopyFeedback('Sem código')
-        setTimeout(() => setCopyFeedback(''), 1500)
-        return
-      }
-      await navigator.clipboard.writeText(inviteCode)
-      setCopyFeedback('Copiado!')
-      setTimeout(() => setCopyFeedback(''), 1500)
-    } catch {
-      setCopyFeedback('Erro ao copiar')
-      setTimeout(() => setCopyFeedback(''), 1500)
-    }
-  }
-
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -229,8 +188,9 @@ export default function Profile() {
     navigate('/')
   }
 
-  // Gift code redeem — feature kept for future activation
-  // (UI wiring needed before enabling)
+  const avatarSrc = vipImageUrl
+    ? (vipImageUrl.startsWith('http') ? vipImageUrl : `${API_URL}${vipImageUrl}`)
+    : 'https://manceraparfums.com/esp/img/hp_custom_block/block_image_1.jpg'
 
   return (
     <main className="dash-app profile-page">
@@ -238,289 +198,243 @@ export default function Profile() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte">
-            <img src="/icon-support.png" alt="Suporte" width="26" height="26" />
-          </a>
           {loading ? (
-            <div className="profile-loading">Carregando perfil...</div>
+            <div className="prof-loading">Carregando perfil...</div>
           ) : (
-            <>
-              <div className="profile-banner-top">
-                <img src="/trk-banner.png" alt="TRK Banner" className="profile-banner-img" />
+            <div className="prof-body">
+
+              {/* ── Title ── */}
+              <div className="prof-title-bar">
+                <h1 className="prof-title">Perfil</h1>
               </div>
 
-              <section className="profile-header-modern">
-                <div className="profile-header-row">
-                  <button type="button" className="profile-avatar-btn" aria-label="Selecionar Avatar">
-                    <div className="profile-avatar-frame">
-                      <img
-                        alt="Avatar do usuário"
-                        className="profile-avatar-img"
-                        src={
-                          vipImageUrl
-                            ? (vipImageUrl.startsWith('http') ? vipImageUrl : `${API_URL}${vipImageUrl}`)
-                            : 'https://i.imgur.com/PFbnl4y_d.webp?maxwidth=760&fidelity=grand'
-                        }
-                      />
+              {/* ── User info ── */}
+              <div className="prof-section">
+                <div className="prof-user-row">
+                  <div className="prof-avatar-wrap">
+                    <div className="prof-avatar-circle">
+                      <img src={avatarSrc} alt="Avatar" className="prof-avatar-img" />
                     </div>
+                    <div className="prof-vip-badge">{activeProductName || vipLevelName || 'VIP1'}</div>
+                  </div>
+                  <div className="prof-user-info">
+                    <div className="prof-user-acc">
+                      <span className="prof-acc-label">ACC:</span>
+                      <span className="prof-acc-value">{maskPhone(user?.phone ?? user?.name ?? '')}</span>
+                    </div>
+                    <div className="prof-user-id">ID: {user?.id}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Meus Produtos ── */}
+              <div className="prof-section">
+                <div className="prof-white-card prof-products-row">
+                  <span className="prof-card-title">Meus Produtos</span>
+                  <button type="button" className="prof-receber-btn" onClick={() => navigate('/fund-details')}>
+                    <img src="/moeda.png" alt="moeda" className="prof-receber-coin" />
+                    <span>Receber Renda</span>
                   </button>
+                </div>
+              </div>
 
-                  <div className="profile-header-info">
-                    <div className="profile-header-topline">
-                      <h2 className="profile-header-name">{user?.phone ?? user?.name ?? 'Usuário'}</h2>
-                      <span className={`profile-user-badge profile-user-badge-${badgeTheme}`} aria-label="Badge do usuário">
-                        <span className="profile-user-badge-icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24">
-                            <path d="M12 2l7 3v6c0 5-3.4 9.3-7 11c-3.6-1.7-7-6-7-11V5l7-3z" fill="currentColor" />
-                            <path d="M12 6.2l3.2 1.4v3.1c0 2.3-1.3 4.5-3.2 5.7c-1.9-1.2-3.2-3.4-3.2-5.7V7.6L12 6.2z" fill="rgba(255,255,255,0.45)" />
-                          </svg>
-                        </span>
-                        <span className="profile-user-badge-text">{userBadge}</span>
-                      </span>
-                      <button
-                        type="button"
-                        className="profile-vip-pill"
-                        aria-label="View VIP benefits"
-                      >
-                        <span className="profile-vip-pill-text">{vipLevelName || 'Estagiário'}</span>
-                        <svg viewBox="0 0 24 24" className="profile-vip-pill-icon" aria-hidden="true">
-                          <path d="M9 6l6 6l-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              {/* ── Wallet card ── */}
+              <div className="prof-section">
+                <div className="prof-white-card">
+                  <div className="prof-wallet-top">
+                    <div className="prof-wallet-col">
+                      <span className="prof-wallet-val">{formatNum(balance)}</span>
+                      <span className="prof-wallet-lbl">Carteira Normal</span>
+                    </div>
+                    <div className="prof-wallet-col prof-wallet-col--border">
+                      <span className="prof-wallet-val">{formatNum(withdrawableBalance)}</span>
+                      <span className="prof-wallet-lbl">Carteira da Equipe</span>
+                    </div>
+                  </div>
+
+                  <div className="prof-actions-row">
+                    <button type="button" className="prof-action-btn" onClick={() => navigate('/cashin')}>Depositar</button>
+                    <button type="button" className="prof-action-btn" onClick={() => navigate('/saque/')}>Sacar</button>
+                  </div>
+
+                  <div className="prof-stats-grid">
+                    <div className="prof-stat">
+                      <span className="prof-stat-lbl">Renda Total</span>
+                      <span className="prof-stat-val">{formatNum(totalIncome)}</span>
+                    </div>
+                    <div className="prof-stat prof-stat--right">
+                      <span className="prof-stat-lbl">Retirada Total</span>
+                      <span className="prof-stat-val">{formatNum(totalWithdrawals)}</span>
+                    </div>
+                    <div className="prof-stat">
+                      <span className="prof-stat-lbl">Renda do Produto</span>
+                      <span className="prof-stat-val">{formatNum(cycleIncome)}</span>
+                    </div>
+                    <div className="prof-stat prof-stat--right">
+                      <span className="prof-stat-lbl">Renda da Equipe</span>
+                      <span className="prof-stat-val">{formatNum(teamIncome)}</span>
+                    </div>
+                    <div className="prof-stat">
+                      <span className="prof-stat-lbl">Outras Rendas</span>
+                      <span className="prof-stat-val">{formatNum(otherIncome)}</span>
+                    </div>
+                    <div className="prof-stat prof-stat--right">
+                      <span className="prof-stat-lbl">MANCOIN</span>
+                      <span className="prof-stat-val">{formatNum(mancecoinBalance)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Minha equipe ── */}
+              <div className="prof-section">
+                <div className="prof-white-card">
+                  <div className="prof-team-header">
+                    <span className="prof-card-title">Minha equipe</span>
+                    <svg className="prof-team-icon" viewBox="0 0 24 24" fill="none">
+                      <path d="M10 22H14C19 22 21 20 21 15V9C21 4 19 2 14 2H10C5 2 3 4 3 9V15C3 20 5 22 10 22Z" stroke="#8C91A2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16.5 7.58V8.58C16.5 9.4 15.83 10.08 15 10.08H9C8.18 10.08 7.5 9.41 7.5 8.58V7.58C7.5 6.76 8.17 6.08 9 6.08H15C15.83 6.08 16.5 6.75 16.5 7.58Z" stroke="#8C91A2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M8.14 14H8.15M12 14H12.01M15.85 14H15.87M8.14 17.5H8.15M12 17.5H12.01M15.85 17.5H15.87" stroke="#8C91A2" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+
+                  <div className="prof-team-levels">
+                    {(['LV1', 'LV2', 'LV3'] as const).map((lv) => (
+                      <div key={lv} className="prof-team-level">
+                        <span className="prof-team-lv-label">{lv}</span>
+                        <span className="prof-team-lv-count">0</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="prof-team-rules">
+                    {commissionLevels.length > 0
+                      ? `Regras: ${commissionLevels.map((l) => `Membros Nível ${l.level} - comissão de ${l.commissionPercent}%`).join('; ')}.`
+                      : 'Regras: Membros Nível 1 - comissão de 10%; Membros Nível 2 - comissão de 5%; Membros Nível 3 - comissão de 2%.'}
+                  </p>
+
+                  <button type="button" className="prof-team-details-btn" onClick={() => navigate('/position')}>
+                    <span>Detalhes</span>
+                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* ── Menu grid ── */}
+              <div className="prof-section">
+                <div className="prof-white-card">
+                  <div className="prof-menu-new">
+
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/redeem-code')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M14.1625 3.3335H5.82916C2.6375 3.3335 1.74583 4.10016 1.67083 7.0835C3.27916 7.0835 4.57916 8.39183 4.57916 10.0002C4.57916 11.6085 3.27916 12.9085 1.67083 12.9168C1.74583 15.9002 2.6375 16.6668 5.82916 16.6668H14.1625C17.4958 16.6668 18.3292 15.8335 18.3292 12.5002V7.50016C18.3292 4.16683 17.4958 3.3335 14.1625 3.3335Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M7.4944 3.3335V6.25016M7.4944 13.75V16.6667" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12.5208 7.7748L13.0375 8.81647C13.0875 8.91647 13.1875 8.99147 13.2958 9.00814L14.4458 9.1748C14.7292 9.21647 14.8458 9.56647 14.6375 9.76647L13.8042 10.5748C13.7208 10.6498 13.6875 10.7665 13.7042 10.8831L13.9042 12.0248C13.9542 12.3081 13.6542 12.5248 13.4042 12.3915L12.3792 11.8498C12.2792 11.7998 12.1542 11.7998 12.0542 11.8498L11.0292 12.3915C10.7708 12.5248 10.4792 12.3081 10.5292 12.0248L10.7292 10.8831C10.7458 10.7665 10.7125 10.6581 10.6292 10.5748L9.80417 9.76647C9.59583 9.56647 9.7125 9.21647 9.99583 9.1748L11.1458 9.00814C11.2625 8.99147 11.3542 8.9248 11.4042 8.81647L11.9125 7.7748C12.0292 7.51647 12.3958 7.51647 12.5208 7.7748Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                      </button>
-                    </div>
+                      </div>
+                      <span>Código de Resgate</span>
+                    </button>
 
-                    <div className="profile-invite-row">
-                      <span>Convite:</span>
-                      <span className="profile-invite-code">{inviteCode}</span>
-                      <button
-                        type="button"
-                        className="profile-copy-btn"
-                        aria-label="Copiar código de convite"
-                        onClick={copyInviteCode}
-                      >
-                        <svg viewBox="0 0 24 24" className="profile-copy-icon" aria-hidden="true">
-                          <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/bank-cards')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M1.66667 7.0874H18.3333" stroke="#292D32" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 13.7539H6.66667M8.75 13.7539H12.0833" stroke="#292D32" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5.36667 2.9209H14.625C17.5917 2.9209 18.3333 3.65423 18.3333 6.57923V13.4209C18.3333 16.3459 17.5917 17.0792 14.6333 17.0792H5.36667C2.40834 17.0876 1.66667 16.3542 1.66667 13.4292V6.57923C1.66667 3.65423 2.40834 2.9209 5.36667 2.9209Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                      </button>
-                      {copyFeedback ? <span className="profile-copy-feedback">{copyFeedback}</span> : null}
-                    </div>
+                      </div>
+                      <span>Conta Bancária</span>
+                    </button>
 
-                    <div className="profile-invite-row">
-                      <span>Vigência:</span>
-                      <span
-                        className={`profile-invite-code profile-vip-expiry profile-vip-expiry--${formatVipExpiry(vipExpiresAt).status}`}
-                      >
-                        {formatVipExpiry(vipExpiresAt).label}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </section>
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/fund-details')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M7.22656 11.9417C7.22656 13.0167 8.05156 13.8834 9.07656 13.8834H11.1682C12.0599 13.8834 12.7849 13.125 12.7849 12.1917C12.7849 11.175 12.3432 10.8167 11.6849 10.5834L8.32656 9.4167C7.66823 9.18337 7.22656 8.82503 7.22656 7.80837C7.22656 6.87503 7.95156 6.1167 8.84323 6.1167H10.9349C11.9599 6.1167 12.7849 6.98337 12.7849 8.05837" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M10 5V15" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9.99999 18.3332C14.6024 18.3332 18.3333 14.6022 18.3333 9.99984C18.3333 5.39746 14.6024 1.6665 9.99999 1.6665C5.39762 1.6665 1.66666 5.39746 1.66666 9.99984C1.66666 14.6022 5.39762 18.3332 9.99999 18.3332Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Detalhes de Fundos</span>
+                    </button>
 
-              <section className="profile-wallet-card">
-                <div className="profile-wallet-item">
-                  <div className="profile-wallet-value">{formatBRL(balance)}</div>
-                  <div className="profile-wallet-label">Saldo (R$)</div>
-                </div>
-                <div className="profile-wallet-divider" />
-                <div className="profile-wallet-item">
-                  <div className="profile-wallet-value">{formatBRL(withdrawableBalance)}</div>
-                  <div className="profile-wallet-label">Comissão (R$)</div>
-                </div>
-                <div className="profile-wallet-divider" />
-                <div className="profile-wallet-item">
-                  <div className="profile-wallet-value">{formatBRL(rechargeBalance)}</div>
-                  <div className="profile-wallet-label">Recarga (R$)</div>
-                </div>
-              </section>
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/change-password')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M5 8.33317V6.6665C5 3.90817 5.83333 1.6665 10 1.6665C14.1667 1.6665 15 3.90817 15 6.6665V8.33317" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M14.1667 18.3335H5.83333C2.5 18.3335 1.66666 17.5002 1.66666 14.1668V12.5002C1.66666 9.16683 2.5 8.3335 5.83333 8.3335H14.1667C17.5 8.3335 18.3333 9.16683 18.3333 12.5002V14.1668C18.3333 17.5002 17.5 18.3335 14.1667 18.3335Z" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13.3304 13.3332H13.3379M9.99623 13.3332H10.0037M6.66209 13.3332H6.66957" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Senha</span>
+                    </button>
 
-              <section className="profile-stats-grid">
-                <div className="profile-stat-card">
-                  <p className="profile-stat-value">{formatBRL(todayIncome)}</p>
-                  <p className="profile-stat-label">Receita total(R$)</p>
-                </div>
-                <div className="profile-stat-card">
-                  <p className="profile-stat-value">{formatBRL(withdrawableBalance)}</p>
-                  <p className="profile-stat-label">Ganhos totais(R$)</p>
-                </div>
-                <div className="profile-stat-card">
-                  <p className="profile-stat-value">{formatBRL(totalDeposits)}</p>
-                  <p className="profile-stat-label">Depósitos acumulados(R$)</p>
-                </div>
-                <div className="profile-stat-card">
-                  <p className="profile-stat-value">{formatBRL(rechargeBalance)}</p>
-                  <p className="profile-stat-label">Total recargas(R$)</p>
-                </div>
-                <div className="profile-stat-card">
-                  <p className="profile-stat-value">{formatBRL(totalWithdrawals)}</p>
-                  <p className="profile-stat-label">Saques acumulados(R$)</p>
-                </div>
-                <div className="profile-stat-card profile-stat-card-full">
-                  <p className="profile-stat-value">{teamTotal}</p>
-                  <p className="profile-stat-label">Total de membros(Individual)</p>
-                </div>
-              </section>
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/withdraw-password')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M5 8.33317V6.6665C5 3.90817 5.83333 1.6665 10 1.6665C14.1667 1.6665 15 3.90817 15 6.6665V8.33317" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M14.1667 18.3335H5.83333C2.5 18.3335 1.66666 17.5002 1.66666 14.1668V12.5002C1.66666 9.16683 2.5 8.3335 5.83333 8.3335H14.1667C17.5 8.3335 18.3333 9.16683 18.3333 12.5002V14.1668C18.3333 17.5002 17.5 18.3335 14.1667 18.3335Z" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13.3304 13.3332H13.3379M9.99623 13.3332H10.0037M6.66209 13.3332H6.66957" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Configurar senha de saque</span>
+                    </button>
 
-              <section className="profile-menu-grid">
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/investment-orders')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3 3v18h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M7 16l4-4 4 4 4-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/statement')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M16.6667 6.87484V14.9998C16.6667 17.4998 15.175 18.3332 13.3333 18.3332H6.66666C4.82499 18.3332 3.33333 17.4998 3.33333 14.9998V6.87484C3.33333 4.1665 4.82499 3.5415 6.66666 3.5415C6.66666 4.05817 6.87497 4.52483 7.21664 4.8665C7.55831 5.20817 8.02499 5.4165 8.54166 5.4165H11.4583C12.4917 5.4165 13.3333 4.57484 13.3333 3.5415C15.175 3.5415 16.6667 4.1665 16.6667 6.87484Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M13.3333 3.5415C13.3333 4.57484 12.4917 5.4165 11.4583 5.4165H8.54167C8.02501 5.4165 7.55832 5.20817 7.21665 4.8665C6.87498 4.52483 6.66667 4.05817 6.66667 3.5415C6.66667 2.50817 7.50834 1.6665 8.54167 1.6665H11.4583C11.975 1.6665 12.4417 1.87484 12.7834 2.21651C13.125 2.55817 13.3333 3.02484 13.3333 3.5415Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M6.66667 10.8335H10M6.66667 14.1665H13.3333" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Sair do Artigo</span>
+                    </button>
+
+                    <button type="button" className="prof-menu-new-item" onClick={handleLogout}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M6.04168 3.3335C5.76693 3.49038 5.50259 3.66309 5.25001 3.85038C4.81772 4.17087 4.41976 4.53408 4.06251 4.93358C2.83075 6.31112 2.08334 8.12062 2.08334 10.1025C2.08334 14.4182 5.62776 17.9168 10 17.9168C14.3723 17.9168 17.9167 14.4182 17.9167 10.1025C17.9167 8.12062 17.1693 6.31112 15.9375 4.93358C15.5803 4.53408 15.1823 4.17087 14.75 3.85038C14.4974 3.66309 14.2331 3.49038 13.9583 3.3335" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M10 1.6665V9.99984" stroke="#161616" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Sair</span>
+                    </button>
+
+                    <button type="button" className="prof-menu-new-item" onClick={() => navigate('/shipping-address')}>
+                      <div className="prof-menu-new-icon">
+                        <svg viewBox="0 0 20 20" fill="none" width="20" height="20">
+                          <path d="M1.66667 7.0874H18.3333" stroke="#292D32" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 13.7539H6.66667M8.75 13.7539H12.0833" stroke="#292D32" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5.36667 2.9209H14.625C17.5917 2.9209 18.3333 3.65423 18.3333 6.57923V13.4209C18.3333 16.3459 17.5917 17.0792 14.6333 17.0792H5.36667C2.40834 17.0876 1.66667 16.3542 1.66667 13.4292V6.57923C1.66667 3.65423 2.40834 2.9209 5.36667 2.9209Z" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <span>Endereço de entrega</span>
+                    </button>
+
                   </div>
-                  <span className="profile-menu-label">Fundo de Riqueza</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/registros-tarefas')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 3v4a1 1 0 0 0 1 1h4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M17 21h-10a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M9 13h6M9 17h6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Registros de Trabalho</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/registro-do-dia')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M3 9h18" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M8 3v4M16 3v4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M8 14h3M8 17h6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Registro do dia</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/position')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <circle cx="16.5" cy="9" r="2.5" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M4 19a5 5 0 0 1 10 0M14 19a4.5 4.5 0 0 1 6 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Relatórios da Equipe</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/monthly-salary')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 19h16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M7 16V9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M12 16V6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M17 16v-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Registros Contábeis</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/statement')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M3 17l4-8l5 6l3-4l4 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M3 20h18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Extrato</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/bank-cards')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M3 10h18" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M7 15h.01M11 15h2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Centros de Crédito</span>
-                </button>
-                <button type="button" className="profile-menu-item">
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 4v12M7 11l5 5l5-5M4 20h16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Baixar Aplicativo</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/invite')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M19 8v6M22 11h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Convidar</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/checkin')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <rect x="3" y="8" width="18" height="4" rx="1" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" strokeWidth="2" />
-                      <path d="M7.5 8a2.5 2.5 0 0 1 0-5A5 5 0 0 1 12 8a5 5 0 0 1 4.5-5a2.5 2.5 0 0 1 0 5" fill="none" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Check-in</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/withdraw-password')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M12 3a11 11 0 0 0 8 3.5c0 6-2.8 11.2-8 14.5c-5.2-3.3-8-8.5-8-14.5A11 11 0 0 0 12 3z" fill="none" stroke="currentColor" strokeWidth="2" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Senha do Fundo</span>
-                </button>
-                <button type="button" className="profile-menu-item" onClick={() => navigate('/change-password')}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M4 20h4l10-10a2.1 2.1 0 1 0-3-3L5 17v3z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-                      <path d="M13.5 6.5l3 3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Alterar Senha</span>
-                </button>
-                <button type="button" className="profile-menu-item logout" onClick={handleLogout}>
-                  <div className="profile-menu-icon-wrap">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M14 4h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      <path d="M10 12h10M17 8l4 4l-4 4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <span className="profile-menu-label">Sair</span>
-                </button>
-              </section>
-            </>
+                </div>
+              </div>
+
+            </div>
           )}
         </div>
       </section>
 
-      {redeemFeedback ? (
-        <div className={`gift-toast ${redeemFeedback.type === 'success' ? 'success' : 'error'}`} role="status" aria-live="polite">
-          {redeemFeedback.message}
-        </div>
-      ) : null}
-
       {showRedeemSuccessModal && redeemSuccessData ? (
-        <div className="redeem-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="redeem-success-title">
-          <div className="redeem-modal-confetti-layer" aria-hidden="true">
-            {Array.from({ length: 28 }).map((_, i) => (
-              <span key={i} className={`confetti confetti-${(i % 7) + 1}`} />
-            ))}
-          </div>
-
+        <div className="redeem-modal-overlay" role="dialog" aria-modal="true">
           <div className="redeem-modal-card">
             <div className="redeem-modal-badge">🎉 Sucesso</div>
-            <h2 id="redeem-success-title">Código resgatado!</h2>
+            <h2>Código resgatado!</h2>
             <p className="redeem-modal-message">{redeemSuccessData.message}</p>
             <div className="redeem-modal-highlight">
               <span>Valor resgatado</span>
-              <strong>{formatBRL(redeemSuccessData.rewardValue)}</strong>
+              <strong>R$ {formatNum(redeemSuccessData.rewardValue)}</strong>
             </div>
             <p className="redeem-modal-code">Código: <b>{redeemSuccessData.code}</b></p>
-            <button
-              type="button"
-              className="redeem-modal-btn"
-              onClick={() => setShowRedeemSuccessModal(false)}
-            >
+            <button type="button" className="redeem-modal-btn" onClick={() => setShowRedeemSuccessModal(false)}>
               Continuar
             </button>
           </div>

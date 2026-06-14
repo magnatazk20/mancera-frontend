@@ -50,16 +50,16 @@ function ogTagsPlugin() {
 
           const ogBlock = `
     <!-- OG tags for referral link -->
-    <meta property="og:title" content="${escHtml(meta.ogTitle ?? 'Você foi convidado para TRK')}" />
+    <meta property="og:title" content="${escHtml(meta.ogTitle ?? 'Você foi convidado para Mancera')}" />
     <meta property="og:description" content="${escHtml(meta.ogDescription ?? 'Você recebeu um convite')}" />
     <meta property="og:image" content="${escHtml(meta.siteLogo || '/trk-banner.png')}" />
     <meta property="og:url" content="https://trk321.cc/register?ref=${refCode}" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${escHtml(meta.ogTitle ?? 'Você foi convidado para TRK')}" />
+    <meta name="twitter:title" content="${escHtml(meta.ogTitle ?? 'Você foi convidado para Mancera')}" />
     <meta name="twitter:description" content="${escHtml(meta.ogDescription ?? 'Você recebeu um convite')}" />
     <meta name="twitter:image" content="${escHtml(meta.siteLogo || '/trk-banner.png')}" />
-    <title>${escHtml(meta.ogTitle ?? 'TRK - Registro')}</title>
+    <title>${escHtml(meta.ogTitle ?? 'Mancera - Registro')}</title>
 `
 
           html = html.replace(/<title>.*?<\/title>/, '').replace('</head>', `${ogBlock}\n  </head>`)

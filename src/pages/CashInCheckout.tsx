@@ -176,7 +176,6 @@ export default function CashInCheckout() {
     <main className="dash-app profile-page">
       <AppSidebar />
       <section className="dash-main">
-        <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
         <div className="dash-content">
           <div className="checkout-container">
             {/* Top Bar */}

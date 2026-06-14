@@ -144,7 +144,6 @@ export default function MonthlySalary() {
         <AppSidebar />
 
         <div className="ms-content">
-          <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
           {/* ── Modal de feedback ── */}
           {(error || successMessage) ? (
             <div className="ms-modal-overlay" onClick={() => { setError(''); setSuccessMessage('') }}>

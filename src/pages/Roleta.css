@@ -1,10 +1,7 @@
 .roleta-pro {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.45), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.25), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  color: #5a3d1a;
+  background: #ffffff !important;
+  color: #2f343a;
   padding: 10px 0 24px;
   position: relative;
   z-index: 2;
@@ -14,7 +11,7 @@
   content: '';
   position: fixed;
   inset: 0;
-  background: linear-gradient(#fff5eb, #fec075);
+  background: transparent;
   z-index: -1;
   pointer-events: none;
 }
@@ -35,9 +32,10 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background: linear-gradient(180deg, rgba(255, 245, 235, 0.9), rgba(255, 245, 235, 0.3));
+  background: linear-gradient(180deg, rgba(250, 250, 250, 0.95), rgba(245, 246, 248, 0.65));
   backdrop-filter: blur(4px);
-  color: #5a3d1a;
+  color: #2f343a;
+  border-radius: 14px;
 }
 
 .roleta-head h1 {
@@ -45,15 +43,42 @@
   text-align: center;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #5a3d1a;
+  color: #2f343a;
 }
 
-/* Título neon "LUCKY WHEEL" */
 .lucky-title {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2px 0;
+  position: relative;
+}
+
+.lucky-title::before,
+.lucky-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: min(86%, 360px);
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent 0%, #b8c0cb 18%, #f5f8ff 50%, #b8c0cb 82%, transparent 100%);
+  box-shadow:
+    0 0 8px rgba(180, 191, 203, 0.7),
+    0 0 18px rgba(214, 223, 234, 0.55),
+    0 0 26px rgba(160, 172, 186, 0.45);
+  animation: titleLineShine 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.lucky-title::before {
+  top: -6px;
+}
+
+.lucky-title::after {
+  bottom: -6px;
+  animation-delay: 1.1s;
 }
 
 .lucky-title__text {
@@ -62,13 +87,13 @@
   font-size: 1.35rem;
   font-weight: 900;
   letter-spacing: 4px;
-  background: linear-gradient(90deg, #ff8a03, #ffd200, #ff8a03);
+  background: linear-gradient(90deg, #4b525a, #7b848d, #4b525a);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   text-shadow:
-    0 0 6px rgba(255, 210, 0, 0.55),
-    0 0 14px rgba(255, 138, 3, 0.45);
+    0 0 6px rgba(120, 128, 138, 0.4),
+    0 0 14px rgba(95, 103, 112, 0.3);
   animation: luckyTitleGlow 1.4s ease-in-out infinite alternate;
   padding: 4px 14px;
   border-radius: 999px;
@@ -82,7 +107,7 @@
   inset: 0;
   border-radius: 999px;
   border: 1.5px solid transparent;
-  background: linear-gradient(90deg, #ff8a03, #ffd200, #ff8a03) border-box;
+  background: linear-gradient(90deg, #5f6670, #9aa3ad, #5f6670) border-box;
   -webkit-mask:
     linear-gradient(#000 0 0) padding-box,
     linear-gradient(#000 0 0);
@@ -94,58 +119,33 @@
 
 @keyframes luckyTitleGlow {
   0% {
-    filter: drop-shadow(0 0 4px rgba(255, 138, 3, 0.55));
+    filter: drop-shadow(0 0 4px rgba(95, 103, 112, 0.45));
   }
   100% {
-    filter: drop-shadow(0 0 12px rgba(255, 210, 0, 0.95));
+    filter: drop-shadow(0 0 12px rgba(154, 163, 173, 0.55));
   }
 }
 
-/* Luzes piscantes ao redor da roda */
-.wheel-lights {
-  position: absolute;
-  inset: 3%;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 5;
-}
-
-.wheel-light {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #fff2b8;
-  transform: translate(-50%, -50%);
-  box-shadow:
-    0 0 6px #ffd200,
-    0 0 14px rgba(255, 210, 0, 0.85),
-    0 0 24px rgba(255, 138, 3, 0.75);
-  animation: wheelLightBlink 1.1s ease-in-out infinite;
-}
-
-.wheel-light::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffffff 0%, #ffd200 55%, transparent 75%);
-  pointer-events: none;
-}
-
-@keyframes wheelLightBlink {
+@keyframes titleLineShine {
   0%, 100% {
-    opacity: 1;
-    box-shadow:
-      0 0 8px #ffd200,
-      0 0 18px rgba(255, 210, 0, 0.95),
-      0 0 30px rgba(255, 138, 3, 0.85);
+    opacity: 0.75;
+    filter: brightness(0.95);
   }
   50% {
-    opacity: 0.25;
-    box-shadow:
-      0 0 2px rgba(255, 210, 0, 0.3),
-      0 0 6px rgba(255, 138, 3, 0.2);
+    opacity: 1;
+    filter: brightness(1.22);
+  }
+}
+
+
+@keyframes wheelConnectorPulse {
+  0%, 100% {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 4px rgba(219, 228, 240, 0.35)) brightness(0.95);
+  }
+  50% {
+    opacity: 0.92;
+    filter: drop-shadow(0 0 10px rgba(238, 245, 255, 0.65)) brightness(1.2);
   }
 }
 
@@ -153,12 +153,12 @@
   width: 36px;
   height: 36px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 138, 3, 0.35);
-  background: #ffffff;
-  color: #5a3d1a;
+  border: 1px solid rgba(95, 103, 112, 0.28);
+  background: #f5f7fa;
+  color: #2f343a;
   font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 138, 3, 0.18);
+  box-shadow: 0 4px 10px rgba(95, 103, 112, 0.14);
 }
 
 .roleta-head-spacer {
@@ -183,18 +183,18 @@
   height: 0;
   border-left: 16px solid transparent;
   border-right: 16px solid transparent;
-  border-bottom: 24px solid #ff8a03;
-  filter: drop-shadow(0 8px 12px rgba(255, 138, 3, 0.45));
+  border-bottom: 24px solid #59616a;
+  filter: drop-shadow(0 8px 12px rgba(85, 93, 102, 0.35));
 }
 
 .wheel-ring {
   position: absolute;
   inset: 3%;
   border-radius: 50%;
-  border: 12px solid rgba(255, 138, 3, 0.35);
+  border: 12px solid rgba(113, 121, 130, 0.34);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.6),
-    0 30px 70px rgba(255, 138, 3, 0.28);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.7),
+    0 30px 70px rgba(120, 130, 141, 0.2);
   z-index: 4;
 }
 
@@ -207,12 +207,31 @@
   transform: translate(-50%, -50%);
   border-radius: 50%;
   overflow: hidden;
-  border: 5px solid rgba(255, 255, 255, 0.7);
+  border: 5px solid rgba(255, 255, 255, 0.75);
   box-shadow:
-    0 0 0 8px rgba(255, 211, 138, 0.55),
-    0 18px 40px rgba(255, 138, 3, 0.35);
+    0 0 0 8px rgba(197, 205, 214, 0.5),
+    0 18px 40px rgba(108, 118, 128, 0.26);
   transition: transform 4.7s cubic-bezier(0.12, 0.95, 0.2, 1);
   z-index: 5;
+}
+
+.wheel-disc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  background:
+    repeating-conic-gradient(
+      from -90deg,
+      rgba(240, 246, 255, 0.55) 0deg 1.1deg,
+      rgba(255, 255, 255, 0) 1.1deg 45deg
+    );
+  mix-blend-mode: screen;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 6px rgba(225, 233, 245, 0.45));
+  animation: wheelConnectorPulse 1.25s ease-in-out infinite;
 }
 
 .wheel-line {
@@ -229,7 +248,7 @@
 .wheel-label {
   position: absolute;
   z-index: 7;
-  color: #5a3d1a;
+  color: #2f343a;
   font-size: 0.9rem;
   font-weight: 800;
   text-shadow:
@@ -238,7 +257,7 @@
 }
 
 .wheel-line {
-  background: rgba(90, 61, 26, 0.35);
+  background: rgba(79, 87, 96, 0.38);
 }
 
 .wheel-center-btn {
@@ -249,17 +268,17 @@
   height: 108px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.8);
-  background: linear-gradient(180deg, #f7d981, #ff8a03);
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  background: linear-gradient(180deg, #8d959e, #5a616a);
   color: #ffffff;
   font-size: 2rem;
   font-weight: 900;
   box-shadow:
-    0 14px 30px rgba(255, 138, 3, 0.45),
-    inset 0 2px 8px rgba(255, 255, 255, 0.55);
+    0 14px 30px rgba(95, 103, 112, 0.35),
+    inset 0 2px 8px rgba(255, 255, 255, 0.35);
   cursor: not-allowed;
   z-index: 9;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .spins-badge {
@@ -268,17 +287,17 @@
   left: 50%;
   transform: translateX(-50%);
   background: #ffffff;
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  border: 1px solid rgba(95, 103, 112, 0.28);
   border-radius: 999px;
   padding: 8px 14px;
   font-size: 0.9rem;
   z-index: 10;
-  color: #5a3d1a;
-  box-shadow: 0 4px 12px rgba(255, 138, 3, 0.2);
+  color: #2f343a;
+  box-shadow: 0 4px 12px rgba(95, 103, 112, 0.14);
 }
 
 .spins-badge strong {
-  color: #ff8a03;
+  color: #525a63;
   font-size: 1.15rem;
 }
 
@@ -292,18 +311,18 @@
   min-height: 48px;
   border: 0;
   border-radius: 14px;
-  background: linear-gradient(135deg, #f1d9b5, #d9b382);
-  color: #8a5300;
+  background: linear-gradient(135deg, #e2e6ea, #c5ccd3);
+  color: #5d646d;
   font-weight: 800;
   cursor: not-allowed;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .spin-cta button.ready {
-  background: linear-gradient(90deg, #f7d981, #ff8a03);
+  background: linear-gradient(90deg, #7a838d, #58606a);
   color: #ffffff;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(255, 138, 3, 0.45);
+  box-shadow: 0 10px 24px rgba(90, 98, 108, 0.32);
 }
 
 .spin-cta button.ready:hover {
@@ -318,16 +337,15 @@
 .winner-text {
   margin: 10px 0 0;
   text-align: center;
-  color: #ff8a03;
+  color: #525a63;
   font-weight: 700;
 }
 
-/* ── Modais de resgate de código ── */
 .redeem-modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 1300;
-  background: rgba(90, 61, 26, 0.45);
+  background: rgba(47, 52, 58, 0.45);
   display: grid;
   place-items: center;
   padding: 16px;
@@ -349,21 +367,21 @@
 }
 
 .redeem-modal--success {
-  border: 1px solid rgba(255, 138, 3, 0.55);
-  background: linear-gradient(160deg, #fff5eb 0%, #ffe1b8 100%);
-  color: #5a3d1a;
+  border: 1px solid rgba(95, 103, 112, 0.35);
+  background: linear-gradient(160deg, #f7f9fb 0%, #eceff3 100%);
+  color: #2f343a;
 }
 
 .redeem-modal--error {
   border: 1px solid rgba(248, 113, 113, 0.55);
-  background: linear-gradient(160deg, #fff5eb 0%, #fde4e4 100%);
+  background: linear-gradient(160deg, #fef2f2 0%, #fde4e4 100%);
   color: #7a2a2a;
 }
 
 .redeem-modal-icon {
   font-size: 3rem;
   line-height: 1;
-  filter: drop-shadow(0 0 16px rgba(255, 138, 3, 0.35));
+  filter: drop-shadow(0 0 16px rgba(95, 103, 112, 0.25));
 }
 
 .redeem-modal h2 {
@@ -373,17 +391,17 @@
   letter-spacing: 0.2px;
 }
 
-.redeem-modal--success h2 { color: #ff8a03; }
+.redeem-modal--success h2 { color: #4f5760; }
 .redeem-modal--error h2   { color: #b91c1c; }
 
 .redeem-modal-code {
   margin: 0;
   font-size: 0.9rem;
-  color: #8a6b3f;
+  color: #5f6770;
 }
 
 .redeem-modal-code strong {
-  color: #5a3d1a;
+  color: #2f343a;
   font-size: 1rem;
   letter-spacing: 1px;
 }
@@ -391,23 +409,23 @@
 .redeem-modal-reward {
   margin: 0;
   font-size: 1.05rem;
-  color: #5a3d1a;
+  color: #2f343a;
   font-weight: 600;
 }
 
 .redeem-modal-reward strong {
-  color: #ff8a03;
+  color: #4d555e;
   font-size: 1.25rem;
 }
 
 .redeem-modal-spins {
   margin: 0;
   font-size: 0.88rem;
-  color: #8a5300;
+  color: #5f6770;
 }
 
 .redeem-modal-spins strong {
-  color: #ff8a03;
+  color: #4d555e;
   font-weight: 700;
 }
 
@@ -432,13 +450,13 @@
   transition: filter 0.18s ease, transform 0.18s ease;
 }
 
-.redeem-modal-btn:hover  { filter: brightness(1.1); transform: translateY(-1px); }
+.redeem-modal-btn:hover  { filter: brightness(1.08); transform: translateY(-1px); }
 .redeem-modal-btn:active { transform: translateY(0); }
 
 .redeem-modal-btn--success {
-  background: linear-gradient(90deg, #f7d981, #ff8a03);
+  background: linear-gradient(90deg, #7c8590, #5a616b);
   color: #fff;
-  box-shadow: 0 8px 22px rgba(255, 138, 3, 0.4);
+  box-shadow: 0 8px 22px rgba(90, 98, 107, 0.35);
 }
 
 .redeem-modal-btn--error {
@@ -451,10 +469,10 @@
   margin: 16px;
   padding: 12px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 138, 3, 0.28);
+  border: 1px solid rgba(95, 103, 112, 0.22);
   background: #ffffff;
-  box-shadow: 0 18px 50px rgba(255, 138, 3, 0.18);
-  color: #5a3d1a;
+  box-shadow: 0 18px 50px rgba(95, 103, 112, 0.12);
+  color: #2f343a;
 }
 
 .records-tabs {
@@ -467,13 +485,13 @@
   min-height: 40px;
   border: 0;
   border-radius: 10px;
-  background: #fff5eb;
-  color: #8a6b3f;
+  background: #eef1f4;
+  color: #5f6770;
   font-weight: 700;
 }
 
 .records-tabs button.active {
-  background: linear-gradient(90deg, #f7d981, #ff8a03);
+  background: linear-gradient(90deg, #7b848e, #5b636c);
   color: #fff;
 }
 
@@ -491,25 +509,25 @@
   align-items: center;
   padding: 10px;
   border-radius: 10px;
-  background: #fff5eb;
-  border: 1px solid rgba(255, 138, 3, 0.15);
+  background: #f5f7fa;
+  border: 1px solid rgba(95, 103, 112, 0.16);
 }
 
 .record-row small {
-  color: #8a6b3f;
+  color: #6b7380;
   font-size: 0.72rem;
   display: block;
 }
 
 .record-row p {
   margin: 2px 0 0;
-  color: #5a3d1a;
+  color: #2f343a;
   font-size: 0.88rem;
 }
 
 .record-row strong {
   font-size: 1rem;
-  background: linear-gradient(90deg, #ff8a03, #f59e0b);
+  background: linear-gradient(90deg, #545c65, #7b858f);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -517,26 +535,58 @@
 
 .empty-state {
   text-align: center;
-  color: #8a6b3f;
+  color: #6b7380;
   padding: 24px 10px;
 }
 
-/* Regras da roleta */
 .rules-card {
   margin: 16px;
   padding: 18px 18px 14px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 138, 3, 0.28);
+  border: 1px solid rgba(95, 103, 112, 0.2);
   background: #ffffff;
-  box-shadow: 0 18px 50px rgba(255, 138, 3, 0.18);
-  color: #5a3d1a;
+  box-shadow: 0 16px 38px rgba(95, 103, 112, 0.1);
+  color: #2f343a;
+  position: relative;
+  isolation: isolate;
+}
+
+.rules-card::before,
+.rules-card::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.rules-card::before {
+  background: linear-gradient(
+    120deg,
+    rgba(166, 176, 190, 0.2),
+    rgba(223, 230, 240, 0.75),
+    rgba(166, 176, 190, 0.2)
+  );
+  z-index: -1;
+  filter: blur(0.4px);
+  animation: rulesCardPulse 1.9s ease-in-out infinite;
+}
+
+.rules-card::after {
+  inset: -7px;
+  border-radius: 22px;
+  background: radial-gradient(circle at center, rgba(214, 223, 235, 0.4), transparent 70%);
+  z-index: -2;
+  filter: blur(8px);
+  opacity: 0.65;
+  animation: rulesCardAuraPulse 1.9s ease-in-out infinite;
 }
 
 .rules-card__title {
   margin: 0 0 12px;
   font-size: 1.1rem;
   font-weight: 800;
-  color: #ff8a03;
+  color: #4f5760;
   text-align: center;
   letter-spacing: 0.3px;
 }
@@ -568,12 +618,12 @@
   padding: 10px 18px 10px 12px;
   width: max-content;
   max-width: 100%;
-  background: linear-gradient(135deg, #fff4e0 0%, #ffe0b2 100%);
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: linear-gradient(135deg, #f4f6f8 0%, #e8edf1 100%);
+  border: 1px solid rgba(95, 103, 112, 0.3);
   border-radius: 14px;
   box-shadow:
-    0 6px 18px rgba(255, 138, 3, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    0 6px 18px rgba(95, 103, 112, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   position: relative;
 }
 
@@ -584,8 +634,8 @@
   top: 50%;
   width: 10px;
   height: 10px;
-  background: #fff7ec;
-  border: 1px solid rgba(255, 138, 3, 0.35);
+  background: #ffffff;
+  border: 1px solid rgba(95, 103, 112, 0.3);
   border-radius: 50%;
   transform: translateY(-50%);
 }
@@ -608,9 +658,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ff9f3c, #ff6a00);
+  background: linear-gradient(135deg, #7b848f, #59616b);
   color: #fff;
-  box-shadow: 0 4px 10px rgba(255, 106, 0, 0.35);
+  box-shadow: 0 4px 10px rgba(90, 98, 108, 0.3);
 }
 
 .spins-token__icon svg {
@@ -629,13 +679,13 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a15500;
+  color: #5f6770;
 }
 
 .spins-token__count {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #ff6a00;
+  color: #4f5760;
   font-variant-numeric: tabular-nums;
 }
 
@@ -646,7 +696,7 @@
   gap: 10px;
   font-size: 0.92rem;
   line-height: 1.5;
-  color: #5a3d1a;
+  color: #3d434a;
 }
 
 .rules-card__list li {
@@ -654,12 +704,12 @@
 }
 
 .rules-card__list li::marker {
-  color: #ff8a03;
+  color: #5d6570;
   font-weight: 800;
 }
 
 .rules-card__list strong {
-  color: #8a5300;
+  color: #2f343a;
   font-weight: 700;
 }
 
@@ -669,7 +719,7 @@
   z-index: 1200;
   display: grid;
   place-items: center;
-  background: rgba(90, 61, 26, 0.35);
+  background: rgba(47, 52, 58, 0.35);
   pointer-events: none;
   animation: roletaFadeIn 220ms ease-out;
 }
@@ -679,14 +729,14 @@
   overflow: hidden;
   width: min(92vw, 520px);
   border-radius: 20px;
-  border: 1px solid rgba(255, 138, 3, 0.55);
-  background: radial-gradient(circle at top, rgba(255, 211, 138, 0.9), #ffffff 58%);
-  color: #5a3d1a;
+  border: 1px solid rgba(95, 103, 112, 0.42);
+  background: radial-gradient(circle at top, rgba(223, 228, 233, 0.95), #ffffff 58%);
+  color: #2f343a;
   text-align: center;
   padding: 20px 18px 18px;
   box-shadow:
-    0 0 0 2px rgba(255, 138, 3, 0.35),
-    0 20px 60px rgba(255, 138, 3, 0.35);
+    0 0 0 2px rgba(136, 145, 154, 0.25),
+    0 20px 60px rgba(95, 103, 112, 0.25);
   animation: celebrationPop 520ms cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
@@ -694,30 +744,30 @@
   margin: 0;
   font-size: 1.8rem;
   letter-spacing: 0.3px;
-  color: #ff8a03;
-  text-shadow: 0 0 14px rgba(255, 138, 3, 0.45);
+  color: #4f5760;
+  text-shadow: 0 0 14px rgba(95, 103, 112, 0.28);
 }
 
 .roleta-celebration-card p {
   margin: 10px 0 0;
   font-size: 1.05rem;
-  color: #5a3d1a;
+  color: #2f343a;
 }
 
 .roleta-celebration-card p strong {
-  color: #ff8a03;
+  color: #525a63;
   font-size: 1.2rem;
-  text-shadow: 0 0 12px rgba(255, 138, 3, 0.35);
+  text-shadow: 0 0 12px rgba(95, 103, 112, 0.25);
 }
 
 .roleta-confetti {
   position: absolute;
   inset: -30% -10%;
   background-image:
-    radial-gradient(circle, rgba(255, 138, 3, 0.95) 0 2px, transparent 2.4px),
-    radial-gradient(circle, rgba(247, 217, 129, 0.95) 0 2px, transparent 2.4px),
-    radial-gradient(circle, rgba(255, 184, 107, 0.95) 0 2px, transparent 2.4px),
-    radial-gradient(circle, rgba(248, 113, 113, 0.9) 0 2px, transparent 2.4px);
+    radial-gradient(circle, rgba(140, 149, 160, 0.9) 0 2px, transparent 2.4px),
+    radial-gradient(circle, rgba(193, 201, 210, 0.9) 0 2px, transparent 2.4px),
+    radial-gradient(circle, rgba(150, 160, 171, 0.9) 0 2px, transparent 2.4px),
+    radial-gradient(circle, rgba(116, 126, 137, 0.9) 0 2px, transparent 2.4px);
   background-size: 56px 56px, 62px 62px, 68px 68px, 74px 74px;
   background-position: 0 0, 24px 18px, 12px 34px, 30px 8px;
   opacity: 0.55;
@@ -746,4 +796,26 @@
 @keyframes confettiMove {
   0% { transform: translateY(-6px) rotate(0deg); }
   100% { transform: translateY(22px) rotate(6deg); }
+}
+
+@keyframes rulesCardPulse {
+  0%, 100% {
+    opacity: 0.45;
+    filter: blur(0.4px) brightness(0.95);
+  }
+  50% {
+    opacity: 0.95;
+    filter: blur(0.8px) brightness(1.15);
+  }
+}
+
+@keyframes rulesCardAuraPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.995);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.01);
+  }
 }

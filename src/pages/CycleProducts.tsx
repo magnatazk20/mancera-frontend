@@ -32,6 +32,7 @@ type CycleProduct = {
   minAmount: number
   maxAmount: number
   profitPercent: number
+  mancecoinReward: number
 }
 
 const normalizePlanType = (value: unknown): PlanCategory => {
@@ -54,7 +55,6 @@ export default function CycleProducts() {
   const [activeCategory, setActiveCategory] = useState<PlanCategory>('normal')
   const [userInviteCount, setUserInviteCount] = useState<{ level1: number; level2: number; level3: number } | null>(null)
   const [myPurchases, setMyPurchases] = useState<Record<number, number>>({})
-  const [investAmounts, setInvestAmounts] = useState<Record<number, string>>({})
   const [userVipLevel, setUserVipLevel] = useState<number | null>(null)
 
   useEffect(() => {
@@ -131,6 +131,7 @@ export default function CycleProducts() {
           minAmount: Number(item.minAmount ?? 0),
           maxAmount: Number(item.maxAmount ?? 0),
           profitPercent: Number(item.profitPercent ?? 0),
+          mancecoinReward: Number(item.mancecoinReward ?? 0),
         }))
 
         setCyclePlans(mappedPlans)
@@ -211,15 +212,13 @@ export default function CycleProducts() {
     setIsBuying(true)
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
-      const userInvestAmount = Number(String(investAmounts[selectedPlan.id] ?? '0').replace(',', '.'))
-
       const response = await fetch(`${API_URL}/api/cycle-products/purchase`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({
           userId: user.id,
           cycleProductId: selectedPlan.id,
-          investAmount: userInvestAmount,
+          investAmount: selectedPlan.amount,
         }),
       })
 
@@ -271,10 +270,11 @@ export default function CycleProducts() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
           {/* ── Banner topo ── */}
           <div className="cycle-banner-wrap">
-            <img src="/trkml.png" alt="TRK Banner" className="cycle-banner-img" />
+            <video autoPlay muted loop playsInline className="cycle-banner-img">
+              <source src="https://manceraparfums.com/esp/themes/mancera/assets/img/homepage/bg_video_mochi_musk.mp4" type="video/mp4" />
+            </video>
           </div>
 
           <h2 className="cycle-storage-title">Período de armazenamento</h2>
@@ -329,83 +329,75 @@ export default function CycleProducts() {
               </div>
 
               {loading ? (
-                <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Carregando produtos...</p>
+                <p style={{ color: '#666666', textAlign: 'center', padding: 20 }}>Carregando produtos...</p>
               ) : filteredCyclePlans.length === 0 ? (
-                <p style={{ color: '#6b7280', textAlign: 'center', padding: 20 }}>Nenhum plano disponível nesta categoria.</p>
+                <p style={{ color: '#666666', textAlign: 'center', padding: 20 }}>Nenhum plano disponível nesta categoria.</p>
               ) : (
-                filteredCyclePlans.map((plan) => {
-                  const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
-                  const estoqueInicial = Math.max(1, initialStock[plan.id] ?? estoque)
-                  const vendidos = Math.max(0, estoqueInicial - estoque)
-                  const progresso = estoqueInicial > 0 ? Math.min(100, Math.round((vendidos / estoqueInicial) * 100)) : 0
-                  const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
-                  const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
-                  const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
-                  const isUnavailable = estoque <= 0 || limitReached
-                  const effectivePercent = plan.profitPercent > 0 ? plan.profitPercent : plan.profit
-                  const totalPercent = Number((effectivePercent * plan.cycleDays).toFixed(2))
+                <div className="dash-cycle-products-grid">
+                  {filteredCyclePlans.map((plan) => {
+                    const estoque = Math.max(0, Number(plan.stockQuantity ?? 0))
+                    const limitPerUser = Number(plan.maxPurchasesPerUser ?? 0)
+                    const userPurchaseCount = Number(myPurchases[plan.id] ?? 0)
+                    const limitReached = limitPerUser > 0 && userPurchaseCount >= limitPerUser
+                    const isUnavailable = estoque <= 0 || limitReached
+                    const effectivePercent = plan.profitPercent > 0 ? plan.profitPercent : plan.profit
+                    const totalPercent = Number((effectivePercent * plan.cycleDays).toFixed(2))
 
-                  return (
-                    <article
-                      key={plan.id}
-                      className={`cycle-product-card${isUnavailable ? ' unavailable' : ''}`}
-                      onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
-                    >
-                      {/* ── Imagem no topo com badges ── */}
-                      <div className="cycle-product-image-wrap">
-                        <img src={plan.imageUrl} alt={plan.name} />
-                        <span className="cycle-percent-overlay">{totalPercent}%</span>
-                        <span className="cycle-days-overlay">{plan.cycleDays} dias</span>
-                      </div>
-
-                      {/* ── Corpo do card ── */}
-                      <div className="cycle-product-body">
-                        <div className="cycle-product-title">{plan.name}</div>
-
-                        <div className="cycle-details-list">
-                          <div>Lucro diário: <strong>{effectivePercent}%</strong></div>
-                          <div>Lucro total no ciclo: <strong>{totalPercent}%</strong></div>
-                          <div>Ciclo: <strong>{plan.cycleDays} dias</strong></div>
-                          <div>Mín. depósito: <strong>{formatBRL(plan.minAmount)}</strong></div>
+                    return (
+                      <div
+                        key={plan.id}
+                        className={`dash-cycle-product-card${isUnavailable ? ' unavailable' : ''}`}
+                        onClick={() => { if (!isUnavailable) setSelectedPlan(plan) }}
+                        style={isUnavailable ? { opacity: 0.6, pointerEvents: 'none' } : {}}
+                      >
+                        <div className="dash-cycle-product-image">
+                          {plan.imageUrl ? (
+                            <img src={plan.imageUrl} alt={plan.name} />
+                          ) : (
+                            <div className="dash-cycle-product-placeholder">
+                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                              </svg>
+                            </div>
+                          )}
+                                                  </div>
+                        <div className="dash-cycle-product-info">
+                          <h3 className="dash-cycle-product-name">{plan.name}</h3>
+                          <div className="dash-cycle-product-stats">
+                            <div className="dash-cycle-stat-item">
+                              <span className="dash-cycle-stat-label">Valor do produto</span>
+                              <span className="dash-cycle-stat-value">{formatBRL(plan.amount)}</span>
+                            </div>
+                            <div className="dash-cycle-stat-item">
+                              <span className="dash-cycle-stat-label">Renda diária</span>
+                              <span className="dash-cycle-stat-value" style={{ color: '#16a34a' }}>
+                                {formatBRL(Number((plan.amount * (effectivePercent / 100)).toFixed(2)))}
+                              </span>
+                            </div>
+                            <div className="dash-cycle-stat-item">
+                              <span className="dash-cycle-stat-label">Total de dias</span>
+                              <span className="dash-cycle-stat-value">{plan.cycleDays} dias</span>
+                            </div>
+                            <div className="dash-cycle-stat-item">
+                              <span className="dash-cycle-stat-label">MANCOIN</span>
+                              <span className="dash-cycle-stat-value" style={{ color: '#2563eb' }}>
+                                {Number(plan.mancecoinReward ?? 0).toLocaleString('pt-BR')}
+                              </span>
+                            </div>
+                          </div>
                         </div>
-
-                        {/* ── Badge circular de progresso ── */}
-                        <div className="cycle-percentage-badge">{progresso}%</div>
-
-                        {/* ── Info compras / estoque ── */}
-                        <div className="cycle-stock-info">
-                          <span>Compras: <strong>{userPurchaseCount}</strong></span>
-                          <span>Estoque: <strong>{estoque}</strong></span>
+                        <div className="dash-cycle-product-buy" onClick={(e) => { e.stopPropagation(); if (!isUnavailable) setSelectedPlan(plan) }}>
+                          <span>{isUnavailable ? 'Esgotado' : 'Investir'}</span>
+                          {!isUnavailable && (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                              <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                          )}
                         </div>
-
-                        {/* ── Tag reinvestimento ── */}
-                        <span className={`cycle-reinvest-tag${isUnavailable ? ' closed' : ''}`}>
-                          {isUnavailable ? 'Não é mais possível investir' : 'Pode ser reinvestido'}
-                        </span>
-
-                        {/* ── Botão ── */}
-                        {isUnavailable ? (
-                          <button
-                            type="button"
-                            className="cycle-product-button disabled"
-                            disabled
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            Esgotado <span className="arrow">✕</span>
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="cycle-product-button"
-                            onClick={(e) => { e.stopPropagation(); setSelectedPlan(plan) }}
-                          >
-                            Invista agora <span className="arrow">➜</span>
-                          </button>
-                        )}
                       </div>
-                    </article>
-                  )
-                })
+                    )
+                  })}
+                </div>
               )}
             </>
           )}
@@ -444,85 +436,48 @@ export default function CycleProducts() {
             <p style={{ marginTop: 6, color: '#4b5a64', fontSize: 14 }}>{selectedPlan.name}</p>
 
             {(() => {
-              const modalInvestStr = investAmounts[selectedPlan.id] ?? ''
-              const modalInvestNum = Number(String(modalInvestStr).replace(',', '.')) || 0
+              const fixedAmount = selectedPlan.amount
               const modalEffectivePercent = selectedPlan.profitPercent > 0 ? selectedPlan.profitPercent : selectedPlan.profit
               const daily = modalEffectivePercent > 0
-                ? Number((modalInvestNum * (modalEffectivePercent / 100)).toFixed(2))
+                ? Number((fixedAmount * (modalEffectivePercent / 100)).toFixed(2))
                 : 0
-              const modalTotalReturn = Number((modalInvestNum + daily * selectedPlan.cycleDays).toFixed(2))
+              const modalTotalReturn = Number((fixedAmount + daily * selectedPlan.cycleDays).toFixed(2))
               return (
-                <>
-                  <div style={{ marginTop: 14, padding: '14px 16px', borderRadius: 12, background: '#f4fdff', border: '2px solid #66b8d7' }}>
-                    <div style={{ color: '#0798cb', fontSize: 14, fontWeight: 700, marginBottom: 10 }}>
-                      Escolha o valor do investimento ({formatBRL(selectedPlan.minAmount)} ~ {formatBRL(selectedPlan.maxAmount)})
-                    </div>
-                    <input
-                      type="number"
-                      min={selectedPlan.minAmount}
-                      max={selectedPlan.maxAmount}
-                      step="1"
-                      value={modalInvestStr}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => setInvestAmounts((prev) => ({ ...prev, [selectedPlan.id]: e.target.value }))}
-                      placeholder={`Ex.: ${selectedPlan.minAmount}`}
-                      style={{
-                        width: '100%',
-                        padding: '12px 14px',
-                        border: '2px solid #66b8d7',
-                        borderRadius: 10,
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: '#2d3b44',
-                        background: '#fff',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                      }}
-                    />
-                    <input
-                      type="range"
-                      min={selectedPlan.minAmount}
-                      max={selectedPlan.maxAmount}
-                      step="1"
-                      value={modalInvestNum || selectedPlan.minAmount}
-                      onClick={(e) => e.stopPropagation()}
-                      onChange={(e) => setInvestAmounts((prev) => ({ ...prev, [selectedPlan.id]: e.target.value }))}
-                      style={{ width: '100%', marginTop: 8, accentColor: '#0798cb' }}
-                    />
-                    {modalInvestNum > 0 && modalEffectivePercent > 0 ? (
-                      <div style={{ marginTop: 12, fontSize: 13, color: '#2f3f49', display: 'grid', gap: 6 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #d0e8f0', paddingTop: 6 }}>
-                          <span>Retorno total ao final:</span>
-                          <strong style={{ color: '#16a34a', fontSize: 15 }}>{formatBRL(modalTotalReturn)}</strong>
-                        </div>
-                      </div>
-                    ) : null}
+                <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, background: 'rgba(212, 175, 55, 0.06)', border: '1px solid #d4af37' }}>
+                    <span><strong>Valor do produto:</strong></span>
+                    <strong style={{ color: '#2d3b44' }}>{formatBRL(fixedAmount)}</strong>
                   </div>
-
-                  <div style={{ marginTop: 14, display: 'grid', gap: 8, color: '#2f3f49', fontSize: 13 }}>
-                    <div><strong>Montante investido:</strong> {formatBRL(modalInvestNum)}</div>
-                    <div><strong>Início:</strong>-{formatDateTime(new Date())}</div>
-                    <div><strong>Fim:</strong>-{formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}</div>
-                    <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
-                    <div style={{
-                      marginTop: 6,
-                      padding: '8px 12px',
-                      borderRadius: 8,
-                      background: '#e9f9ff',
-                      border: '1px solid #5fb8d7',
-                      color: '#038fc2',
-                      fontSize: 12,
-                      fontWeight: 700,
-                    }}>
-                      O lucro + investimento será retornado ao final do ciclo.
-                    </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, background: 'rgba(212, 175, 55, 0.06)', border: '1px solid #d4af37' }}>
+                    <span><strong>Renda diária:</strong></span>
+                    <strong style={{ color: '#16a34a' }}>{formatBRL(daily)} <span style={{ fontSize: 11 }}>(após 24h)</span></strong>
                   </div>
-                </>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, background: 'rgba(212, 175, 55, 0.06)', border: '1px solid #d4af37' }}>
+                    <span><strong>Retorno total:</strong></span>
+                    <strong style={{ color: '#16a34a' }}>{formatBRL(modalTotalReturn)}</strong>
+                  </div>
+                  <div><strong>Início:</strong> {formatDateTime(new Date())}</div>
+                  <div><strong>Fim:</strong> {formatDateTime(new Date(Date.now() + selectedPlan.cycleDays * 24 * 60 * 60 * 1000))}</div>
+                  <div><strong>Duração:</strong> {selectedPlan.cycleDays} dias</div>
+                  <div><strong>Recompensa MANCOIN:</strong> {Number(selectedPlan.mancecoinReward ?? 0).toLocaleString('pt-BR')}</div>
+                  <div style={{
+                    marginTop: 6,
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    background: 'rgba(212, 175, 55, 0.12)',
+                    border: '1px solid #d4af37',
+                    color: '#7a6200',
+                    fontSize: 12,
+                    fontWeight: 700,
+                  }}>
+                    A renda diária será creditada automaticamente após cada período de 24h. O investimento total será retornado ao final do ciclo.
+                  </div>
+                </div>
               )
             })()}
 
             {(selectedPlan.requireCommissionLevel1Count > 0 || selectedPlan.requireCommissionLevel2Count > 0 || selectedPlan.requireCommissionLevel3Count > 0) ? (
-              <div style={{ marginTop: 14, padding: '10px 12px', borderRadius: 10, background: '#f4fdff', border: '1px solid #9ecde0', fontSize: 13 }}>
+              <div style={{ marginTop: 14, padding: '10px 12px', borderRadius: 10, background: 'rgba(212, 175, 55, 0.06)', border: '1px solid #d4af37', fontSize: 13 }}>
                 <strong style={{ display: 'block', marginBottom: 6, color: '#2d3b44' }}>Requisitos para se tornar funcionario</strong>
                 {selectedPlan.requireCommissionLevel1Count > 0 ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
@@ -563,7 +518,7 @@ export default function CycleProducts() {
                 onClick={closePurchaseModal}
                 disabled={isBuying}
                 style={{
-                  border: '1px solid #9ecde0',
+                  border: '1px solid #d4af37',
                   background: '#fff',
                   color: '#4b5a64',
                   borderRadius: 8,
@@ -579,9 +534,9 @@ export default function CycleProducts() {
                 onClick={confirmBuyCycle}
                 disabled={isBuying}
                 style={{
-                  border: '1px solid #0074a1',
-                  background: 'linear-gradient(180deg, #0798cb 0%, #0b80b2 100%)',
-                  color: '#fff',
+                  border: '1px solid #b8942a',
+                  background: 'linear-gradient(135deg, #d4af37, #f7d981)',
+                  color: '#3a2e00',
                   borderRadius: 8,
                   padding: '10px 16px',
                   fontWeight: 700,

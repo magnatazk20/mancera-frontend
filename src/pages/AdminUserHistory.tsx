@@ -52,6 +52,19 @@ type PurchaseItem = {
   createdAt: string | null
 }
 
+type CyclePurchaseItem = {
+  id: number
+  planName: string
+  amountPaid: number
+  expectedProfit: number
+  totalCredited: number
+  cycleDays: number
+  status: string
+  startedAt: string | null
+  endsAt: string | null
+  createdAt: string | null
+}
+
 type GiftCodeRedemptionItem = {
   id: number
   code: string
@@ -129,7 +142,7 @@ type UserDetailsResponse = {
     name: string
     phone: string
     vipPurchases?: PurchaseItem[]
-    cyclePurchases?: PurchaseItem[]
+    cyclePurchases?: CyclePurchaseItem[]
     giftCodeRedemptions?: GiftCodeRedemptionItem[]
     dailyCheckinRedemptions?: DailyCheckinRedemptionItem[]
     depositHistory?: DepositHistoryItem[]
@@ -250,68 +263,86 @@ export default function AdminUserHistory() {
           <>
             <section className='admin-panel admin-user-list-panel'>
               <div className='admin-log-header'>
-                <h3>Planos VIP comprados</h3>
-                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowVipPurchases((prev) => !prev)}>
-                  {showVipPurchases ? 'Ocultar planos VIP' : 'Mostrar planos VIP'}
-                </button>
-              </div>
-              {showVipPurchases ? (
-                (user.vipPurchases ?? []).length ? (
-                  <div className='admin-user-list'>
-                    {(user.vipPurchases ?? []).map((item) => (
-                      <article key={`vip-${item.id}`} className='admin-user-list-item'>
-                        <div>
-                          <strong>{item.planName}</strong>
-                          <p>{item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}</p>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span>{formatBRL(item.amountPaid)}</span>
-                          <button
-                            type='button'
-                            onClick={() => handleRemoveVip(item)}
-                            style={{
-                              padding: '3px 10px',
-                              borderRadius: '8px',
-                              border: '1.5px solid #dc2626',
-                              background: 'transparent',
-                              color: '#dc2626',
-                              fontWeight: 700,
-                              fontSize: '12px',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            🗑️ Remover VIP
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                ) : <p>Nenhuma compra VIP encontrada.</p>
-              ) : <p className='admin-log-hint'>Clique em Mostrar planos VIP para visualizar os planos comprados.</p>}
-            </section>
-
-            <section className='admin-panel admin-user-list-panel'>
-              <div className='admin-log-header'>
-                <h3>Planos de ciclo comprados</h3>
+                <h3>📦 Histórico de compras de produto</h3>
                 <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowCyclePurchases((prev) => !prev)}>
-                  {showCyclePurchases ? 'Ocultar planos de ciclo' : 'Mostrar planos de ciclo'}
+                  {showCyclePurchases ? 'Ocultar compras' : `Mostrar compras (${(user.cyclePurchases ?? []).length})`}
                 </button>
               </div>
               {showCyclePurchases ? (
                 (user.cyclePurchases ?? []).length ? (
                   <div className='admin-user-list'>
-                    {(user.cyclePurchases ?? []).map((item) => (
-                      <article key={`cycle-${item.id}`} className='admin-user-list-item'>
-                        <div>
-                          <strong>{item.planName}</strong>
-                          <p>{item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}</p>
-                        </div>
-                        <span>{formatBRL(item.amountPaid)}</span>
-                      </article>
-                    ))}
+                    {(user.cyclePurchases ?? []).map((item) => {
+                      const isActive = item.status === 'active'
+                      const isCompleted = item.status === 'completed'
+                      const endsAt = item.endsAt ? new Date(item.endsAt) : null
+                      const isExpired = !isCompleted && endsAt != null && endsAt < new Date()
+                      const statusLabel = isCompleted ? 'Concluído' : isExpired ? 'Expirado' : 'Ativo'
+                      const statusColor = isCompleted ? '#22c55e' : isExpired ? '#f87171' : '#60a5fa'
+                      const statusBg = isCompleted ? 'rgba(34,197,94,0.12)' : isExpired ? 'rgba(248,113,113,0.12)' : 'rgba(96,165,250,0.12)'
+                      const statusBorder = isCompleted ? '#166534' : isExpired ? '#7f1d1d' : '#1e40af'
+                      const progressPct = item.expectedProfit > 0
+                        ? Math.min(100, Math.round((item.totalCredited / item.expectedProfit) * 100))
+                        : 0
+                      return (
+                        <article key={`cycle-${item.id}`} className='admin-user-list-item' style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+                            <div>
+                              <strong style={{ fontSize: '0.95rem' }}>{item.planName}</strong>
+                              <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                                Comprado em: {item.createdAt ? new Date(item.createdAt).toLocaleString('pt-BR') : '-'}
+                              </p>
+                            </div>
+                            <span style={{
+                              display: 'inline-block', padding: '3px 10px', borderRadius: '999px',
+                              fontSize: '0.75rem', fontWeight: 700,
+                              background: statusBg, color: statusColor, border: `1px solid ${statusBorder}`,
+                              flexShrink: 0,
+                            }}>
+                              {statusLabel}
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 6 }}>
+                            <div style={{ background: '#0d1526', borderRadius: 8, padding: '6px 10px' }}>
+                              <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Valor investido</p>
+                              <strong style={{ fontSize: '0.88rem', color: '#e2e8f0' }}>{formatBRL(item.amountPaid)}</strong>
+                            </div>
+                            <div style={{ background: '#0d1526', borderRadius: 8, padding: '6px 10px' }}>
+                              <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Lucro esperado</p>
+                              <strong style={{ fontSize: '0.88rem', color: '#4ade80' }}>{formatBRL(item.expectedProfit)}</strong>
+                            </div>
+                            <div style={{ background: '#0d1526', borderRadius: 8, padding: '6px 10px' }}>
+                              <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Já creditado</p>
+                              <strong style={{ fontSize: '0.88rem', color: '#fbbf24' }}>{formatBRL(item.totalCredited)}</strong>
+                            </div>
+                            <div style={{ background: '#0d1526', borderRadius: 8, padding: '6px 10px' }}>
+                              <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b' }}>Duração</p>
+                              <strong style={{ fontSize: '0.88rem', color: '#e2e8f0' }}>{item.cycleDays} dias</strong>
+                            </div>
+                          </div>
+
+                          <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                            {item.startedAt && <span>Início: {new Date(item.startedAt).toLocaleString('pt-BR')}</span>}
+                            {item.endsAt && <span>Término: {new Date(item.endsAt).toLocaleString('pt-BR')}</span>}
+                          </div>
+
+                          {isActive && item.expectedProfit > 0 && (
+                            <div>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748b', marginBottom: 3 }}>
+                                <span>Progresso do lucro</span>
+                                <span>{progressPct}%</span>
+                              </div>
+                              <div style={{ height: 6, borderRadius: 999, background: '#1e293b', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${progressPct}%`, background: 'linear-gradient(90deg, #22c55e, #4ade80)', borderRadius: 999 }} />
+                              </div>
+                            </div>
+                          )}
+                        </article>
+                      )
+                    })}
                   </div>
-                ) : <p>Nenhuma compra de ciclo encontrada.</p>
-              ) : <p className='admin-log-hint'>Clique em Mostrar planos de ciclo para visualizar os planos comprados.</p>}
+                ) : <p>Nenhuma compra de produto encontrada.</p>
+              ) : <p className='admin-log-hint'>Clique em Mostrar compras para visualizar o histórico de produtos comprados.</p>}
             </section>
 
             <section className='admin-panel admin-user-list-panel'>
@@ -465,73 +496,6 @@ export default function AdminUserHistory() {
               ) : <p className='admin-log-hint'>Clique em Mostrar saques para visualizar o historico.</p>}
             </section>
 
-            {/* ── DEPÓSITOS NA LOJA ── */}
-            <section className='admin-panel admin-user-list-panel'>
-              <div className='admin-log-header'>
-                <h3>🏪 Depósitos na loja (shop_balance)</h3>
-                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowShopDepositHistory((p) => !p)}>
-                  {showShopDepositHistory ? 'Ocultar' : 'Mostrar depósitos loja'}
-                </button>
-              </div>
-              {showShopDepositHistory ? (
-                (user.shopDepositHistory ?? []).length ? (
-                  <div className='admin-user-list'>
-                    {(user.shopDepositHistory ?? []).map((dep) => {
-                      const isPaid = ['paid', 'payment.paid'].includes(dep.status.toLowerCase())
-                      const isExp  = ['expired', 'canceled', 'failed'].includes(dep.status.toLowerCase())
-                      const color  = isPaid ? '#22c55e' : isExp ? '#f87171' : '#94a3b8'
-                      const bg     = isPaid ? 'rgba(34,197,94,0.15)' : isExp ? 'rgba(248,113,113,0.15)' : 'rgba(148,163,184,0.12)'
-                      const border = isPaid ? '#166534' : isExp ? '#7f1d1d' : '#334155'
-                      return (
-                        <article key={`sdep-${dep.id}`} className='admin-user-list-item'>
-                          <div>
-                            <strong style={{ color }}>
-                              {isPaid ? '✅' : isExp ? '❌' : '⏳'} {formatBRL(dep.amount)}
-                            </strong>
-                            <p>Criado: {dep.createdAt ? new Date(dep.createdAt).toLocaleString('pt-BR') : '-'}</p>
-                            {dep.paidAt && <p>Pago: {new Date(dep.paidAt).toLocaleString('pt-BR')}</p>}
-                            {dep.externalId && <small style={{ color: '#64748b' }}>ID: {dep.externalId}</small>}
-                          </div>
-                          <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:'999px', fontSize:'0.75rem', fontWeight:700, background:bg, color, border:`1px solid ${border}` }}>
-                            {dep.status}
-                          </span>
-                        </article>
-                      )
-                    })}
-                  </div>
-                ) : <p>Nenhum depósito na loja encontrado.</p>
-              ) : <p className='admin-log-hint'>Clique para ver depósitos PIX feitos na loja.</p>}
-            </section>
-
-            {/* ── COMPRAS DE GIFT CARD ── */}
-            <section className='admin-panel admin-user-list-panel'>
-              <div className='admin-log-header'>
-                <h3>🎁 Compras de gift card (loja)</h3>
-                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowShopPurchaseHistory((p) => !p)}>
-                  {showShopPurchaseHistory ? 'Ocultar' : 'Mostrar compras gift card'}
-                </button>
-              </div>
-              {showShopPurchaseHistory ? (
-                (user.shopPurchaseHistory ?? []).length ? (
-                  <div className='admin-user-list'>
-                    {(user.shopPurchaseHistory ?? []).map((purch) => (
-                      <article key={`spurch-${purch.id}`} className='admin-user-list-item'>
-                        <div>
-                          <strong style={{ color: '#f87171' }}>🎁 -{formatBRL(purch.amount)}</strong>
-                          <p>{purch.reason}</p>
-                          <p>{purch.createdAt ? new Date(purch.createdAt).toLocaleString('pt-BR') : '-'}</p>
-                          {purch.referenceId && <small style={{ color: '#64748b' }}>Ref: {purch.referenceId}</small>}
-                        </div>
-                        <span style={{ display:'inline-block', padding:'3px 10px', borderRadius:'999px', fontSize:'0.75rem', fontWeight:700, background:'rgba(248,113,113,0.12)', color:'#f87171', border:'1px solid #7f1d1d' }}>
-                          débito
-                        </span>
-                      </article>
-                    ))}
-                  </div>
-                ) : <p>Nenhuma compra de gift card encontrada.</p>
-              ) : <p className='admin-log-hint'>Clique para ver compras de gift card feitas na loja.</p>}
-            </section>
-
             <section className='admin-panel admin-user-list-panel'>
               <div className='admin-log-header'>
                 <h3>Roleta — saldo e historico de giros</h3>
@@ -587,57 +551,6 @@ export default function AdminUserHistory() {
               ) : (
                 <p className='admin-log-hint'>Clique em Mostrar roleta para visualizar os giros e saldo.</p>
               )}
-            </section>
-
-            <section className='admin-panel admin-user-list-panel'>
-              <div className='admin-log-header'>
-                <h3>📋 Logs de tarefas de mineração</h3>
-                <button type='button' className='admin-toggle-logs-btn' onClick={() => setShowTaskLogs((prev) => !prev)}>
-                  {showTaskLogs ? 'Ocultar logs de tarefas' : 'Mostrar logs de tarefas'}
-                </button>
-              </div>
-              {showTaskLogs ? (
-                (() => {
-                  const taskLogs = (user.accountLogs ?? []).filter(
-                    (log) => String(log.action ?? '').toLowerCase() === 'mining_task_complete'
-                  )
-                  return taskLogs.length ? (
-                    <div className='admin-user-list'>
-                      {taskLogs.map((log) => {
-                        let taskInfo = ''
-                        let walletLabel = '💰 Saldo Geral'
-                        try {
-                          if (log.metadata) {
-                            const meta = JSON.parse(log.metadata)
-                            taskInfo = `Tarefa #${meta.taskId ?? '-'}${meta.vipName ? ` · ${meta.vipName}` : ''}`
-                            walletLabel = formatWalletName(meta.creditedTo, log.action)
-                          }
-                        } catch {
-                          taskInfo = ''
-                        }
-                        return (
-                          <article key={`tasklog-${log.id}`} className='admin-user-log-item'>
-                            <div>
-                              <strong style={{ color: '#22c55e' }}>✅ Tarefa concluída</strong>
-                              {taskInfo ? <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{taskInfo}</p> : null}
-                              <small style={{ color: '#64748b' }}>{walletLabel}</small>
-                              <p>{log.created_at ? new Date(log.created_at).toLocaleString('pt-BR') : '-'}</p>
-                              <small style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                                anterior: {log.old_balance == null ? '-' : formatBRL(log.old_balance)} | novo: {log.new_balance == null ? '-' : formatBRL(log.new_balance)} | valor: {log.amount == null ? '-' : formatBRL(log.amount)}
-                              </small>
-                            </div>
-                            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                              <strong style={{ color: '#22c55e', fontSize: '1rem' }}>
-                                {log.amount != null ? `+${formatBRL(log.amount)}` : '-'}
-                              </strong>
-                            </div>
-                          </article>
-                        )
-                      })}
-                    </div>
-                  ) : <p>Nenhum log de tarefa encontrado.</p>
-                })()
-              ) : <p className='admin-log-hint'>Clique em Mostrar logs de tarefas para visualizar as tarefas concluídas pelo usuário.</p>}
             </section>
 
             <section className='admin-panel admin-user-list-panel'>

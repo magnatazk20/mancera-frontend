@@ -94,8 +94,8 @@ export default function AdminSiteSettings() {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          siteTitle: 'TRK',
-          siteDescription: 'TRK',
+          siteTitle: 'Mancera',
+          siteDescription: 'Mancera',
           siteLogoUrl: '',
           telegramGroupLink: '',
           allowUserReferralLink,

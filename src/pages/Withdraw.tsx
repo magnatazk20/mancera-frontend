@@ -24,13 +24,6 @@ type WithdrawConfigResponse = {
   }
 }
 
-type VipData = {
-  levelName: string
-  vipPrice: number
-  dailyTaskLimit: number
-  taskRewardAmount: number
-}
-
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 const formatBRL = (value: number) =>
@@ -50,72 +43,6 @@ const maskPixKey = (value: string) => {
   const end = raw.slice(-2)
   const middle = '*'.repeat(Math.max(3, raw.length - 4))
   return `${start}${middle}${end}`
-}
-
-/**
- * Valores fixos de saque por nivel VIP.
- * T0 = bloqueado (sem opcoes).
- */
-const WITHDRAW_OPTIONS_BY_LEVEL: Record<string, number[]> = {
-  T1: [30, 50, 100, 200, 300, 400, 500, 600],
-  T2: [100, 200, 300, 400, 500, 600, 700],
-  T3: [300, 400, 500, 600, 700, 800, 900],
-  T4: [1000, 2000, 3000],
-  T5: [1000, 2000, 4000],
-}
-
-/**
- * Identifica o nivel VIP pelo nome ou pelo preco.
- * Tenta primeiro pelo nome (T1, T2...), depois por faixas de preco.
- * VIP com price=0 e sempre T0 (bloqueado).
- * Qualquer VIP pago sem match = fallback para T1.
- */
-const resolveVipTier = (levelName: string, vipPrice: number): string | null => {
-  if (vipPrice <= 0) return null // T0
-
-  // Tenta extrair do nome (ex: "T1", "T3 Premium", "Nivel T2")
-  const nameMatch = String(levelName ?? '').toUpperCase().match(/T(\d+)/)
-  if (nameMatch) {
-    const key = `T${nameMatch[1]}`
-    if (WITHDRAW_OPTIONS_BY_LEVEL[key]) return key
-  }
-
-  // Tenta extrair um numero do nome (ex: "VIP 1" -> T1, "Nivel 3" -> T3)
-  const numMatch = String(levelName ?? '').match(/(\d+)/)
-  if (numMatch) {
-    const key = `T${numMatch[1]}`
-    if (WITHDRAW_OPTIONS_BY_LEVEL[key]) return key
-  }
-
-  // Fallback: qualquer VIP pago usa T1
-  return 'T1'
-}
-
-/**
- * Retorna as opcoes de saque baseado no nivel VIP e saldo.
- */
-const buildWithdrawOptions = (levelName: string, vipPrice: number, balance: number): number[] => {
-  if (vipPrice <= 0 || balance <= 0) return []
-
-  const tier = resolveVipTier(levelName, vipPrice)
-  if (!tier) return []
-
-  const options = WITHDRAW_OPTIONS_BY_LEVEL[tier] ?? WITHDRAW_OPTIONS_BY_LEVEL['T1']
-  return (options ?? []).filter((v) => v <= balance)
-}
-
-/**
- * Retorna o valor minimo de saque do nivel VIP.
- */
-const getMinWithdrawByVip = (levelName: string, vipPrice: number): number => {
-  if (vipPrice <= 0) return 0
-
-  const tier = resolveVipTier(levelName, vipPrice)
-  if (!tier) return 0
-
-  const options = WITHDRAW_OPTIONS_BY_LEVEL[tier] ?? WITHDRAW_OPTIONS_BY_LEVEL['T1']
-  if (!options || options.length === 0) return 0
-  return Math.min(...options)
 }
 
 export default function Withdraw() {
@@ -159,23 +86,13 @@ export default function Withdraw() {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passwordModalError, setPasswordModalError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-
-  // VIP state
-  const [vipData, setVipData] = useState<VipData | null>(null)
-  const [vipLoaded, setVipLoaded] = useState(false)
-
-  // T0 check: user is T0 if they have no VIP or VIP price is 0
-  const isT0 = vipLoaded && (vipData === null || vipData.vipPrice === 0)
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
+  const [showWithdrawBlockedModal, setShowWithdrawBlockedModal] = useState(false)
+  const [hasShownBlockedModal, setHasShownBlockedModal] = useState(false)
 
   // Balance da carteira selecionada
   const activeBalance = selectedWallet === 'commission' ? commissionBalance : userBalance
   const safeBalance = activeBalance !== null && activeBalance > 0 ? activeBalance : 0
-
-  // Minimo de saque do VIP do usuario
-  const vipMinAmount = getMinWithdrawByVip(vipData?.levelName ?? '', vipData?.vipPrice ?? 0)
-
-  // Opcoes de valor baseadas no VIP
-  const withdrawOptions = buildWithdrawOptions(vipData?.levelName ?? '', vipData?.vipPrice ?? 0, safeBalance)
 
   // Preview de valores
   const withdrawAmount = selectedAmount ?? 0
@@ -286,53 +203,16 @@ export default function Withdraw() {
       }
     }
 
-    const loadVipStatus = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/vip/user/${user.id}`)
-        const data = (await res.json()) as {
-          ok?: boolean
-          hasVip?: boolean
-          vip?: {
-            levelName?: string
-            vipPrice?: number
-            dailyTaskLimit?: number
-            taskRewardAmount?: number
-          } | null
-        }
-        if (res.ok && data?.ok) {
-          if (data.hasVip && data.vip) {
-            setVipData({
-              levelName: String(data.vip.levelName ?? ''),
-              vipPrice: Number(data.vip.vipPrice ?? 0),
-              dailyTaskLimit: Number(data.vip.dailyTaskLimit ?? 0),
-              taskRewardAmount: Number(data.vip.taskRewardAmount ?? 0),
-            })
-          } else {
-            setVipData(null)
-          }
-        }
-      } catch {
-        // silencioso
-      } finally {
-        setVipLoaded(true)
-      }
-    }
-
     loadStoredPix()
     loadWithdrawConfig()
     loadBalance()
     loadWithdrawPasswordStatus()
-    loadVipStatus()
   }, [navigate, token, user?.id])
 
   const openPasswordModal = () => {
     if (!token || !user?.id) {
       setFeedback({ type: 'error', message: 'Usuario nao autenticado.' })
       navigate('/')
-      return
-    }
-
-    if (isT0) {
       return
     }
 
@@ -362,7 +242,7 @@ export default function Withdraw() {
     }
 
     if (!isWithdrawWindowOpen) {
-      setFeedback({ type: 'error', message: withdrawWindowMessage })
+      setShowWithdrawBlockedModal(true)
       return
     }
 
@@ -371,27 +251,26 @@ export default function Withdraw() {
       return
     }
 
-    setWithdrawPassword('')
-    setShowPassword(false)
     setPasswordModalError('')
-    setShowPasswordModal(true)
+    setShowPasswordModal(false)
+    submitWithdraw()
   }
 
   const submitWithdraw = async () => {
     setPasswordModalError('')
 
     if (!token || !user?.id) {
-      setPasswordModalError('Usuario nao autenticado.')
+      setFeedback({ type: 'error', message: 'Usuario nao autenticado.' })
       return
     }
 
     if (!selectedAmount || selectedAmount <= 0) {
-      setPasswordModalError('Valor de saque invalido.')
+      setFeedback({ type: 'error', message: 'Valor de saque invalido.' })
       return
     }
 
     if (!withdrawPassword || withdrawPassword.length < 6) {
-      setPasswordModalError('Informe a senha de saque (minimo 6 caracteres).')
+      setFeedback({ type: 'error', message: 'Informe a senha de saque (minimo 6 caracteres).' })
       return
     }
 
@@ -411,19 +290,25 @@ export default function Withdraw() {
         }),
       })
 
-      const requestData = (await requestRes.json()) as {
-        ok?: boolean
-        error?: string
-        message?: string
-        withdraw?: {
-          id?: number
-          amount?: number
-          externalId?: string | null
-        }
+      if (requestRes.status === 401 || requestRes.status === 403) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        sessionStorage.removeItem('token')
+        sessionStorage.removeItem('user')
+        navigate('/')
+        return
+      }
+
+      let requestData: { ok?: boolean; error?: string; message?: string; withdraw?: { id?: number; amount?: number; externalId?: string | null } } = {}
+      try {
+        requestData = await requestRes.json() as typeof requestData
+      } catch {
+        setFeedback({ type: 'error', message: 'Nao foi possivel solicitar o saque.' })
+        return
       }
 
       if (!requestRes.ok || !requestData?.ok || !requestData.withdraw) {
-        setPasswordModalError(requestData?.error || 'Nao foi possivel solicitar o saque.')
+        setFeedback({ type: 'error', message: requestData?.error || requestData?.message || 'Nao foi possivel solicitar o saque.' })
         return
       }
 
@@ -447,7 +332,7 @@ export default function Withdraw() {
         },
       })
     } catch {
-      setPasswordModalError('Erro ao processar solicitacao de saque.')
+      setFeedback({ type: 'error', message: 'Erro ao processar solicitacao de saque.' })
     } finally {
       setLoading(false)
     }
@@ -485,6 +370,18 @@ export default function Withdraw() {
       : false
 
   const isWithdrawWindowOpen = isDayAllowed && isTimeAllowed
+
+  useEffect(() => {
+    if (!isWithdrawWindowOpen && !hasShownBlockedModal) {
+      setShowWithdrawBlockedModal(true)
+      setHasShownBlockedModal(true)
+    }
+
+    if (isWithdrawWindowOpen && hasShownBlockedModal) {
+      setHasShownBlockedModal(false)
+      setShowWithdrawBlockedModal(false)
+    }
+  }, [isWithdrawWindowOpen, hasShownBlockedModal])
   const buildAllowedDaysLabel = (days: number[]): string => {
     if (days.length === 0) return 'Nenhum'
     if (days.length === 7) return 'Todos os dias'
@@ -521,7 +418,6 @@ export default function Withdraw() {
 
   return (
     <main className="wd-page">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
       {/* ── Topbar ── */}
       <header className="wd-topbar">
         <button type="button" className="wd-topbar-back" onClick={() => navigate('/dashboard')}>
@@ -534,60 +430,36 @@ export default function Withdraw() {
         {/* ── Wallet selector ── */}
         <div className="wd-section-label">Carteira</div>
         <div className="wd-wallet-row">
-          <button
-            type="button"
-            className={`wd-wallet-opt${selectedWallet === 'balance' ? ' wd-wallet-opt--active' : ''}`}
-            onClick={() => setSelectedWallet('balance')}
-            disabled={isT0}
+          <select
+            className="wd-wallet-select"
+            value={selectedWallet}
+            onChange={(e) => setSelectedWallet(e.target.value as WalletType)}
           >
-            <span className="wd-wallet-opt__name">Saldo</span>
-            <strong className="wd-wallet-opt__val">{userBalance !== null ? formatBRL(userBalance) : '--'}</strong>
-          </button>
-          <button
-            type="button"
-            className={`wd-wallet-opt${selectedWallet === 'commission' ? ' wd-wallet-opt--active' : ''}`}
-            onClick={() => setSelectedWallet('commission')}
-            disabled={isT0}
-          >
-            <span className="wd-wallet-opt__name">Comissao</span>
-            <strong className="wd-wallet-opt__val">{commissionBalance !== null ? formatBRL(commissionBalance) : '--'}</strong>
-          </button>
-        </div>
-
-        {/* ── Nivel VIP ── */}
-        <div className="wd-cell">
-          <div className="wd-cell-title">Nivel VIP</div>
-          <div className="wd-cell-value">
-            <span className={`wd-cell-text ${isT0 ? 'wd-cell-text--red' : 'wd-cell-text--green'}`}>
-              {!vipLoaded ? 'Carregando...' : (vipData?.levelName || 'Estagiario (T0)')}
-            </span>
-          </div>
+            <option value="balance">Saldo: {userBalance !== null ? formatBRL(userBalance) : '--'}</option>
+            <option value="commission">Comissão: {commissionBalance !== null ? formatBRL(commissionBalance) : '--'}</option>
+          </select>
         </div>
 
         {/* ── Selecionar valor ── */}
         <div className="wd-section-label">Selecione o valor</div>
-        {isT0 ? (
-          <div className="wd-amount-empty">
-            Disponivel a partir do nivel T1
+        <div className="wd-cell">
+          <div className="wd-cell-title">Valor do saque</div>
+          <div className="wd-cell-value">
+            <input
+              type="number"
+              min={minWithdrawAmount > 0 ? minWithdrawAmount : 0}
+              max={maxWithdrawAmount > 0 ? maxWithdrawAmount : undefined}
+              step="0.01"
+              className="wd-cell-input"
+              placeholder="0,00"
+              value={selectedAmount ?? ''}
+              onChange={(e) => {
+                const value = Number(e.target.value)
+                setSelectedAmount(Number.isFinite(value) && value > 0 ? value : null)
+              }}
+            />
           </div>
-        ) : withdrawOptions.length === 0 ? (
-          <div className="wd-amount-empty">
-            {safeBalance <= 0 ? 'Saldo insuficiente' : `Saldo inferior ao minimo do seu VIP (${formatBRL(vipMinAmount)})`}
-          </div>
-        ) : (
-          <div className="wd-amount-grid">
-            {withdrawOptions.map((val) => (
-              <button
-                key={val}
-                type="button"
-                className={`wd-amount-btn${selectedAmount === val ? ' wd-amount-btn--active' : ''}`}
-                onClick={() => setSelectedAmount(val)}
-              >
-                {formatBRL(val)}
-              </button>
-            ))}
-          </div>
-        )}
+        </div>
 
         {/* ── Cartao bancario ── */}
         <div className="wd-cell">
@@ -603,11 +475,36 @@ export default function Withdraw() {
           </div>
         </div>
 
+        {/* ── Senha de saque (na propria pagina) ── */}
+        <div className="wd-cell">
+          <div className="wd-cell-title">Senha de saque</div>
+          <div className="wd-cell-value">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              className="wd-cell-input"
+              placeholder="Digite sua senha de saque"
+              value={withdrawPassword}
+              maxLength={72}
+              autoComplete="current-password"
+              onChange={(e) =>
+                setWithdrawPassword(
+                  String(e.target.value).replace(/[\x00-\x1F\x7F]/g, '').slice(0, 72)
+                )
+              }
+            />
+          </div>
+          <div className="wd-password-actions">
+            <button type="button" className="wd-link-btn wd-link-btn--chip" onClick={() => setShowPassword((s) => !s)}>
+              {showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            </button>
+          </div>
+        </div>
+
         {/* ── Info rows ── */}
         <div className="wd-cell">
           <div className="wd-cell-title">Saque minimo</div>
           <div className="wd-cell-value">
-            <span className="wd-cell-text">{vipMinAmount > 0 ? formatBRL(vipMinAmount) : '--'}</span>
+            <span className="wd-cell-text">{minWithdrawAmount > 0 ? formatBRL(minWithdrawAmount) : '--'}</span>
           </div>
         </div>
 
@@ -625,18 +522,18 @@ export default function Withdraw() {
           </div>
         </div>
 
-        <div className="wd-cell">
+        <div className="wd-cell" onClick={() => setShowScheduleModal(true)} style={{cursor: 'pointer'}}>
           <div className="wd-cell-title">Horario de saque</div>
           <div className="wd-cell-value">
             <span className={`wd-cell-text ${isWithdrawWindowOpen ? 'wd-cell-text--green' : 'wd-cell-text--red'}`}>
-              {isWithdrawWindowOpen ? 'Disponivel' : 'Indisponivel'} ({withdrawStartTime} - {withdrawEndTime})
+              {isWithdrawWindowOpen ? 'Aberto' : 'Bloqueado'} • {withdrawStartTime} - {withdrawEndTime}
             </span>
           </div>
         </div>
 
-        {/* ── Alterar cartao ── */}
-        <div className="wd-link-wrap">
-          <button type="button" className="wd-link-btn" onClick={() => navigate('/bank-cards')}>
+        {/* ── Acessos rapidos ── */}
+        <div className="wd-link-wrap wd-link-wrap--actions">
+          <button type="button" className="wd-link-btn wd-link-btn--chip" onClick={() => navigate('/bank-cards')}>
             Alterar cartao bancario
           </button>
         </div>
@@ -646,38 +543,23 @@ export default function Withdraw() {
           <button
             type="button"
             className="wd-submit"
-            disabled={loading || !isWithdrawWindowOpen || hasWithdrawPassword === false || isT0 || !selectedAmount}
+            disabled={loading || !isWithdrawWindowOpen || hasWithdrawPassword === false || !selectedAmount}
             onClick={openPasswordModal}
           >
             <span>
               {loading
                 ? 'Enviando...'
-                : isT0
-                  ? 'VIP necessario para sacar'
-                  : !selectedAmount
-                    ? 'Selecione um valor'
-                    : `Sacar ${formatBRL(selectedAmount)}`}
+                : !selectedAmount
+                  ? 'Informe um valor'
+                  : `Sacar ${formatBRL(selectedAmount)}`}
             </span>
           </button>
         </div>
       </div>
 
-      {/* ── Modal: usuario T0 (estagiario) ── */}
-      {isT0 ? (
-        <div className="wd-modal-overlay" onClick={() => navigate('/dashboard')}>
-          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="wd-modal-icon wd-modal-icon--error">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-            </div>
-            <p className="wd-modal-message">Voce ainda e <strong>Estagiario (T0)</strong>. Para realizar saques, e necessario ter pelo menos o nivel <strong>T1</strong> ou superior.</p>
-            <button type="button" className="wd-modal-button" onClick={() => navigate('/vip')}>Ver planos VIP</button>
-            <button type="button" className="wd-modal-button wd-modal-button--ghost" onClick={() => navigate('/dashboard')}>Voltar ao inicio</button>
-          </div>
-        </div>
-      ) : null}
 
       {/* ── Modal: sem senha cadastrada ── */}
-      {!isT0 && hasWithdrawPassword === false ? (
+      {hasWithdrawPassword === false ? (
         <div className="wd-modal-overlay" onClick={() => navigate('/dashboard')}>
           <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
             <div className="wd-modal-icon wd-modal-icon--error">
@@ -749,6 +631,70 @@ export default function Withdraw() {
             </div>
             <p className="wd-modal-message">{feedback.message}</p>
             <button type="button" className="wd-modal-button" onClick={() => setFeedback(null)}>OK</button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Modal: saque bloqueado fora do horario ── */}
+      {showWithdrawBlockedModal ? (
+        <div className="wd-modal-overlay" onClick={() => setShowWithdrawBlockedModal(false)}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="wd-modal-icon wd-modal-icon--error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="7" x2="12" y2="13" />
+                <circle cx="12" cy="16.5" r="0.8" fill="currentColor" stroke="none" />
+              </svg>
+            </div>
+            <p className="wd-modal-message"><strong>Saque indisponivel no momento</strong></p>
+            <div className="wd-cell" style={{ width: '100%', margin: '0 0 8px' }}>
+              <div className="wd-cell-title">Horario permitido</div>
+              <div className="wd-cell-value">
+                <span className="wd-cell-text">{withdrawStartTime} - {withdrawEndTime}</span>
+              </div>
+            </div>
+            <div className="wd-cell" style={{ width: '100%', margin: '0 0 16px' }}>
+              <div className="wd-cell-title">Dias permitidos</div>
+              <div className="wd-cell-value">
+                <span className="wd-cell-text">{allowedDaysLabel}</span>
+              </div>
+            </div>
+            <button type="button" className="wd-modal-button" onClick={() => setShowWithdrawBlockedModal(false)}>
+              Entendi
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* ── Modal: horarios de saque ── */}
+      {showScheduleModal ? (
+        <div className="wd-modal-overlay" onClick={() => setShowScheduleModal(false)}>
+          <div className="wd-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="wd-modal-icon wd-modal-icon--success">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+            </div>
+            <p className="wd-modal-message"><strong>Horario de saque</strong></p>
+            <div className="wd-cell" style={{width: '100%', margin: '0 0 8px'}}>
+              <div className="wd-cell-title">Status</div>
+              <div className="wd-cell-value">
+                <span className={`wd-cell-text ${isWithdrawWindowOpen ? 'wd-cell-text--green' : 'wd-cell-text--red'}`}>
+                  {isWithdrawWindowOpen ? 'Disponivel' : 'Indisponivel'}
+                </span>
+              </div>
+            </div>
+            <div className="wd-cell" style={{width: '100%', margin: '0 0 8px'}}>
+              <div className="wd-cell-title">Horario</div>
+              <div className="wd-cell-value">
+                <span className="wd-cell-text">{withdrawStartTime} - {withdrawEndTime}</span>
+              </div>
+            </div>
+            <div className="wd-cell" style={{width: '100%', margin: '0 0 16px'}}>
+              <div className="wd-cell-title">Dias permitidos</div>
+              <div className="wd-cell-value">
+                <span className="wd-cell-text">{allowedDaysLabel}</span>
+              </div>
+            </div>
+            <button type="button" className="wd-modal-button" onClick={() => setShowScheduleModal(false)}>OK</button>
           </div>
         </div>
       ) : null}

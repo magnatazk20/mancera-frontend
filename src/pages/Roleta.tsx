@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import AppSidebar from '../components/AppSidebar'
+import './Dashboard.css'
 import './Roleta.css'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
@@ -198,9 +200,9 @@ export default function Roleta() {
 
   const wheelStyle = useMemo(() => {
     const colors = [
-      '#ff8a03', '#ffd38a', '#ffb347', '#fff0d6',
-      '#f59e0b', '#ffe1b8', '#ff6f00', '#fed7aa',
-      '#ff8a03', '#ffd38a', '#ffb347', '#fff0d6',
+      '#2b2f36', '#3a404a', '#4a515d', '#5a6372',
+      '#6b7586', '#7d889b', '#919caf', '#a7b1c2',
+      '#2b2f36', '#3a404a', '#4a515d', '#5a6372',
     ]
     const stops = prizes.map((_, i) => {
       const start = i * segmentAngle
@@ -294,9 +296,7 @@ export default function Roleta() {
   }
 
   return (
-    <main className="roleta-pro">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
-
+    <main className="dash-app roleta-pro">
       {/* ── Modal de sucesso no resgate ── */}
       {redeemModal?.type === 'success' ? (
         <div
@@ -356,38 +356,18 @@ export default function Roleta() {
         </div>
       ) : null}
 
-      <div className="roleta-wrap">
-        <header className="roleta-head">
+      <section className="dash-main">
+        <AppSidebar />
+        <div className="dash-content roleta-content">
+          <div className="roleta-wrap">
+            <header className="roleta-head">
           <button className="roleta-back-btn" onClick={() => navigate('/dashboard')} type="button">←</button>
-          <h1 className="lucky-title">
-            <span className="lucky-title__text">LUCKY WHEEL</span>
-          </h1>
           <div className="roleta-head-spacer" />
-        </header>
+            </header>
 
-        <section className="wheel-stage">
+            <section className="wheel-stage">
           <div className="wheel-pointer" />
           <div className="wheel-ring" />
-          <div className="wheel-lights" aria-hidden="true">
-            {Array.from({ length: 16 }).map((_, i) => {
-              const angle = i * (360 / 16)
-              const rad = (angle * Math.PI) / 180
-              const r = 48 // % do raio do container das luzes
-              const left = 50 + r * Math.sin(rad)
-              const top = 50 - r * Math.cos(rad)
-              return (
-                <span
-                  key={`light-${i}`}
-                  className="wheel-light"
-                  style={{
-                    left: `${left}%`,
-                    top: `${top}%`,
-                    animationDelay: `${(i % 4) * 0.15}s`,
-                  }}
-                />
-              )
-            })}
-          </div>
           <div className="wheel-disc" style={wheelStyle}>
             {prizes.map((text, i) => {
               const angle = i * segmentAngle + segmentAngle / 2
@@ -415,10 +395,10 @@ export default function Roleta() {
             ))}
           </div>
 
-          <button className="wheel-center-btn" disabled>IR</button>
-        </section>
+          <button className="wheel-center-btn" disabled>{remainingSpins}</button>
+            </section>
 
-        <section className="spin-cta">
+            <section className="spin-cta">
           <button
             type="button"
             onClick={spin}
@@ -428,39 +408,15 @@ export default function Roleta() {
             {isSpinning ? 'Girando...' : 'Iniciar Sorteio'}
           </button>
           {winner ? <p className="winner-text">Resultado: {winner}</p> : null}
-        </section>
+            </section>
 
-        <section className="rules-card" aria-label="Regras da roleta">
-          <h2 className="rules-card__title">Regras da Roleta</h2>
+            <section className="rules-card" aria-label="Regras da roleta">
+          <h2 className="rules-card__title">Regras da Sorte</h2>
 
-          <div className="spins-token" role="status" aria-live="polite">
-            <div className="spins-token__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8.009 8.009 0 0 1-8 8Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M15.09 8.91a1 1 0 0 0-1.41 0L12 10.59l-1.68-1.68a1 1 0 0 0-1.41 1.41L10.59 12l-1.68 1.68a1 1 0 1 0 1.41 1.41L12 13.41l1.68 1.68a1 1 0 0 0 1.41-1.41L13.41 12l1.68-1.68a1 1 0 0 0 0-1.41Z"
-                  fill="currentColor"
-                  opacity="0"
-                />
-                <path
-                  d="M12 6.5a1 1 0 0 0-1 1v4a1 1 0 0 0 .29.71l2.5 2.5a1 1 0 0 0 1.42-1.42L13 11.09V7.5a1 1 0 0 0-1-1Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-            <div className="spins-token__info">
-              <span className="spins-token__label">Giros disponíveis</span>
-              <span className="spins-token__count">{remainingSpins}</span>
-            </div>
-          </div>
 
           <ol className="rules-card__list">
             <li>
-              <strong>Como ganhar giros:</strong> a cada usuário que se torna
-              funcionário através do seu link de convite, você ganha 1 giro
+              <strong>Como ganhar giros:</strong> a cada usuário que deposita através do seu link de convite, você ganha 1 giro
               gratuito para usar na roleta.
             </li>
             <li>
@@ -471,25 +427,16 @@ export default function Roleta() {
               <strong>Prêmios:</strong> o valor sorteado é creditado automaticamente no seu
               saldo assim que a roda para.
             </li>
-            <li>
-              <strong>Códigos promocionais:</strong> códigos de resgate podem conceder giros
-              extras ou bônus em dinheiro. Cada código só pode ser usado uma vez por conta.
-            </li>
-            <li>
-              <strong>Resultado final:</strong> o resultado é gerado pelo servidor e é
-              definitivo — não é possível repetir ou reverter um giro.
-            </li>
+            
             <li>
               <strong>Uso justo:</strong> contas com comportamento fraudulento, múltiplos
               cadastros ou uso de automação serão bloqueadas e perderão os prêmios.
             </li>
-            <li>
-              <strong>Saques:</strong> os ganhos da roleta seguem as mesmas regras de saque
-              da plataforma (saldo mínimo e horário de processamento).
-            </li>
           </ol>
-        </section>
-      </div>
+            </section>
+          </div>
+        </div>
+      </section>
     </main>
   )
 }

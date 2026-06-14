@@ -12,6 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export default function ChangePassword() {
   const navigate = useNavigate()
+  const [phone, setPhone] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -82,80 +83,76 @@ export default function ChangePassword() {
   }
 
   return (
-    <main className="cp-page">
-      <header className="cp-topbar">
-        <button
-          type="button"
-          className="cp-topbar-back"
-          onClick={() => navigate('/profile')}
-          aria-label="Voltar"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 6l-6 6l6 6" />
-          </svg>
-        </button>
-        <span className="cp-topbar-title">Alterar senha</span>
-      </header>
-
-      <div className="cp-scroll-box">
-        <div className="cp-cell">
-          <div className="cp-cell-title">
-            <span>Senha atual</span>
-          </div>
-          <div className="cp-cell-value">
-            <input
-              type="password"
-              className="cp-cell-input"
-              placeholder="Digite sua senha atual"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </div>
-        </div>
-
-        <div className="cp-cell">
-          <div className="cp-cell-title">
-            <span>Nova senha</span>
-          </div>
-          <div className="cp-cell-value">
-            <input
-              type="password"
-              className="cp-cell-input"
-              placeholder="Mínimo de 6 caracteres"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-          </div>
-        </div>
-
-        <div className="cp-cell">
-          <div className="cp-cell-title">
-            <span>Confirmar senha</span>
-          </div>
-          <div className="cp-cell-value">
-            <input
-              type="password"
-              className="cp-cell-input"
-              placeholder="Repita a nova senha"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-          </div>
-        </div>
-
-        <div className="cp-submit-wrap">
+    <main className="cp-page cp-forgot-style">
+      <div className="cp-content">
+        <header className="cp-header">
           <button
             type="button"
-            className="cp-submit"
-            onClick={saveNewPassword}
-            disabled={loading}
+            className="cp-back"
+            onClick={() => navigate('/profile')}
+            aria-label="Voltar"
           >
-            <span>{loading ? 'Enviando...' : 'Enviar'}</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 6l-6 6l6 6" />
+            </svg>
           </button>
+        </header>
+
+        <h1 className="cp-title">Esqueci a senha</h1>
+
+        <div className="cp-form-stack">
+          <div className="cp-input-card cp-phone-card">
+            <div className="cp-phone-prefix">
+              <span className="cp-flag">🇧🇷</span>
+              <span>+55</span>
+            </div>
+            <input
+              type="tel"
+              className="cp-input"
+              placeholder="Por favor, insira o número de telefone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+
+          <input
+            type="password"
+            className="cp-input-card cp-only-input"
+            placeholder="Nova Senha"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            autoComplete="new-password"
+          />
+
+          <input
+            type="password"
+            className="cp-input-card cp-only-input"
+            placeholder="Confirmar senha"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
+          />
+
+          <input
+            type="password"
+            className="cp-hidden-current-password"
+            placeholder="Senha atual (obrigatório)"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            autoComplete="current-password"
+          />
         </div>
+      </div>
+
+      <div className="cp-bottom-submit-wrap">
+        <button
+          type="button"
+          className="cp-bottom-submit"
+          onClick={saveNewPassword}
+          disabled={loading}
+        >
+          {loading ? 'Enviando...' : 'Confirmar'}
+        </button>
       </div>
 
       {feedback ? (

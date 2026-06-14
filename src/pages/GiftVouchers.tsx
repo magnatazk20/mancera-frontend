@@ -142,7 +142,6 @@ export default function GiftVouchers() {
   return (
     <main className="tasks-page gift-vouchers-page">
       <AppSidebar />
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
 
       {confirmVoucher ? (
         <div className="redeem-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="gift-buy-confirm-title">

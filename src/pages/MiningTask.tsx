@@ -287,7 +287,6 @@ export default function MiningTask() {
     <main className="dash-app">
       <section className="dash-main">
         <AppSidebar />
-        <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
 
         <div className="dash-content">
           {/* ── Banner ── */}

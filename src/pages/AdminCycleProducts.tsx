@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import AdminSidebar from '../components/AdminSidebar'
 import './Admin.css'
 
@@ -9,6 +9,7 @@ type CycleProduct = {
   imageUrl: string
   price: number
   redeemRewardValue: number
+  mancecoinReward: number
   cycleDays: number
   planType: 'normal' | 'vip' | 'vip_day'
   requireCommissionLevel1Count: number
@@ -38,6 +39,7 @@ type FormState = {
   imageUrl: string
   price: string
   redeemRewardValue: string
+  mancecoinReward: string
   cycleDays: string
   planType: 'normal' | 'vip' | 'vip_day'
   requireCommissionLevel1Count: string
@@ -63,6 +65,7 @@ const emptyForm: FormState = {
   imageUrl: '',
   price: '',
   redeemRewardValue: '',
+  mancecoinReward: '0',
   cycleDays: '0',
   planType: 'normal',
   requireCommissionLevel1Count: '0',
@@ -188,6 +191,7 @@ export default function AdminCycleProducts() {
           imageUrl?: string
           price?: number
           redeemRewardValue?: number
+          mancecoinReward?: number
           cycleDays?: number
           planType?: string
           requireCommissionLevel1Count?: number
@@ -218,6 +222,7 @@ export default function AdminCycleProducts() {
             imageUrl: String(item.imageUrl ?? ''),
             price: Number(item.price ?? 0),
             redeemRewardValue: Number(item.redeemRewardValue ?? 0),
+            mancecoinReward: Number(item.mancecoinReward ?? 0),
             cycleDays: Number(item.cycleDays ?? 0),
             planType: normalizePlanType(String(item.planType ?? 'normal')),
             requireCommissionLevel1Count: Number(item.requireCommissionLevel1Count ?? 0),
@@ -256,6 +261,7 @@ export default function AdminCycleProducts() {
       imageUrl: product.imageUrl,
       price: String(product.price),
       redeemRewardValue: String(product.redeemRewardValue),
+      mancecoinReward: String(product.mancecoinReward ?? 0),
       cycleDays: String(product.cycleDays ?? 0),
       planType: product.planType ?? 'normal',
       requireCommissionLevel1Count: String(product.requireCommissionLevel1Count ?? 0),
@@ -278,6 +284,7 @@ export default function AdminCycleProducts() {
     const normalizedImageUrl = form.imageUrl.trim()
     const numericPrice = Number(form.price.replace(',', '.'))
     const numericReward = Number(form.redeemRewardValue.replace(',', '.'))
+    const numericMancecoinReward = Number(form.mancecoinReward.replace(',', '.'))
     const numericCycleDays = Number(form.cycleDays.replace(',', '.'))
     const numericRequireLevel1 = Number(form.requireCommissionLevel1Count.replace(',', '.'))
     const numericRequireLevel2 = Number(form.requireCommissionLevel2Count.replace(',', '.'))
@@ -310,6 +317,11 @@ export default function AdminCycleProducts() {
 
     if (!Number.isFinite(numericReward) || numericReward < 0) {
       setFeedback({ type: 'error', text: 'Informe um valor de resgate válido.' })
+      return
+    }
+
+    if (!Number.isFinite(numericMancecoinReward) || numericMancecoinReward < 0) {
+      setFeedback({ type: 'error', text: 'Informe uma recompensa MANCOIN válida.' })
       return
     }
 
@@ -365,6 +377,7 @@ export default function AdminCycleProducts() {
           imageUrl: normalizedImageUrl,
           price: Number(numericPrice.toFixed(2)),
           redeemRewardValue: Number(numericReward.toFixed(2)),
+          mancecoinReward: Number(numericMancecoinReward.toFixed(2)),
           cycleDays: numericCycleDays,
           planType: form.planType,
           requireCommissionLevel1Count: numericRequireLevel1,
@@ -562,34 +575,89 @@ export default function AdminCycleProducts() {
             </div>
 
             <div className="admin-cycle-field">
+              <label>Recompensa MANCOIN</label>
+              <input
+                type="text"
+                value={form.mancecoinReward}
+                onChange={(e) => setForm((prev) => ({ ...prev, mancecoinReward: e.target.value }))}
+                placeholder="Ex.: 15"
+              />
+            </div>
+
+            <div className="admin-cycle-field">
               <label>Porcentagem de lucro diário (%) <small style={{ color: '#94a3b8', fontWeight: 400 }}>(lucro = montante × % × dias do ciclo)</small></label>
-              <input
-                type="text"
-                value={form.profitPercent}
-                onChange={(e) => setForm((prev) => ({ ...prev, profitPercent: e.target.value }))}
-                placeholder="Ex.: 5"
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <input
+                  type="text"
+                  value={form.profitPercent}
+                  onChange={(e) => setForm((prev) => ({ ...prev, profitPercent: e.target.value }))}
+                  placeholder="Ex.: 5"
+                  style={{ flex: 1 }}
+                />
+                {(() => {
+                  const pct = Number(String(form.profitPercent).replace(',', '.'))
+                  const days = Number(form.cycleDays)
+                  const price = Number(String(form.price).replace(',', '.'))
+                  const minAmt = Number(String(form.minAmount).replace(',', '.'))
+                  const maxAmt = Number(String(form.maxAmount).replace(',', '.'))
+                  const baseStyle: React.CSSProperties = {
+                    background: '#1e293b',
+                    border: '1px solid #334155',
+                    borderRadius: 8,
+                    padding: '6px 12px',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                  }
+                  if (!pct) return (
+                    <span style={{ ...baseStyle, color: '#64748b' }}>
+                      Informe a %
+                    </span>
+                  )
+                  const amount = price > 0 ? price : minAmt > 0 ? minAmt : 0
+                  const amountMax = price > 0 ? price : maxAmt > 0 ? maxAmt : 0
+                  // Só % preenchida
+                  if (amount <= 0 && days <= 0) return (
+                    <span style={{ ...baseStyle, color: '#94a3b8' }}>
+                      {pct}% / dia
+                    </span>
+                  )
+                  // % + dias, sem montante
+                  if (amount <= 0) return (
+                    <span style={{ ...baseStyle, color: '#94a3b8' }}>
+                      ? × {pct}% × {days}d
+                    </span>
+                  )
+                  // % + montante, sem dias → lucro diário
+                  if (days <= 0) {
+                    const daily = amount * (pct / 100)
+                    return (
+                      <span style={{ ...baseStyle, color: '#fbbf24' }}>
+                        {formatBRL(daily)} / dia
+                      </span>
+                    )
+                  }
+                  // Tudo preenchido — lucro total do ciclo
+                  if (minAmt > 0 && amountMax > 0 && price === 0) {
+                    const totalMin = minAmt * (pct / 100) * days
+                    const totalMax = amountMax * (pct / 100) * days
+                    return (
+                      <span style={{ ...baseStyle, color: '#4ade80' }}>
+                        = {formatBRL(totalMin)} ~ {formatBRL(totalMax)}
+                      </span>
+                    )
+                  }
+                  const total = amount * (pct / 100) * days
+                  return (
+                    <span style={{ ...baseStyle, color: '#4ade80' }}>
+                      = {formatBRL(total)}
+                    </span>
+                  )
+                })()}
+              </div>
             </div>
 
-            <div className="admin-cycle-field">
-              <label>Investimento Mínimo (R$)</label>
-              <input
-                type="text"
-                value={form.minAmount}
-                onChange={(e) => setForm((prev) => ({ ...prev, minAmount: e.target.value }))}
-                placeholder="Ex.: 10"
-              />
-            </div>
-
-            <div className="admin-cycle-field">
-              <label>Investimento Máximo (R$)</label>
-              <input
-                type="text"
-                value={form.maxAmount}
-                onChange={(e) => setForm((prev) => ({ ...prev, maxAmount: e.target.value }))}
-                placeholder="Ex.: 1000"
-              />
-            </div>
+           
 
             <div className="admin-cycle-field">
               <label>Dias do ciclo</label>
@@ -756,7 +824,7 @@ export default function AdminCycleProducts() {
                       <strong className="admin-cycle-item-title">{product.name}</strong>
                       <p className="admin-cycle-item-description">{product.description}</p>
                       <p className="admin-cycle-item-meta">
-                        Preço: {formatBRL(product.price)} • Resgate: {formatBRL(product.redeemRewardValue)} • Ciclo: {product.cycleDays} dias
+                        Preço: {formatBRL(product.price)} • Resgate: {formatBRL(product.redeemRewardValue)} • MANCOIN: {Number(product.mancecoinReward ?? 0).toLocaleString('pt-BR')} • Ciclo: {product.cycleDays} dias
                       </p>
                       <p className="admin-cycle-item-meta secondary">
                         Tipo: {product.planType === 'vip' ? 'Plano VIP' : product.planType === 'vip_day' ? 'VIP do dia' : 'Plano normal'} • Status: {product.isActive ? 'Ativo' : 'Inativo'} • Criado em: {product.createdAt ? new Date(product.createdAt).toLocaleString('pt-BR') : '-'}

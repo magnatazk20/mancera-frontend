@@ -49,11 +49,7 @@ export default function BankCards() {
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
-    try {
-      return JSON.parse(raw) as StoredUser
-    } catch {
-      return null
-    }
+    try { return JSON.parse(raw) as StoredUser } catch { return null }
   }, [])
 
   const selectedTypeMeta = useMemo(
@@ -63,21 +59,15 @@ export default function BankCards() {
 
   useEffect(() => {
     const loadPixData = async () => {
-      if (!user?.id) {
-        navigate('/')
-        return
-      }
-
+      if (!user?.id) { navigate('/'); return }
       setLoading(true)
       try {
         const res = await fetch(`${API_URL}/api/user/pix-key/${user.id}`)
         const data = (await res.json()) as PixKeyResponse
-
         if (!res.ok || !data?.ok) {
           setMsg({ text: data?.error ?? 'Erro ao carregar dados PIX.', type: 'error' })
           return
         }
-
         if (data.hasPixKey && data.pixKey) {
           setHolderName(String(data.pixKey.holderName ?? ''))
           setHolderCpf(String(data.pixKey.holderCpf ?? ''))
@@ -93,7 +83,6 @@ export default function BankCards() {
         setLoading(false)
       }
     }
-
     loadPixData()
   }, [navigate, user?.id])
 
@@ -124,14 +113,11 @@ export default function BankCards() {
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify(payload),
       })
-
       const data = (await res.json()) as { ok?: boolean; error?: string; message?: string }
-
       if (!res.ok || !data?.ok) {
         setMsg({ text: data?.error ?? 'Erro ao salvar chave PIX.', type: 'error' })
         return
       }
-
       setHasExistingKey(true)
       setMsg({ text: data?.message ?? 'Chave PIX salva com sucesso!', type: 'success' })
     } catch {
@@ -141,104 +127,138 @@ export default function BankCards() {
     }
   }
 
+  if (loading) {
+    return (
+      <main className="dash-app bankcards-page">
+        <section className="dash-main">
+          <AppSidebar />
+          <div className="dash-content bc-content">
+            <div className="bc-topbar">
+              <button type="button" className="bc-topbar-back" onClick={() => navigate('/profile')}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                  <path d="M15 6l-6 6l6 6" />
+                </svg>
+              </button>
+              <span className="bc-topbar-title">Banco</span>
+            </div>
+            <div className="bc-loading">
+              <div className="bc-spinner" />
+              Carregando dados...
+            </div>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
   return (
     <main className="dash-app bankcards-page">
       <section className="dash-main">
         <AppSidebar />
-        <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
+        <div className="dash-content bc-content">
 
-        <div className="dash-content">
-          {/* Header */}
+          {/* ── Header ── */}
           <div className="bc-header">
-            <button type="button" className="bc-back-btn" onClick={() => navigate('/profile')} aria-label="Voltar">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M15 6l-6 6l6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <button type="button" className="bc-back-btn" onClick={() => navigate('/profile')}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
+            <h1 className="bc-title">{hasExistingKey ? 'Editar Banco' : 'Adicionar Banco'}</h1>
+          </div>
+
+          {/* ── Aviso ── */}
+          <div className="bc-alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
             <div>
-              <h2 className="bc-title">Chave PIX</h2>
-              <p className="bc-subtitle">Cadastre ou atualize sua chave PIX para saques</p>
+              <strong>Recebimento apenas via PIX</strong>
+              <p>As transferências são feitas exclusivamente por chave PIX (CPF, e-mail ou telefone).</p>
             </div>
           </div>
 
-          {/* Mensagem */}
+          {/* ── Mensagem de feedback ── */}
           {msg && (
-            <div className={`bc-msg ${msg.type}`}>
+            <div className={`bc-feedback bc-feedback--${msg.type}`}>
+              {msg.type === 'success' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" /></svg>
+              )}
               {msg.text}
             </div>
           )}
 
-          {loading ? (
-            <div className="bc-loading">Carregando dados...</div>
-          ) : (
-            <div className="bc-form-panel">
-              <form className="bc-form" onSubmit={onSave}>
-                {/* Tipo de chave */}
-                <div className="bc-section">
-                  <label className="bc-label">Tipo de chave PIX</label>
-                  <select
-                    className="bc-select"
-                    value={pixKeyType}
-                    onChange={(e) => setPixKeyType(e.target.value as PixKeyType)}
-                  >
-                    {PIX_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value} disabled={opt.disabled}>
-                        {opt.label}{opt.disabled ? ' (indisponível)' : ''}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          {/* ── Formulário ── */}
+          <form className="bc-form" onSubmit={onSave}>
 
-                {/* Nome do titular */}
-                <div className="bc-section">
-                  <label className="bc-label">Nome do titular <span className="bc-required">*</span></label>
-                  <input
-                    className="bc-input"
-                    placeholder="Nome completo"
-                    value={holderName}
-                    onChange={(e) => setHolderName(e.target.value)}
-                  />
-                </div>
-
-                {/* CPF do titular */}
-                <div className="bc-section">
-                  <label className="bc-label">CPF do titular <span className="bc-required">*</span></label>
-                  <input
-                    className="bc-input"
-                    placeholder="000.000.000-00"
-                    value={holderCpf}
-                    onChange={(e) => setHolderCpf(e.target.value)}
-                    inputMode="numeric"
-                  />
-                </div>
-
-                {/* Chave PIX */}
-                <div className="bc-section">
-                  <label className="bc-label">Chave PIX <span className="bc-required">*</span></label>
-                  <input
-                    className="bc-input"
-                    placeholder={selectedTypeMeta.placeholder}
-                    value={pixKey}
-                    onChange={(e) => setPixKey(e.target.value)}
-                  />
-                  <span className="bc-hint">
-                    {selectedTypeMeta.label === 'CPF' || selectedTypeMeta.label === 'CNPJ'
-                      ? 'Apenas números, sem pontos ou traços.'
-                      : `Informe sua chave do tipo ${selectedTypeMeta.label}.`}
-                  </span>
-                </div>
-
-                {/* Botão salvar */}
-                <button type="submit" className="bc-submit-btn" disabled={saving}>
-                  {saving
-                    ? 'Salvando...'
-                    : hasExistingKey
-                      ? 'Atualizar chave PIX'
-                      : 'Salvar chave PIX'}
-                </button>
-              </form>
+            {/* Tipo de Chave PIX */}
+            <div className="bc-group">
+              <label className="bc-label">Tipo de chave PIX</label>
+              <select
+                className="bc-input bc-select"
+                value={pixKeyType}
+                onChange={(e) => setPixKeyType(e.target.value as PixKeyType)}
+              >
+                {PIX_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                    {opt.label}{opt.disabled ? ' (indisponível)' : ''}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
+
+            {/* Nome Completo */}
+            <div className="bc-group">
+              <label className="bc-label">Nome completo</label>
+              <input
+                className="bc-input"
+                type="text"
+                placeholder="Como aparece no banco"
+                value={holderName}
+                onChange={(e) => setHolderName(e.target.value)}
+              />
+            </div>
+
+            {/* CPF */}
+            <div className="bc-group">
+              <label className="bc-label">CPF</label>
+              <input
+                className="bc-input"
+                type="text"
+                placeholder="CPF do titular"
+                value={holderCpf}
+                onChange={(e) => setHolderCpf(e.target.value.replace(/\D/g, ''))}
+                maxLength={11}
+              />
+            </div>
+
+            {/* Chave PIX */}
+            <div className="bc-group">
+              <label className="bc-label">{selectedTypeMeta.label}</label>
+              <input
+                className="bc-input"
+                type="text"
+                placeholder={selectedTypeMeta.placeholder}
+                value={pixKey}
+                onChange={(e) => setPixKey(e.target.value)}
+              />
+            </div>
+
+            {/* Botão */}
+            <button type="submit" className="bc-btn" disabled={saving}>
+              {saving ? (
+                <span className="bc-btn-loading">
+                  <span className="bc-spinner bc-spinner--sm" />
+                  Salvando...
+                </span>
+              ) : hasExistingKey ? 'Salvar Alterações' : 'Cadastrar Chave PIX'}
+            </button>
+
+          </form>
         </div>
       </section>
     </main>

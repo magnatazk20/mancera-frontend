@@ -1,128 +1,181 @@
-/* Withdraw — layout basico */
+/* Withdraw — white layout */
 .wd-page {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  background-attachment: fixed;
-  color: #5a3d1a;
-  padding: 24px 16px 100px;
+  background: #ffffff;
+  color: #333333;
+  padding: 20px 14px 90px;
 }
 
 /* ── Topbar ───────────────────────────────────── */
 .wd-topbar {
+  width: min(980px, 100%);
+  margin: 0 auto 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 10px;
+  padding: 12px 14px;
   background: #ffffff;
-  border-bottom: 1px solid #eaeaea;
+  border: 1px solid #e0e0e0;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
 .wd-topbar-back {
-  width: 32px;
-  height: 32px;
-  border: 0;
-  background: transparent;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #f5f5f5;
   display: grid;
   place-items: center;
   cursor: pointer;
-  color: #333;
+  color: #d4af37;
+  transition: 0.2s ease;
+}
+
+.wd-topbar-back:hover {
+  transform: translateY(-1px);
+  background: #eeeeee;
 }
 
 .wd-topbar-back svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .wd-topbar-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #333333;
 }
 
 /* ── Scroll box ───────────────────────────────── */
 .wd-scroll-box {
-  flex: 1;
+  width: min(980px, 100%);
+  margin: 0 auto;
   background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.06);
 }
 
 /* ── Section label ────────────────────────────── */
 .wd-section-label {
-  padding: 12px 16px 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #999;
+  padding: 14px 16px 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #d4af37;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  background: #ffffff;
+  letter-spacing: 0.08em;
+  background: transparent;
 }
 
 /* ── Wallet row ───────────────────────────────── */
 .wd-wallet-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   padding: 6px 16px 14px;
+  border-bottom: 1px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.wd-wallet-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
   background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  color: #333333;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+.wd-wallet-select:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.wd-wallet-select option {
+  padding: 10px;
+  font-weight: 600;
 }
 
 .wd-wallet-opt {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
   padding: 12px 8px;
-  border: 2px solid #eaeaea;
+  border: 1px solid #e0e0e0;
   border-radius: 12px;
-  background: #fafafa;
+  background: #ffffff;
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s;
+  transition: 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .wd-wallet-opt:hover {
-  border-color: #ccc;
+  border-color: #d4af37;
+  transform: translateY(-1px);
+}
+
+.wd-wallet-opt:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .wd-wallet-opt--active {
-  border-color: #ff8a03;
-  background: #fffaf0;
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.08);
 }
 
 .wd-wallet-opt__name {
-  font-size: 12px;
-  font-weight: 600;
-  color: #999;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #666666;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 
 .wd-wallet-opt--active .wd-wallet-opt__name {
-  color: #ff8a03;
+  color: #d4af37;
 }
 
 .wd-wallet-opt__val {
-  font-size: 16px;
-  font-weight: 700;
-  color: #323233;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #333333;
 }
 
-/* ── Cell row ─────────────────────────────────── */
+/* ── Cell row ���────────────────────────────────── */
 .wd-cell {
   display: flex;
   align-items: center;
+  gap: 10px;
   padding: 14px 16px;
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .wd-cell-title {
-  flex: 0 0 140px;
-  font-size: 14px;
-  color: #323233;
+  flex: 0 0 150px;
+  font-size: 0.88rem;
+  color: #666666;
+  font-weight: 600;
 }
 
 .wd-cell-value {
@@ -132,28 +185,29 @@
 
 .wd-cell-input {
   width: 100%;
-  border: 0;
+  border: 1px solid #e0e0e0;
   outline: 0;
-  background: transparent;
-  font-size: 14px;
-  color: #323233;
+  background: #ffffff;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  color: #333333;
   font-family: inherit;
-  padding: 0;
+  padding: 10px 12px;
   text-align: right;
 }
 
 .wd-cell-input::placeholder {
-  color: #c8c9cc;
+  color: #999999;
 }
 
 .wd-cell-input:disabled {
-  color: #999;
+  color: #999999;
 }
 
 .wd-cell-text {
-  font-size: 14px;
-  color: #323233;
-  font-weight: 500;
+  font-size: 0.9rem;
+  color: #333333;
+  font-weight: 700;
 }
 
 .wd-cell-text--green {
@@ -164,91 +218,71 @@
   color: #ef4444;
 }
 
-/* ── Amount grid (botoes de valor) ────────────── */
-.wd-amount-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 8px 16px 14px;
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.wd-amount-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 6px;
-  border: 2px solid #eaeaea;
-  border-radius: 10px;
-  background: #fafafa;
-  font-size: 14px;
-  font-weight: 600;
-  color: #323233;
-  cursor: pointer;
-  font-family: inherit;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.wd-amount-btn:hover {
-  border-color: #ccc;
-}
-
-.wd-amount-btn--active {
-  border-color: #ff8a03;
-  background: #fffaf0;
-  color: #ff8a03;
-}
-
-.wd-amount-empty {
-  padding: 20px 16px;
-  text-align: center;
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
-  color: #999;
-  font-size: 14px;
-  font-weight: 500;
+/* ── Input de valor livre ─────────────────────── */
+.wd-cell-input[type="number"] {
+  font-weight: 700;
 }
 
 /* ── Link button ──────────────────────────────── */
 .wd-link-wrap {
   padding: 12px 16px;
-  background: #ffffff;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.wd-link-wrap--actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .wd-link-btn {
   background: none;
   border: none;
   padding: 0;
-  color: #ff8a03;
-  font-size: 14px;
-  font-weight: 600;
+  color: #d4af37;
+  font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
   font-family: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
+.wd-link-btn--chip {
+  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #333333;
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
 .wd-link-btn:hover {
-  color: #e67a00;
+  color: #d4af37;
+}
+
+.wd-password-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 /* ── Submit ────────────────────────────────────── */
 .wd-submit-wrap {
-  padding: 20px 16px;
-  background: #ffffff;
+  padding: 18px 16px;
 }
 
 .wd-submit {
   width: 100%;
-  height: 44px;
+  height: 46px;
   border: 0;
-  border-radius: 999px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 800;
   color: #ffffff;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  box-shadow: 0 12px 26px rgba(34, 197, 94, 0.34);
   cursor: pointer;
   font-family: inherit;
 }
@@ -258,11 +292,11 @@
   cursor: not-allowed;
 }
 
-/* ── Modal overlay ────────────────────────────── */
+/* ── Modal overlay ───────────────────────��────── */
 .wd-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   display: grid;
   place-items: center;
   z-index: 1000;
@@ -278,11 +312,12 @@
 /* ── Modal card ───────────────────────────────── */
 .wd-modal {
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   background: #ffffff;
-  border-radius: 14px;
-  padding: 22px 20px 16px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 20px 18px 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -297,18 +332,18 @@
 
 /* ── Modal icon ───────────────────────────────── */
 .wd-modal-icon {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #ffffff;
 }
 
 .wd-modal-icon svg {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 }
 
 .wd-modal-icon--success {
@@ -321,15 +356,15 @@
 
 /* ── Modal text ───────────────────────────────── */
 .wd-modal-message {
-  font-size: 15px;
+  font-size: 0.9rem;
   font-weight: 500;
-  color: #323233;
-  margin: 0 0 16px;
+  color: #333333;
+  margin: 0 0 14px;
   line-height: 1.45;
 }
 
 .wd-modal-message strong {
-  color: #ff8a03;
+  color: #d4af37;
 }
 
 /* ── Modal field (password input) ─────────────── */
@@ -337,9 +372,9 @@
   width: 100%;
   display: flex;
   align-items: center;
-  border: 1px solid #eaeaea;
+  border: 1px solid #e0e0e0;
   border-radius: 10px;
-  background: #fafafa;
+  background: #ffffff;
   margin-bottom: 10px;
   overflow: hidden;
 }
@@ -348,23 +383,25 @@
   flex: 1;
   padding: 10px 12px;
   text-align: left;
-  font-size: 15px;
+  font-size: 0.9rem;
+  border: 0;
+  background: transparent;
 }
 
 .wd-modal-eye {
   background: none;
   border: none;
   padding: 10px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #ff8a03;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #d4af37;
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
 }
 
 .wd-modal-eye:hover {
-  color: #e67a00;
+  color: #d4af37;
 }
 
 /* ── Modal error ──────────────────────────────── */
@@ -373,10 +410,10 @@
   margin: 0 0 10px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  color: #dc2626;
-  font-size: 13px;
+  background: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  color: #b91c1c;
+  font-size: 0.8rem;
   font-weight: 500;
   text-align: left;
 }
@@ -386,11 +423,11 @@
   width: 100%;
   height: 42px;
   border: 0;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
   color: #ffffff;
-  background: linear-gradient(to right, rgb(247, 217, 129), rgb(255, 138, 3));
+  background: linear-gradient(90deg, #22c55e, #16a34a);
   cursor: pointer;
   font-family: inherit;
   margin-bottom: 8px;
@@ -402,21 +439,21 @@
 }
 
 .wd-modal-button--ghost {
-  background: none;
-  border: 1px solid #eaeaea;
-  color: #666;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #333333;
 }
 
 .wd-modal-button--ghost:hover {
-  background: #f5f5f5;
+  background: #eeeeee;
 }
 
 /* ── Forgot link ──────────────────────────────── */
 .wd-modal-forgot {
   background: none;
   border: none;
-  color: #999;
-  font-size: 13px;
+  color: #666666;
+  font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -427,5 +464,29 @@
 }
 
 .wd-modal-forgot:hover {
-  color: #666;
+  color: #333333;
+}
+
+@media (max-width: 760px) {
+  .wd-cell {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .wd-cell-title {
+    flex: none;
+  }
+
+  .wd-cell-value {
+    width: 100%;
+    text-align: left;
+  }
+
+  .wd-cell-input {
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
 }

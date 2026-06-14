@@ -1,4 +1,4 @@
-const DEFAULT_TITLE = 'TRK'
+const DEFAULT_TITLE = 'Mancera'
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
 export type SiteBrandingConfig = {

@@ -454,7 +454,6 @@ export default function CaixasBox() {
   return (
     <main className="cbox-page">
       <AppSidebar />
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
 
       <header className="cbox-header">
         <button type="button" className="cbox-back-btn" onClick={() => navigate('/profile')} aria-label="Voltar">

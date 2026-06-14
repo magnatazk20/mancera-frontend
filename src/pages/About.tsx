@@ -9,7 +9,6 @@ export default function About() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
           {/* ── Imagem principal ── */}
           <section className="about-photo-section">
             <img

@@ -191,7 +191,6 @@ export default function MiniTasks() {
   return (
     <main className="tasks-page mini-tasks-page">
       <AppSidebar />
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
       <header className="tasks-header">
         <div>
           <p className="tasks-kicker">Perfil</p>

@@ -12,7 +12,6 @@ export default function Introduction() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
           {/* ── Back button ── */}
           <button
             type="button"

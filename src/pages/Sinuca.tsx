@@ -549,7 +549,6 @@ export default function Sinuca() {
 
   return (
     <main className="sinuca-page">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
       <div className="sinuca-shell">
         <header className="sinuca-header">
           <div>

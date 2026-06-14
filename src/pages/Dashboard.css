@@ -1,25 +1,21 @@
 :root {
-  --dash-bg: #fff5eb;
+  --dash-bg: #ffffff;
   --dash-card: #ffffff;
-  --dash-card-2: #fff8ef;
-  --dash-border: rgba(255, 138, 3, 0.22);
-  --dash-text: #5a3d1a;
-  --dash-muted: #8a6b3f;
-  --dash-orange: #ff8a03;
-  --dash-orange-dim: rgba(255, 138, 3, 0.18);
+  --dash-card-2: #f5f5f5;
+  --dash-border: #e0e0e0;
+  --dash-text: #333333;
+  --dash-muted: #666666;
+  --dash-gold: #d4af37;
+  --dash-gold-dim: rgba(212, 175, 55, 0.12);
   --dash-green: #34d399;
   --dash-red: #f87171;
 }
 
 .dash-app {
   min-height: 100vh;
-  padding: 0 16px 100px;
-  background:
-    radial-gradient(circle at 10% 5%, rgba(255, 211, 138, 0.55), transparent 32%),
-    radial-gradient(circle at 90% 10%, rgba(255, 138, 3, 0.28), transparent 34%),
-    linear-gradient(170deg, #fff5eb 0%, #ffe1b8 50%, #fec075 100%);
-  background-attachment: fixed;
-  color: #5a3d1a;
+  padding: 0 16px 120px;
+  background: #ffffff;
+  color: #333;
   position: relative;
   z-index: 2;
 }
@@ -46,13 +42,13 @@
   padding-top: env(safe-area-inset-top, 0);
 }
 
-/* ── Sidebar (light TRK theme) ── */
+/* ── Sidebar (dark Mancera theme) ── */
 .dash-sidebar {
   position: fixed;
   z-index: 30;
   inset: 0 auto 0 0;
   width: 272px;
-  background: rgba(255, 245, 235, 0.98);
+  background: #ffffff;
   border-right: 1px solid var(--dash-border);
   transform: translateX(-100%);
   transition: transform 0.28s ease;
@@ -145,19 +141,38 @@
 
 /* ── TRK Hero Banner ── */
 .trk-hero-banner {
-  border: 1px solid rgba(255, 138, 3, 0.35);
-  background: linear-gradient(135deg, #ff8a03, #f7a93b, #f7d981);
-  padding: 36px 24px 22px;
+  background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+  padding: 24px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(255, 138, 3, 0.25);
+  box-shadow: none;
   margin: 0;
   width: 100vw;
+  height: 220px;
   margin-left: calc(50% - 50vw);
-  border-radius: 0;
-  border-left: none;
-  border-right: none;
-  border-top: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+}
+
+.trk-hero-banner video,
+.trk-hero-banner iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+  border: 0;
+  outline: 0;
+  display: block;
+}
+
+.trk-hero-banner > *:not(video):not(iframe) {
+  position: relative;
+  z-index: 1;
 }
 
 .trk-hero-vip {
@@ -204,14 +219,15 @@
   font-weight: 800;
   color: #fff;
   line-height: 1.25;
-  text-shadow: 0 2px 4px rgba(180, 83, 9, 0.4);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8);
 }
 
 .trk-hero-sub {
   margin: 0;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.85);
   line-height: 1.4;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .trk-hero-glow {
@@ -220,7 +236,7 @@
   height: 200px;
   top: -80px;
   right: -40px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15), transparent 70%);
   border-radius: 50%;
   pointer-events: none;
 }
@@ -235,8 +251,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  border: 1px solid rgba(255, 138, 3, 0.22);
-  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(45, 31, 15, 0.8);
   backdrop-filter: blur(6px);
   border-radius: 12px;
   padding: 10px 12px;
@@ -247,7 +263,7 @@
   width: 24px;
   height: 24px;
   border-radius: 7px;
-  background: #ff8a03;
+  background: var(--dash-gold);
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -256,7 +272,7 @@
 .dash-notice-icon {
   width: 14px;
   height: 14px;
-  color: #fff;
+  color: #1a1209;
 }
 
 .dash-notice-marquee {
@@ -270,14 +286,14 @@
   align-items: center;
   gap: 20px;
   white-space: nowrap;
-  color: #8a6b3f;
+  color: var(--dash-muted);
   font-size: 0.78rem;
   animation: dash-marquee 24s linear infinite;
   will-change: transform;
 }
 
 .dash-notice-sep {
-  color: #ff8a03;
+  color: var(--dash-gold);
   font-weight: 700;
 }
 
@@ -293,8 +309,8 @@
 }
 
 .mini-card {
-  background: #ffffff;
-  border: 1px solid rgba(255, 138, 3, 0.22);
+  background: rgba(45, 31, 15, 0.9);
+  border: 1px solid rgba(212, 175, 55, 0.2);
   border-radius: 14px;
   padding: 14px;
 }
@@ -302,7 +318,7 @@
 .mini-card h3 {
   margin: 8px 0 4px;
   font-size: 0.96rem;
-  color: #5a3d1a;
+  color: #f5e6d3;
 }
 
 .mini-card p {
@@ -312,7 +328,7 @@
 }
 
 .money-value {
-  color: #ff8a03 !important;
+  color: var(--dash-gold) !important;
   font-weight: 800;
   font-size: 1.05rem !important;
   letter-spacing: 0.2px;
@@ -822,7 +838,28 @@
 }
 
 .landscape-btn.deposit {
-  background: url('./static/images/home/cz.png') 100% center / 100% 100% no-repeat;
+  background: linear-gradient(135deg, #d4af37, #f7d981);
+}
+
+.landscape-btn.withdraw {
+  background: linear-gradient(135deg, #d4af37, #f7d981);
+}
+
+.landscape-btn.deposit::after,
+.landscape-btn.withdraw::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 78% 42%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 52%),
+    url('/mancera-perfume.png');
+  background-repeat: no-repeat, no-repeat;
+  background-position: 78% 45%, 78% 48%;
+  background-size: 150px 150px, 120px 120px;
+  opacity: 0.2;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .deposit-bg-dollars {
@@ -879,7 +916,7 @@
 }
 
 .landscape-btn.withdraw {
-  background: url('./static/images/home/tx.png') 100% center / 100% 100% no-repeat;
+  background: linear-gradient(135deg, #d4af37, #f7d981);
 }
 
 .landscape-btn.roulette {
@@ -962,9 +999,162 @@
 
 /* ── Menu Grid (novo layout de navegação) ── */
 .dash-menu-grid {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.dash-menu-replacement-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 138, 3, 0.25);
+  box-shadow: 0 10px 24px rgba(180, 83, 9, 0.2);
+}
+
+/* ── Quick Actions Grid ──────────────────────────── */
+.dash-quick-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 14px 4px;
+  padding: 14px 10px 8px;
+}
+
+.dash-quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  gap: 0;
+}
+
+.dash-quick-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  margin: 0 auto;
+  color: #5a3d1a;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.dash-quick-item:hover .dash-quick-icon {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: #d4af37;
+}
+
+.dash-quick-label {
+  margin: 8px 0 0;
+  font-size: 10px;
+  color: #444;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.chromo-shortcuts {
+  margin-top: 10px;
+  background: linear-gradient(180deg, #121212, #0f0f0f);
+  border: 1px solid rgba(255, 138, 3, 0.18);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.chromo-item {
+  border: none;
+  background: transparent;
+  color: #c77843;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 2px;
+  cursor: pointer;
+}
+
+.chromo-icon {
+  width: 24px;
+  height: 24px;
+  line-height: 1;
+  color: #b26d3f;
+}
+
+.chromo-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chromo-label {
+  font-size: 12px;
+  color: #b26d3f;
+  letter-spacing: 0.1px;
+}
+
+.chromo-item:hover .chromo-label {
+  color: #d48b57;
+}
+
+.perfume-income-banner {
+  position: relative;
+  margin-top: 10px;
+  min-height: 156px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 138, 3, 0.2);
+  background:
+    linear-gradient(120deg, rgba(12, 15, 22, 0.9) 0%, rgba(21, 26, 36, 0.78) 38%, rgba(34, 40, 54, 0.72) 100%),
+    url('/mancera-perfume.png') left center / contain no-repeat,
+    linear-gradient(135deg, #1b2330, #243248);
+}
+
+.perfume-income-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 78% 30%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+.perfume-income-banner__content {
+  position: relative;
+  z-index: 1;
+  min-height: 156px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 18px 16px 36%;
+}
+
+.perfume-income-banner__content p {
+  margin: 0;
+  color: #ffffff;
+  text-align: left;
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.7);
+  max-width: 520px;
+}
+
+.perfume-income-banner__content p span {
+  display: inline-block;
 }
 
 .dash-menu-item {
@@ -1405,35 +1595,41 @@
 .dash-bottom-nav {
   position: fixed;
   z-index: 40;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(70px + env(safe-area-inset-bottom));
-  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
-  background: rgba(255, 245, 235, 0.97);
+  left: 10px;
+  right: 10px;
+  bottom: 24px;
+  width: auto;
+  height: calc(66px + env(safe-area-inset-bottom));
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+  background: #ffffff;
   backdrop-filter: blur(12px);
-  border-top: 1px solid rgba(255, 138, 3, 0.22);
-  box-shadow: 0 -4px 20px rgba(255, 138, 3, 0.12);
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 8px;
 }
 
 .dash-bottom-nav button {
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   background: transparent;
-  color: #6b5a3f;
+  color: #666666;
   display: grid;
   place-items: center;
-  gap: 2px;
+  gap: 0;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 
 .dash-bottom-nav button.active {
-  background: rgba(255, 138, 3, 0.15);
-  color: #ff8a03;
+  background: #111111;
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .dash-bottom-nav span {
@@ -1441,8 +1637,7 @@
 }
 
 .dash-bottom-nav small {
-  font-size: 0.72rem;
-  font-weight: 600;
+  display: none;
 }
 
 /* ── Icons ── */
@@ -1453,8 +1648,8 @@
 }
 
 .icon-sm {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -1567,8 +1762,7 @@
 
 @media (max-width: 520px) {
   .dash-menu-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    margin-top: 6px;
   }
 
   .dash-menu-icon {
@@ -1587,7 +1781,7 @@
 
 @media (max-width: 360px) {
   .dash-menu-grid {
-    grid-template-columns: repeat(2, 1fr);
+    margin-top: 4px;
   }
 }
 
@@ -1699,4 +1893,184 @@
 
 .support-card__btn--grupo {
   background: linear-gradient(135deg, #25d366, #128c7e);
+}
+
+/* ── Cycle Products Section ── */
+.dash-cycle-products {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  margin: 12px 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.dash-cycle-products-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #333333;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dash-cycle-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.dash-cycle-product-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dash-cycle-product-card:hover {
+  border-color: #d4af37;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+}
+
+.dash-cycle-product-image {
+  width: 100%;
+  height: 90px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.04));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.dash-cycle-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dash-cycle-product-placeholder {
+  color: #d4af37;
+  opacity: 0.5;
+}
+
+.dash-cycle-product-placeholder svg {
+  width: 32px;
+  height: 32px;
+}
+
+.dash-cycle-product-info {
+  padding: 10px;
+}
+
+.dash-cycle-product-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #333333;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-cycle-product-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.dash-cycle-stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.dash-cycle-stat-label {
+  color: #666666;
+  font-weight: 500;
+}
+
+.dash-cycle-stat-value {
+  color: #2d3b44;
+  font-weight: 700;
+}
+
+.dash-cycle-product-desc {
+  font-size: 0.72rem;
+  color: #666666;
+  margin: 0 0 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.dash-cycle-product-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.dash-cycle-product-price {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #d4af37;
+}
+
+.dash-cycle-product-profit {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.dash-cycle-product-duration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: #666666;
+  font-weight: 600;
+}
+
+.dash-cycle-product-buy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  background: linear-gradient(135deg, #d4af37, #f7d981);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.dash-cycle-product-buy:hover {
+  filter: brightness(1.05);
+}
+
+.dash-cycle-products-more {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+  background: transparent;
+  color: #d4af37;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dash-cycle-products-more:hover {
+  background: rgba(212, 175, 55, 0.1);
 }

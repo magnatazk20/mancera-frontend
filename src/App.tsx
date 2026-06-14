@@ -15,7 +15,9 @@ import VipCheckout from './pages/VipCheckout'
 import Invite from './pages/Invite'
 import Profile from './pages/Profile'
 import InvestmentOrders from './pages/InvestmentOrders'
+import FundDetails from './pages/FundDetails'
 import BankCards from './pages/BankCards'
+import ShippingAddress from './pages/ShippingAddress'
 import TeamReport from './pages/TeamReport'
 import Position from './pages/Position'
 import Checkin from './pages/Checkin'
@@ -39,6 +41,7 @@ import RegistroDoDia from './pages/RegistroDoDia'
 import RegistrosTarefas from './pages/RegistrosTarefas'
 import Support from './pages/Support'
 import TeamExpansion from './pages/TeamExpansion'
+import TaskBonus from './pages/TaskBonus'
 import Admin from './pages/Admin'
 import AdminUsers from './pages/AdminUsers'
 import AdminUserDetails from './pages/AdminUserDetails'
@@ -183,6 +186,7 @@ export default function App() {
         <Route path="/cashin" element={<CashIn />} />
         <Route path="/cashin/checkout" element={<CashInCheckout />} />
         <Route path="/tasks" element={<Tasks />} />
+        <Route path="/task-bonus" element={<TaskBonus />} />
         <Route path="/tasks/mining/:taskId" element={<MiningTask />} />
         <Route path="/vip" element={<Vip />} />
         <Route path="/vip/checkout/:id" element={<VipCheckout />} />
@@ -195,6 +199,7 @@ export default function App() {
         <Route path="/statement" element={<Statement />} />
         <Route path="/manual" element={<Manual />} />
         <Route path="/investment-orders" element={<InvestmentOrders />} />
+        <Route path="/fund-details" element={<FundDetails />} />
         <Route
           path="/monthly-salary"
           element={(
@@ -212,6 +217,7 @@ export default function App() {
           )}
         />
         <Route path="/bank-cards" element={<BankCards />} />
+        <Route path="/shipping-address" element={<ShippingAddress />} />
         <Route
           path="/registro-do-dia"
           element={(

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AppSidebar from '../components/AppSidebar'
+import './Dashboard.css'
 import './RedeemCode.css'
 
 type StoredUser = {
@@ -82,122 +84,96 @@ export default function RedeemCode() {
   }
 
   return (
-    <main className="rc-page">
-      <header className="rc-topbar">
-        <button
-          type="button"
-          className="rc-topbar-back"
-          onClick={() => navigate(-1)}
-          aria-label="Voltar"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 6l-6 6l6 6" />
-          </svg>
-        </button>
-        <span className="rc-topbar-title">Resgatar código</span>
-      </header>
-
-      <div className="rc-scroll-box">
-        <section className="rc-hero">
-          <div className="rc-hero-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 12v9H4v-9" />
-              <rect x="2" y="7" width="20" height="5" rx="1.5" />
-              <path d="M12 22V7" />
-              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-            </svg>
-          </div>
-          <h2 className="rc-hero-title">Resgate seu código</h2>
-          <p className="rc-hero-text">
-            Tem um código promocional? Insira abaixo para receber sua recompensa.
-          </p>
-        </section>
-
-        <div className="rc-cell">
-          <div className="rc-cell-title">
-            <span>Código</span>
-          </div>
-          <div className="rc-cell-value">
-            <input
-              type="text"
-              className="rc-cell-input"
-              placeholder="Digite seu código"
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              autoComplete="off"
-              maxLength={32}
-            />
-          </div>
-        </div>
-
-        <div className="rc-submit-wrap">
-          <button
-            type="button"
-            className="rc-submit"
-            onClick={handleRedeem}
-            disabled={loading}
-          >
-            <span>{loading ? 'Resgatando...' : 'Resgatar'}</span>
-          </button>
-        </div>
-
-        <section className="rc-info-section">
-          <h3 className="rc-info-title">Como funciona</h3>
-          <ul className="rc-info-list">
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>Códigos são válidos por tempo limitado.</span>
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>Cada código pode ser usado apenas uma vez por usuário.</span>
-            </li>
-            <li>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>O valor é adicionado automaticamente ao seu saldo.</span>
-            </li>
-          </ul>
-        </section>
-      </div>
-
-      {feedback ? (
-        <div
-          className="rc-modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setFeedback(null)}
-        >
-          <div className="rc-modal" onClick={(e) => e.stopPropagation()}>
-            <div className={`rc-modal-icon rc-modal-icon--${feedback.type}`}>
-              {feedback.type === 'success' ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              )}
-            </div>
-            <p className="rc-modal-message">{feedback.message}</p>
+    <main className="dash-app rc-page">
+      <section className="dash-main">
+        <AppSidebar />
+        <div className="dash-content rc-content">
+          <header className="rc-topbar">
             <button
               type="button"
-              className="rc-modal-button"
+              className="rc-topbar-back"
+              onClick={() => navigate('/profile')}
+              aria-label="Voltar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 6l-6 6l6 6" />
+              </svg>
+            </button>
+            <span className="rc-topbar-title">Resgatar código</span>
+          </header>
+
+          <div className="rc-scroll-box">
+            <section className="rc-hero">
+              <img src="/inlock.png" alt="Resgate de código" className="rc-hero-image" />
+              <h2 className="rc-hero-title">Resgate seu código</h2>
+              <p className="rc-hero-text">
+                Tem um código promocional? Insira abaixo para receber sua recompensa.
+              </p>
+            </section>
+
+            <div className="rc-cell">
+              <div className="rc-cell-title">
+                <span>Código</span>
+              </div>
+              <div className="rc-cell-value">
+                <input
+                  type="text"
+                  className="rc-cell-input"
+                  placeholder="Digite seu código"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  autoComplete="off"
+                  maxLength={32}
+                />
+              </div>
+            </div>
+
+            <div className="rc-submit-wrap">
+              <button
+                type="button"
+                className="rc-submit"
+                onClick={handleRedeem}
+                disabled={loading}
+              >
+                <span>{loading ? 'Resgatando...' : 'Resgatar'}</span>
+              </button>
+            </div>
+
+          </div>
+
+          {feedback ? (
+            <div
+              className="rc-modal-overlay"
+              role="dialog"
+              aria-modal="true"
               onClick={() => setFeedback(null)}
             >
-              OK
-            </button>
-          </div>
+              <div className="rc-modal" onClick={(e) => e.stopPropagation()}>
+                <div className={`rc-modal-icon rc-modal-icon--${feedback.type}`}>
+                  {feedback.type === 'success' ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  )}
+                </div>
+                <p className="rc-modal-message">{feedback.message}</p>
+                <button
+                  type="button"
+                  className="rc-modal-button"
+                  onClick={() => setFeedback(null)}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
-      ) : null}
+      </section>
     </main>
   )
 }

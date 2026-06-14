@@ -12,7 +12,6 @@ type CheckinStatusResponse = {
   ok?: boolean
   canClaim?: boolean
   currentDay?: number
-  claimedToday?: boolean
   rewards?: number[]
   history?: Array<{
     day?: number
@@ -24,8 +23,6 @@ type CheckinStatusResponse = {
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3333'
 
-const formatBRL = (value: number) =>
-  Number(value ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export default function Checkin() {
   const navigate = useNavigate()
@@ -33,100 +30,90 @@ export default function Checkin() {
   const [claiming, setClaiming] = useState(false)
   const [canClaim, setCanClaim] = useState(false)
   const [currentDay, setCurrentDay] = useState(1)
-  const [rewards, setRewards] = useState<number[]>([2, 2, 3, 3, 4, 4, 5, 5, 6, 10])
+  const [rewards, setRewards] = useState<number[]>([0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2])
   const [historyDays, setHistoryDays] = useState<number[]>([])
+  const [historyItems, setHistoryItems] = useState<Array<{ day: number; rewardAmount: number; checkinDate: string }>>([])
+  const [totalEarnings, setTotalEarnings] = useState(0)
+  const [vipLevel, setVipLevel] = useState(1)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-
-  const progressPercent = Math.min(100, Math.max(0, (historyDays.length / 10) * 100))
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
-    try {
-      return JSON.parse(raw) as StoredUser
-    } catch {
-      return null
-    }
+    try { return JSON.parse(raw) as StoredUser } catch { return null }
   }, [])
 
   const loadStatus = async () => {
     if (!user?.id) return
-
     try {
       const res = await fetch(`${API_URL}/api/checkin/status/${user.id}`)
       const data = (await res.json()) as CheckinStatusResponse
-
-      if (!res.ok || !data?.ok) {
-        setFeedback({ type: 'error', message: data?.error ?? 'Erro ao carregar check-in.' })
-        return
-      }
+      if (!res.ok || !data?.ok) return
 
       setCanClaim(Boolean(data.canClaim))
       setCurrentDay(Math.min(Math.max(Number(data.currentDay ?? 1), 1), 10))
-      if (Array.isArray(data.rewards) && data.rewards.length === 10) {
+      if (Array.isArray(data.rewards) && data.rewards.length > 0) {
         setRewards(data.rewards.map((v) => Number(v ?? 0)))
       }
 
-      const days = Array.isArray(data.history)
-        ? data.history.map((item) => Number(item.day ?? 0)).filter((d) => d >= 1 && d <= 10)
-        : []
+      const history = Array.isArray(data.history) ? data.history : []
+      const days = history.map((item) => Number(item.day ?? 0)).filter((d) => d >= 1)
       setHistoryDays(days)
-    } catch {
-      setFeedback({ type: 'error', message: 'Falha de conexão ao carregar check-in.' })
-    }
+      setHistoryItems(history.map((item) => ({
+        day: Number(item.day ?? 0),
+        rewardAmount: Number(item.rewardAmount ?? 0),
+        checkinDate: item.checkinDate ?? '',
+      })).filter((item) => item.day >= 1))
+
+      const total = history.reduce((sum, item) => sum + Number(item.rewardAmount ?? 0), 0)
+      setTotalEarnings(Number(total.toFixed(2)))
+    } catch {/* silencioso */}
+  }
+
+  const loadVipLevel = async () => {
+    if (!user?.id) return
+    try {
+      const res = await fetch(`${API_URL}/api/user/summary/${user.id}`)
+      const data = await res.json().catch(() => ({})) as { vipLevelId?: number }
+      if (res.ok && data?.vipLevelId != null) {
+        setVipLevel(Number(data.vipLevelId))
+      }
+    } catch {/* silencioso */}
   }
 
   useEffect(() => {
-    if (!user?.id) {
-      navigate('/')
-      return
-    }
-
+    if (!user?.id) { navigate('/'); return }
     const run = async () => {
       setLoading(true)
-      await loadStatus()
+      await Promise.all([loadStatus(), loadVipLevel()])
       setLoading(false)
     }
-
     run()
   }, [navigate, user?.id])
 
   const handleClaim = async () => {
     if (!user?.id || claiming || !canClaim) return
-
     setClaiming(true)
     const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
     try {
       const res = await fetch(`${API_URL}/api/checkin/claim`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ userId: user.id }),
       })
-
       const data = await res.json().catch(() => ({})) as {
-        ok?: boolean
-        error?: string
-        message?: string
+        ok?: boolean; error?: string; message?: string
         claim?: { day?: number; rewardAmount?: number }
       }
-
       if (!res.ok || !data?.ok) {
-        setFeedback({ type: 'error', message: data?.error ?? 'Não foi possível resgatar o check-in.' })
+        setFeedback({ type: 'error', message: data?.error ?? 'Não foi possível fazer o check-in.' })
         return
       }
-
       const reward = Number(data?.claim?.rewardAmount ?? 0)
-      setFeedback({
-        type: 'success',
-        message: data?.message ?? `Check-in resgatado! Você recebeu ${formatBRL(reward)}.`,
-      })
-
+      setFeedback({ type: 'success', message: `Check-in realizado! +${reward.toFixed(2)}` })
       await loadStatus()
     } catch {
-      setFeedback({ type: 'error', message: 'Erro de conexão ao resgatar check-in.' })
+      setFeedback({ type: 'error', message: 'Erro de conexão.' })
     } finally {
       setClaiming(false)
     }
@@ -134,14 +121,8 @@ export default function Checkin() {
 
   return (
     <main className="ck-page">
-      <a href="/support" className="support-float-btn" title="Suporte"><img src="/icon-support.png" alt="Suporte" width="26" height="26" /></a>
       <header className="ck-topbar">
-        <button
-          type="button"
-          className="ck-topbar-back"
-          onClick={() => navigate('/profile')}
-          aria-label="Voltar"
-        >
+        <button type="button" className="ck-topbar-back" onClick={() => navigate('/profile')} aria-label="Voltar">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 6l-6 6l6 6" />
           </svg>
@@ -149,86 +130,113 @@ export default function Checkin() {
         <span className="ck-topbar-title">Check-in Diário</span>
       </header>
 
-      <div className="ck-scroll-box">
-        {loading ? (
-          <div className="ck-loading">Carregando seu progresso...</div>
-        ) : (
-          <>
-            {/* Progress */}
-            <section className="ck-section">
-              <h3 className="ck-section-title">Status do progresso</h3>
-              <div className="ck-progress-row">
-                <span>Dias concluídos</span>
-                <span>{historyDays.length}/10</span>
-              </div>
-              <div className="ck-progress-track">
-                <div className="ck-progress-fill" style={{ width: `${progressPercent}%` }} />
-              </div>
-              <span className="ck-progress-percent">{Math.round(progressPercent)}% completo</span>
+      {loading ? (
+        <div className="ck-loading">Carregando...</div>
+      ) : (
+        <div className="ck-scroll-box">
 
-              <div className="ck-status-row">
-                <span className="ck-pill">Dia atual: {currentDay}/10</span>
-                <span className={`ck-pill ${canClaim ? 'ck-pill--ok' : 'ck-pill--warn'}`}>
-                  {canClaim ? 'Disponível para resgatar' : 'Resgate de hoje concluído'}
-                </span>
-              </div>
+          {/* ── Earnings Section ── */}
+          <div className="ck-earnings-section">
+            <div className="ck-earnings-text">
+              <span className="ck-earnings-label">Meus Ganhos</span>
+              <span className="ck-earnings-value">{totalEarnings.toFixed(2)}</span>
+            </div>
+            <div className="ck-coin-img">
+              <img src="/moeda.png" alt="moeda" width="94" height="94" style={{ objectFit: 'contain' }} />
+            </div>
+          </div>
 
-              <button
-                type="button"
-                className="ck-claim-btn"
-                onClick={handleClaim}
-                disabled={!canClaim || claiming}
-              >
-                {claiming
-                  ? 'Resgatando...'
-                  : canClaim
-                    ? `Resgatar ${formatBRL(Number(rewards[currentDay - 1] ?? 0))}`
-                    : 'Resgate de hoje concluído'}
-              </button>
-            </section>
+          {/* ── Sign Card ── */}
+          <div className="ck-sign-card">
+            {/* Level info */}
+            <div className="ck-level-info">
+              <svg viewBox="0 0 16 16" fill="none" width="16" height="16" style={{ marginRight: 6 }}>
+                <polygon points="8,1 10,6 15,6.5 11.5,10 12.5,15 8,12.5 3.5,15 4.5,10 1,6.5 6,6" fill="#d4af37"/>
+              </svg>
+              <span className="ck-level-text">LV{vipLevel}</span>
+            </div>
 
-            {/* Days grid */}
-            <section className="ck-section">
-              <h3 className="ck-section-title">Recompensas dos 10 dias</h3>
-              <div className="ck-grid">
-                {Array.from({ length: 10 }).map((_, index) => {
-                  const day = index + 1
-                  const isDone = historyDays.includes(day)
-                  const isCurrent = currentDay === day && !isDone
-                  return (
-                    <article
-                      key={day}
-                      className={`ck-day ${isDone ? 'ck-day--done' : ''} ${isCurrent ? 'ck-day--current' : ''}`}
-                    >
-                      <div className="ck-day-head">
-                        <span className="ck-day-badge">Dia {day}</span>
-                        {isDone ? (
-                          <span className="ck-day-status ck-day-status--done">✓</span>
-                        ) : isCurrent ? (
-                          <span className="ck-day-status ck-day-status--current">Hoje</span>
-                        ) : null}
+            {/* 7-day grid */}
+            <div className="ck-days-grid">
+              {Array.from({ length: 7 }).map((_, i) => {
+                const day = i + 1
+                const isDone = historyDays.includes(day)
+                const isCurrent = currentDay === day && !isDone
+                const isPast = day < currentDay && !isDone
+
+                let stateClass = 'pending'
+                if (isDone) stateClass = 'done'
+                else if (isCurrent) stateClass = 'current'
+                else if (isPast) stateClass = 'past'
+
+                return (
+                  <div key={day} className={`ck-day-item ${stateClass}`}>
+                    <span className="ck-day-label">Day{day}</span>
+                    <div className="ck-day-icon-wrap">
+                      {isDone ? (
+                        <svg viewBox="0 0 14 14" fill="none" width="16" height="16">
+                          <circle cx="7" cy="7" r="6.5" fill="#F9D54A"/>
+                          <path d="M4.52 7L6.17 8.65L9.48 5.35" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 16 16" fill="none" width="16" height="16">
+                          <circle cx="8" cy="8" r="7.5" fill={isCurrent ? '#d4af37' : isPast ? '#bbb' : '#ccc'}/>
+                          <text x="8" y="12" textAnchor="middle" fill="white" fontSize="8" fontWeight="bold" fontFamily="sans-serif">$</text>
+                        </svg>
+                      )}
+                    </div>
+                    <span className="ck-day-reward">{(rewards[i] ?? 0).toFixed(2)}</span>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Claim button */}
+            <button
+              type="button"
+              className={`ck-claim-btn${canClaim ? ' ck-claim-active' : ''}`}
+              onClick={handleClaim}
+              disabled={!canClaim || claiming}
+            >
+              {claiming ? 'Processando...' : 'Entrar'}
+            </button>
+          </div>
+
+          {/* ── History Section ── */}
+          <div className="ck-history-section">
+            <h3 className="ck-criteria-title">Histórico de Resgates</h3>
+            {historyItems.length === 0 ? (
+              <p className="ck-history-empty">Nenhum resgate realizado ainda.</p>
+            ) : (
+              <div className="ck-reward-table">
+                <div className="ck-table-header">
+                  <span>Dia</span>
+                  <span>Data</span>
+                  <span>Valor</span>
+                </div>
+                <div className="ck-table-rows">
+                  {[...historyItems].reverse().map((item, idx) => {
+                    const date = item.checkinDate ? new Date(item.checkinDate).toLocaleDateString('pt-BR') : '—'
+                    return (
+                      <div key={idx} className="ck-table-row">
+                        <span className="ck-history-day">Dia {item.day}</span>
+                        <span className="ck-history-date">{date}</span>
+                        <span className="ck-table-reward">+{item.rewardAmount.toFixed(2)}</span>
                       </div>
-                      <span className="ck-day-amount">{formatBRL(Number(rewards[index] ?? 0))}</span>
-                      <span className="ck-day-hint">
-                        {isDone ? 'Resgatado' : isCurrent ? 'Disponível hoje' : 'Aguardando'}
-                      </span>
-                    </article>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </section>
+            )}
+          </div>
 
-          </>
-        )}
-      </div>
+          <div style={{ height: 30 }} />
+        </div>
+      )}
 
+      {/* ── Feedback Modal ── */}
       {feedback ? (
-        <div
-          className="ck-modal-overlay"
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setFeedback(null)}
-        >
+        <div className="ck-modal-overlay" role="dialog" aria-modal="true" onClick={() => setFeedback(null)}>
           <div className="ck-modal" onClick={(e) => e.stopPropagation()}>
             <div className={`ck-modal-icon ck-modal-icon--${feedback.type}`}>
               {feedback.type === 'success' ? (
@@ -237,19 +245,12 @@ export default function Checkin() {
                 </svg>
               ) : (
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               )}
             </div>
             <p className="ck-modal-message">{feedback.message}</p>
-            <button
-              type="button"
-              className="ck-modal-button"
-              onClick={() => setFeedback(null)}
-            >
-              OK
-            </button>
+            <button type="button" className="ck-modal-button" onClick={() => setFeedback(null)}>OK</button>
           </div>
         </div>
       ) : null}

@@ -80,6 +80,8 @@ type UserDetailsResponse = {
     } | null
     hasWithdrawPassword?: boolean
     activeContract?: string | null
+    ipAddress?: string | null
+    ipLocation?: string | null
     totalDepositsPaid: number
     totalWithdrawals: number
     totalCyclePlansBought: number
@@ -926,6 +928,16 @@ export default function AdminUserDetails() {
               </p>
               <p><strong>Contrato ativo:</strong> {String(user.activeContract ?? '').trim() || 'Sem contrato ativo'}</p>
               <p><strong>Cadastrado em:</strong> {user.created_at ? new Date(user.created_at).toLocaleString('pt-BR') : '-'}</p>
+              <p>
+                <strong>IP de cadastro:</strong>{' '}
+                {user.ipAddress
+                  ? <span style={{ fontFamily: 'monospace', background: '#f1f5f9', padding: '1px 6px', borderRadius: 4 }}>{user.ipAddress}</span>
+                  : <span style={{ color: '#94a3b8' }}>—</span>
+                }
+              </p>
+              {user.ipLocation ? (
+                <p><strong>Localização:</strong> {user.ipLocation}</p>
+              ) : null}
 
               <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #e2e8f0' }}>
                 <button
@@ -1020,59 +1032,6 @@ export default function AdminUserDetails() {
               </section>
             ) : null}
 
-            {Number(user.telegramConectado ?? 0) === 1 ? (
-              <section className="admin-panel admin-user-list-panel">
-                <div className="admin-log-header">
-                  <h3>📨 Enviar mensagem pelo Telegram</h3>
-                </div>
-                <p className="admin-log-hint" style={{ marginBottom: 12 }}>
-                  Envie uma mensagem diretamente para este usuário via bot do Telegram.
-                  {user.telegramConnection?.telegramFirstName
-                    ? ` Conectado como: ${user.telegramConnection.telegramFirstName}${user.telegramConnection.telegramUsername ? ` (@${user.telegramConnection.telegramUsername})` : ''}.`
-                    : ''}
-                </p>
-                <form onSubmit={handleTelegramMessage} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <textarea
-                    value={telegramMsgText}
-                    onChange={(e) => setTelegramMsgText(e.target.value)}
-                    placeholder="Digite a mensagem para enviar ao usuário..."
-                    rows={4}
-                    style={{
-                      width: '100%',
-                      padding: '10px 14px',
-                      borderRadius: 10,
-                      border: '1.5px solid #2a3a63',
-                      background: '#0d1526',
-                      color: '#e2e8f0',
-                      fontSize: 14,
-                      resize: 'vertical',
-                      outline: 'none',
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                    <button
-                      type="submit"
-                      className="admin-toggle-logs-btn"
-                      disabled={telegramMsgLoading}
-                      style={{ opacity: telegramMsgLoading ? 0.7 : 1 }}
-                    >
-                      {telegramMsgLoading ? 'Enviando...' : '📤 Enviar mensagem'}
-                    </button>
-                    {telegramMsgFeedback ? (
-                      <span style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: telegramMsgFeedback.type === 'success' ? '#16a34a' : '#dc2626',
-                      }}>
-                        {telegramMsgFeedback.message}
-                      </span>
-                    ) : null}
-                  </div>
-                </form>
-              </section>
-            ) : null}
 
             <section className="admin-user-metrics-grid">
               <article className="admin-kpi-card">

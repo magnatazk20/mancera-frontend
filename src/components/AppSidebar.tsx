@@ -18,7 +18,7 @@ function SideIcon({
   name,
   className = 'icon-sm',
 }: {
-  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit' | 'products' | 'vip'
+  name: 'home' | 'tasks' | 'vjp' | 'invite' | 'user' | 'menu' | 'logout' | 'extract' | 'withdraw' | 'deposit' | 'products' | 'vip' | 'team'
   className?: string
 }) {
   switch (name) {
@@ -98,8 +98,10 @@ function SideIcon({
     case 'products':
       return (
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M8 10h8M8 14h5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          <path d="M6 6h12l-1.5 9h-9z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" strokeWidth="1.8"/>
+          <circle cx="9" cy="14" r="1" fill="currentColor"/>
+          <circle cx="15" cy="14" r="1" fill="currentColor"/>
         </svg>
       )
     case 'vip':
@@ -107,6 +109,14 @@ function SideIcon({
         <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
           <path d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           <circle cx="12" cy="14" r="1.1" fill="currentColor" />
+        </svg>
+      )
+    case 'team':
+      return (
+        <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="9" cy="12" r="2.3" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          <circle cx="15.5" cy="12" r="1.7" fill="currentColor" />
         </svg>
       )
     default:
@@ -263,25 +273,20 @@ export default function AppSidebar() {
       </aside>
 
       <nav className="dash-bottom-nav">
-        <button className={isActive('/dashboard') ? 'active' : ''} onClick={() => go('/dashboard')}>
+        <button className={isActive('/dashboard') ? 'active' : ''} onClick={() => go('/dashboard')} aria-label="Início">
           <SideIcon name="home" className="icon-sm" />
-          <small>Início</small>
         </button>
-        <button className={isActive('/vip') ? 'active' : ''} onClick={() => go('/vip')}>
-          <SideIcon name="vip" className="icon-sm" />
-          <small>VIP</small>
-        </button>
-        <button className={isActive('/position') ? 'active' : ''} onClick={() => go('/position')}>
+        <button className={isActive('/cycle-products') ? 'active' : ''} onClick={() => go('/cycle-products')} aria-label="Produtos">
           <SideIcon name="products" className="icon-sm" />
-          <small>Gestão de Equipe</small>
         </button>
-        <button className={isActive('/invite') ? 'active' : ''} onClick={() => go('/invite')}>
+        <button className={isActive('/position') ? 'active' : ''} onClick={() => go('/position')} aria-label="Equipe">
+          <SideIcon name="team" className="icon-sm" />
+        </button>
+        <button className={isActive('/invite') ? 'active' : ''} onClick={() => go('/invite')} aria-label="Convidar">
           <SideIcon name="invite" className="icon-sm" />
-          <small>Convidar</small>
         </button>
-        <button className={isActive('/profile') ? 'active' : ''} onClick={() => go('/profile')}>
+        <button className={isActive('/profile') ? 'active' : ''} onClick={() => go('/profile')} aria-label="Perfil">
           <SideIcon name="user" className="icon-sm" />
-          <small>Perfil</small>
         </button>
       </nav>
     </>

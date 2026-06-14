@@ -1,7 +1,5 @@
-# TODO: Adicionar navbar inferior na página VIP
-
-- [ ] Criar TODO.md ✅
-- [ ] Editar src/pages/Vip.tsx: adicionar import AppBottomNav e renderizar no final do main ✅
-- [ ] Completar AppBottomNav.css com estilos ✅
-- [ ] Verificar no browser localhost:5173/vip ✅ (Browser tool disabled; recarregue a página)
-- [ ] Completar tarefa ✅
+- [x] Criar página TaskBonus (`src/pages/TaskBonus.tsx`)
+- [x] Criar estilos da página (`src/pages/TaskBonus.css`)
+- [x] Adicionar rota `/task-bonus` em `src/App.tsx`
+- [x] Alterar botão “Bônus de Tarefa” no Dashboard para `/task-bonus`
+- [ ] Validar build/HMR sem erros

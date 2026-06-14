@@ -136,10 +136,6 @@ export default function InvestmentOrders() {
         <AppSidebar />
 
         <div className="dash-content">
-          <a href="/support" className="support-float-btn" title="Suporte">
-            <img src="/icon-support.png" alt="Suporte" width="26" height="26" />
-          </a>
-
           {/* cabeçalho */}
           <div className="inv-page-header">
             <button type="button" className="inv-back-btn" onClick={() => navigate('/profile')} aria-label="Voltar">
@@ -267,6 +263,10 @@ export default function InvestmentOrders() {
                       <div className="inv-metric">
                         <span className="inv-metric-label">Investido</span>
                         <strong className="inv-metric-value">{formatBRL(order.amountPaid)}</strong>
+                      </div>
+                      <div className="inv-metric">
+                        <span className="inv-metric-label">Renda diária</span>
+                        <strong className="inv-metric-value">{formatBRL(order.expectedProfit / order.cycleDays)}</strong>
                       </div>
                       <div className="inv-metric">
                         <span className="inv-metric-label">{isCompleted ? 'Lucro total' : 'Lucro acumulado'}</span>

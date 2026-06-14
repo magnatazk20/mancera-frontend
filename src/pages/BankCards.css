@@ -1,31 +1,36 @@
-/* BankCards - layout basico */
+/* BankCards — layout limpo */
 
-.bankcards-page {
-  background: inherit;
-  color: #374151;
+.bankcards-page .bc-content {
+  background: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 120px;
 }
 
+/* ── Header ── */
 .bc-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  margin: 0 16px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 138, 3, 0.22);
-  border-radius: 14px;
+  padding: 16px 16px 8px;
+  background: #fff;
 }
 
 .bc-back-btn {
   width: 36px;
   height: 36px;
+  border: none;
   border-radius: 10px;
-  background: rgba(255, 138, 3, 0.15);
-  border: 1px solid rgba(255, 138, 3, 0.3);
-  color: #5a3d1a;
+  background: #f1f3f5;
+  color: #495057;
   display: grid;
   place-items: center;
   cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.bc-back-btn:hover {
+  background: #e9ecef;
 }
 
 .bc-back-btn svg {
@@ -34,149 +39,225 @@
 }
 
 .bc-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #5a3d1a;
 }
 
-.bc-subtitle {
-  margin: 2px 0 0;
-  font-size: 0.84rem;
-  color: #8a6b3f;
+/* ── Alerta ── */
+.bc-alert {
+  display: flex;
+  gap: 12px;
+  margin: 8px 16px 16px;
+  padding: 14px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 12px;
 }
 
-.bc-msg {
-  margin: 12px 16px 0;
-  padding: 10px 14px;
+.bc-alert svg {
+  width: 22px;
+  height: 22px;
+  color: #e67e22;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bc-alert strong {
+  display: block;
+  font-size: 14px;
+  color: #856404;
+  margin-bottom: 4px;
+}
+
+.bc-alert p {
+  font-size: 13px;
+  color: #856404;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Feedback ── */
+.bc-feedback {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 16px 12px;
+  padding: 12px 14px;
   border-radius: 10px;
-  font-size: 0.88rem;
+  font-size: 14px;
   font-weight: 600;
 }
 
-.bc-msg.error {
-  color: #dc2626;
-  background: #fef2f2;
-  border: 1px solid #fca5a5;
+.bc-feedback svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
-.bc-msg.success {
-  color: #16a34a;
-  background: #f0fdf4;
-  border: 1px solid #86efac;
+.bc-feedback--success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.bc-loading {
-  margin: 18px 16px 0;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 138, 3, 0.22);
-  border-radius: 12px;
-  padding: 28px 18px;
-  text-align: center;
-  color: #8a6b3f;
+.bc-feedback--error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
-.bc-form-panel {
-  margin: 16px 16px 24px;
-  background: transparent;
-  border: 1px solid rgba(255, 138, 3, 0.22);
-  border-radius: 14px;
-  padding: 20px 18px;
-}
-
+/* ── Formulário ── */
 .bc-form {
+  margin: 0 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.bc-section {
+.bc-group {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .bc-label {
-  font-size: 0.84rem;
-  color: #374151;
+  font-size: 13px;
   font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.bc-required {
-  color: #dc2626;
-}
-
-.bc-input,
-.bc-select {
+.bc-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
-  color: #374151;
-  padding: 11px 14px;
+  height: 52px;
+  background: #f8f9fa;
+  color: #212529;
+  padding: 0 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 138, 3, 0.25);
+  border: 1.5px solid #dee2e6;
   outline: none;
-  font-size: 0.92rem;
+  font-size: 15px;
   font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
-  transition: border-color 0.15s ease;
+}
+
+.bc-input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
 .bc-input::placeholder {
-  color: #9ca3af;
-}
-
-.bc-input:focus,
-.bc-select:focus {
-  border-color: #ff8a03;
-  box-shadow: 0 0 0 2px rgba(255, 138, 3, 0.15);
+  color: #adb5bd;
 }
 
 .bc-select {
   cursor: pointer;
-  -webkit-appearance: none;
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
-  padding-right: 36px;
+  padding-right: 40px;
 }
 
-.bc-hint {
-  font-size: 0.76rem;
-  color: #9ca3af;
-}
-
-.bc-submit-btn {
+/* ── Botão ── */
+.bc-btn {
   width: 100%;
-  background: #ff8a03;
+  height: 54px;
+  background: linear-gradient(135deg, #d4af37, #b8962e);
   color: #fff;
-  border: 0;
-  border-radius: 10px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: 700;
-  font-size: 0.95rem;
   font-family: inherit;
-  padding: 13px;
   cursor: pointer;
-  margin-top: 4px;
-  transition: background 0.15s ease;
+  transition: opacity 0.2s, transform 0.1s;
+  margin-top: 8px;
 }
 
-.bc-submit-btn:hover:not(:disabled) {
-  background: #e8760b;
+.bc-btn:hover:not(:disabled) {
+  opacity: 0.92;
 }
 
-.bc-submit-btn:disabled {
-  opacity: 0.5;
+.bc-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.bc-btn:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+.bc-btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ── Loading ── */
+.bc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: #868e96;
+  font-size: 15px;
+}
+
+.bc-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e9ecef;
+  border-top-color: #d4af37;
+  border-radius: 50%;
+  animation: bc-spin 0.8s linear infinite;
+}
+
+.bc-spinner--sm {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+@keyframes bc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Desktop ── */
 @media (min-width: 768px) {
-  .bc-header,
-  .bc-form-panel,
-  .bc-loading,
-  .bc-msg {
-    max-width: 520px;
-    margin-left: auto;
-    margin-right: auto;
+  .bankcards-page .bc-content {
+    max-width: 480px;
+    margin: 0 auto;
+    padding-bottom: 160px;
+  }
+
+  .bc-header {
+    padding: 20px 0 12px;
+  }
+
+  .bc-alert,
+  .bc-feedback,
+  .bc-form {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .bc-form {
+    gap: 14px;
+  }
+
+  .bc-group {
+    padding: 18px;
+    border-radius: 16px;
   }
 }
