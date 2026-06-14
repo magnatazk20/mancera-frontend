@@ -64,6 +64,8 @@ export default function Position() {
   const [members, setMembers] = useState<TeamMember[]>([])
   const [membersLoading, setMembersLoading] = useState(false)
 
+  const [commissionRates, setCommissionRates] = useState<Record<number, number>>({ 1: 10, 2: 5, 3: 2 })
+
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     if (!raw) return null
@@ -168,6 +170,18 @@ export default function Position() {
 
     load()
   }, [navigate, user?.id])
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/referral/commission-levels`)
+      .then((r) => r.ok ? r.json() : { levels: [] })
+      .then((d: { levels?: { level: number; commissionPercent: number }[] }) => {
+        if (!Array.isArray(d.levels)) return
+        const map: Record<number, number> = {}
+        d.levels.forEach((l) => { map[l.level] = Number(l.commissionPercent) })
+        if (Object.keys(map).length > 0) setCommissionRates((prev) => ({ ...prev, ...map }))
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!user?.id) return
@@ -303,13 +317,13 @@ export default function Position() {
 
               <div className="pos-level-filters">
                 <button type="button" className={`pos-level-btn ${levelTab === 1 ? 'active' : ''}`} onClick={() => setLevelTab(1)}>
-                  L1-10% ({lv1Count})
+                  L1-{commissionRates[1]}% ({lv1Count})
                 </button>
                 <button type="button" className={`pos-level-btn ${levelTab === 2 ? 'active' : ''}`} onClick={() => setLevelTab(2)}>
-                  L2-5% ({lv2Count})
+                  L2-{commissionRates[2]}% ({lv2Count})
                 </button>
                 <button type="button" className={`pos-level-btn ${levelTab === 3 ? 'active' : ''}`} onClick={() => setLevelTab(3)}>
-                  L3-2% ({lv3Count})
+                  L3-{commissionRates[3]}% ({lv3Count})
                 </button>
               </div>
 
