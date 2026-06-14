@@ -3,7 +3,7 @@ import './Dashboard.css'
 
 export default function Support() {
   return (
-    <main className="dash-app">
+    <main className="dash-app support-page">
       <section className="dash-main">
         <AppSidebar />
         <div className="dash-content">
@@ -17,25 +17,7 @@ export default function Support() {
             />
           </section>
 
-          {/* ── Notice bar (mesmo visual da dashboard) ── */}
-          <div className="dash-notice-bar-vant" style={{ marginTop: '0' }}>
-            <div className="dash-notice-icon-wrap">
-              <svg className="dash-notice-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M11 5L6 9H2v6h4l5 4V5z"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-              </svg>
-            </div>
-            <div className="dash-notice-marquee">
-              <div className="dash-notice-track">
-                <span>Suporte oficial Mancera disponível 24h por dia para ajudar você.</span>
-                <span>Entre em contato com a gerente ou participe do grupo de membros.</span>
-                <span>Suporte oficial Mancera disponível 24h por dia para ajudar você.</span>
-                <span>Entre em contato com a gerente ou participe do grupo de membros.</span>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Botões de suporte ── */}
+{/* ── Botões de suporte ── */}
           <section className="support-cards">
 
 

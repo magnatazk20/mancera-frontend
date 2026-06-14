@@ -1814,25 +1814,36 @@
 }
 
 /* ── Página de Suporte ── */
+.support-page .dash-content {
+  background: linear-gradient(135deg, #1a1209 0%, #2d1f0f 55%, #1a1209 100%);
+  min-height: 100vh;
+}
+
 .support-cards {
   display: flex;
   gap: 20px;
-  padding: 24px 20px;
+  padding: 28px 20px;
   flex-wrap: wrap;
 }
 
 .support-card {
   flex: 1;
   min-width: 240px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 28px 24px;
+  background: linear-gradient(135deg, rgba(45, 31, 15, 0.95) 0%, rgba(26, 18, 9, 0.98) 100%);
+  border-radius: 20px;
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 2px 12px rgba(255, 138, 3, 0.12);
-  border: 1px solid rgba(255, 138, 3, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.4);
 }
 
 .support-card__icon {
@@ -1846,8 +1857,8 @@
 }
 
 .support-card__icon--gerente {
-  background: linear-gradient(135deg, #ff8a03, #e67300);
-  color: #fff;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
+  color: #1a1209;
 }
 
 .support-card__icon--grupo {
@@ -1858,37 +1869,40 @@
 .support-card__title {
   font-size: 18px;
   font-weight: 700;
-  color: #333;
+  color: #d4af37;
   margin: 0 0 10px;
+  letter-spacing: 0.3px;
 }
 
 .support-card__desc {
   font-size: 14px;
-  color: #666;
-  margin: 0 0 20px;
-  line-height: 1.5;
+  color: rgba(245, 230, 211, 0.7);
+  margin: 0 0 24px;
+  line-height: 1.6;
 }
 
 .support-card__btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 12px 28px;
   border-radius: 50px;
   font-size: 15px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .support-card__btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .support-card__btn--gerente {
-  background: linear-gradient(135deg, #ff8a03, #e67300);
+  background: linear-gradient(135deg, #f5d76e, #d4af37, #b8860b);
+  color: #1a1209;
 }
 
 .support-card__btn--grupo {
