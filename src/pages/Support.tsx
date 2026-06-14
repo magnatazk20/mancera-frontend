@@ -3,7 +3,7 @@ import './Dashboard.css'
 
 export default function Support() {
   return (
-    <main className="dash-app support-page">
+    <main className="dash-app">
       <section className="dash-main">
         <AppSidebar />
         <div className="dash-content">

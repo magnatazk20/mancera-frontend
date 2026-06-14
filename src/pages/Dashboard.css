@@ -1814,51 +1814,46 @@
 }
 
 /* ── Página de Suporte ── */
-.support-page .dash-content {
-  background: linear-gradient(135deg, #1a1209 0%, #2d1f0f 55%, #1a1209 100%);
-  min-height: 100vh;
-}
-
 .support-cards {
   display: flex;
-  gap: 20px;
-  padding: 28px 20px;
+  gap: 16px;
+  padding: 16px;
   flex-wrap: wrap;
 }
 
 .support-card {
   flex: 1;
   min-width: 240px;
-  background: linear-gradient(135deg, rgba(45, 31, 15, 0.95) 0%, rgba(26, 18, 9, 0.98) 100%);
-  border-radius: 20px;
-  padding: 32px 28px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(212, 175, 55, 0.2);
-  border: 1px solid rgba(212, 175, 55, 0.25);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .support-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .support-card__icon {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .support-card__icon--gerente {
   background: linear-gradient(135deg, #d4af37, #b8860b);
-  color: #1a1209;
+  color: #fff;
 }
 
 .support-card__icon--grupo {
@@ -1867,17 +1862,16 @@
 }
 
 .support-card__title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  color: #d4af37;
-  margin: 0 0 10px;
-  letter-spacing: 0.3px;
+  color: #1a1a1a;
+  margin: 0 0 8px;
 }
 
 .support-card__desc {
-  font-size: 14px;
-  color: rgba(245, 230, 211, 0.7);
-  margin: 0 0 24px;
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 20px;
   line-height: 1.6;
 }
 
@@ -1885,24 +1879,22 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 28px;
+  padding: 11px 24px;
   border-radius: 50px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: #fff;
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
 .support-card__btn:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transform: scale(1.04);
+  filter: brightness(1.08);
 }
 
 .support-card__btn--gerente {
-  background: linear-gradient(135deg, #f5d76e, #d4af37, #b8860b);
-  color: #1a1209;
+  background: linear-gradient(135deg, #d4af37, #b8860b);
 }
 
 .support-card__btn--grupo {
