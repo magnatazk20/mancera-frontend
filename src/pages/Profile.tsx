@@ -86,7 +86,9 @@ export default function Profile() {
   const [teamIncome, setTeamIncome] = useState(0)
   const [otherIncome, setOtherIncome] = useState(0)
   const [commissionLevels, setCommissionLevels] = useState<Array<{ level: number; commissionPercent: number }>>([])
-
+  const [lv1Count, setLv1Count] = useState(0)
+  const [lv2Count, setLv2Count] = useState(0)
+  const [lv3Count, setLv3Count] = useState(0)
 
   const user = useMemo(() => {
     const raw = localStorage.getItem('user') ?? sessionStorage.getItem('user')
@@ -111,13 +113,14 @@ export default function Profile() {
       const token = localStorage.getItem('token') ?? sessionStorage.getItem('token') ?? ''
       const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
       try {
-        const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes, commissionRes] = await Promise.all([
+        const [summaryRes, vipRes, metricsRes, miningRes, miniTasksRes, commissionRes, teamReportRes] = await Promise.all([
           fetch(`${API_URL}/api/user/summary/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/vip/user/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/profile/metrics/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/mining/tasks/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/mini-tasks/${user.id}`, { headers: authHeaders }),
           fetch(`${API_URL}/api/referral/commission-levels`),
+          fetch(`${API_URL}/api/team/report/${user.id}`),
         ])
 
         if (summaryRes.ok) {
@@ -170,6 +173,19 @@ export default function Profile() {
                 .filter((l) => l.level >= 1 && l.level <= 3)
                 .sort((a, b) => a.level - b.level)
             )
+          }
+        }
+
+        if (teamReportRes.ok) {
+          const td = await teamReportRes.json().catch(() => null) as { levels?: Array<{ level?: number; totalMembers?: number }> } | null
+          if (Array.isArray(td?.levels)) {
+            td.levels.forEach((l) => {
+              const lv = Number(l.level ?? 0)
+              const count = Number(l.totalMembers ?? 0)
+              if (lv === 1) setLv1Count(count)
+              else if (lv === 2) setLv2Count(count)
+              else if (lv === 3) setLv3Count(count)
+            })
           }
         }
       } finally {
@@ -299,10 +315,14 @@ export default function Profile() {
                   </div>
 
                   <div className="prof-team-levels">
-                    {(['LV1', 'LV2', 'LV3'] as const).map((lv) => (
-                      <div key={lv} className="prof-team-level">
-                        <span className="prof-team-lv-label">{lv}</span>
-                        <span className="prof-team-lv-count">0</span>
+                    {([
+                      { label: 'LV1', count: lv1Count },
+                      { label: 'LV2', count: lv2Count },
+                      { label: 'LV3', count: lv3Count },
+                    ]).map(({ label, count }) => (
+                      <div key={label} className="prof-team-level">
+                        <span className="prof-team-lv-label">{label}</span>
+                        <span className="prof-team-lv-count">{count}</span>
                       </div>
                     ))}
                   </div>
