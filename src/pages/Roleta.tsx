@@ -149,6 +149,7 @@ export default function Roleta() {
 
   // ── Effect 3: carrega giros/vitórias e timer de winners (não depende de prizes)
   useEffect(() => {
+    const rawToken = localStorage.getItem('token') ?? sessionStorage.getItem('token')
     const rawUser = localStorage.getItem('user') ?? sessionStorage.getItem('user')
     const parsed = rawUser ? (JSON.parse(rawUser) as { id?: number }) : null
     const userId = Number(parsed?.id ?? 0)
@@ -158,6 +159,14 @@ export default function Roleta() {
     if (userId && !Number.isNaN(userId)) {
       const loadData = async () => {
         try {
+          // Sincroniza giros de indicados nível 1 que já depositaram (garante recuperação mesmo sem webhook)
+          if (rawToken) {
+            await fetch(`${API_URL}/api/roleta/sync-referral-spins`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${rawToken}` },
+            }).catch(() => {})
+          }
+
           const [winsRes, spinsRes] = await Promise.all([
             fetch(`${API_URL}/api/roleta/spins/${userId}?limit=20`),
             fetch(`${API_URL}/api/roleta/spins-available/${userId}`),
