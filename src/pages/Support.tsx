@@ -26,7 +26,7 @@ export default function Support() {
               <h2 className="support-card__title">Grupo de Membros</h2>
               <p className="support-card__desc">Entre no grupo oficial de membros Mancera para atualizações e suporte da comunidade.</p>
               <a
-                href="https://chat.whatsapp.com/IUeU0tcqvtm5ymAadcoQXX?mode=gi_t"
+                href="https://chat.whatsapp.com/CrNhvk35n47JkXytDsATMa"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="support-card__btn support-card__btn--grupo"
